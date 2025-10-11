@@ -41,9 +41,9 @@ router.post('/video-idea', async (req, res, next) => {
 
 router.post('/assets', async (req, res, next) => {
     try {
-        const { company, videoIdea } = req.body;
-        if (!company || !videoIdea) return res.status(400).json({ message: 'Company and videoIdea are required.' });
-        await geminiService.generateAndSaveAssets(company, videoIdea); // This now generates and saves the video too
+        const { companyName, videoIdea } = req.body;
+        if (!companyName || !videoIdea) return res.status(400).json({ message: 'Company and videoIdea are required.' });
+        await geminiService.generateAndSaveAssets(companyName, videoIdea); // This now generates and saves the video too
         res.status(200).json({ message: 'Assets and video generated successfully.' });
     } catch (error) {
         next(error);
