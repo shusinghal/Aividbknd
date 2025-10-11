@@ -1,0 +1,11 @@
+# Dependencies
+backend/node_modules
+
+# Environment variables
+backend/.env
+
+# Google Service Account Key
+backend/google_servive_account.json
+
+# Local data assets
+backend/data/assets

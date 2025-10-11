@@ -1,0 +1,12 @@
+[
+  {
+    "name": "New Company",
+    "description": "A company added via the webhook tester.",
+    "niche": "AI Tools & Automation"
+  },
+  {
+    "name": "Jasper.ai",
+    "description": "A company added via the webhook tester.",
+    "niche": "AI Tools & Automation"
+  }
+]

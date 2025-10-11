@@ -1,0 +1,87 @@
+[
+  {
+    "method": "GET",
+    "path": "/api/companies",
+    "description": "Retrieves a list of all companies."
+  },
+  {
+    "method": "PUT",
+    "path": "/api/companies",
+    "description": "Updates or creates a company."
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/companies/:name",
+    "description": "Deletes a company by name."
+  },
+  {
+    "method": "GET",
+    "path": "/api/niches",
+    "description": "Retrieves a list of all niches."
+  },
+  {
+    "method": "PUT",
+    "path": "/api/niches",
+    "description": "Updates or creates a niche."
+  },
+  {
+    "method": "GET",
+    "path": "/api/assets/video-groups",
+    "description": "Retrieves assets grouped by video."
+  },
+  {
+    "method": "POST",
+    "path": "/api/assets/image",
+    "description": "Saves a new image asset."
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/assets/image/:name",
+    "description": "Deletes an image asset by name."
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/assets/audio/:name",
+    "description": "Deletes an audio asset by name."
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/assets/video/:name",
+    "description": "Deletes a video asset by name."
+  },
+  {
+    "method": "POST",
+    "path": "/api/generate/scan-niche",
+    "description": "Scans a niche to find related companies."
+  },
+  {
+    "method": "POST",
+    "path": "/api/generate/marketing-insights",
+    "description": "Generates marketing insights for a company."
+  },
+  {
+    "method": "POST",
+    "path": "/api/generate/video-idea",
+    "description": "Generates a new video idea."
+  },
+  {
+    "method": "POST",
+    "path": "/api/generate/assets",
+    "description": "Generates and saves all assets (images, audio, video) for a video idea."
+  },
+  {
+    "method": "POST",
+    "path": "/api/generate/character-description",
+    "description": "Generates a character description for a video idea."
+  },
+  {
+    "method": "POST",
+    "path": "/api/generate/single-image",
+    "description": "Generates a single image based on a description."
+  },
+  {
+    "method": "POST",
+    "path": "/api/generate/tts",
+    "description": "Converts text to speech and returns the audio."
+  }
+]
