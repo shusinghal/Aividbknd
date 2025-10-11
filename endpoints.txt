@@ -40,7 +40,7 @@
     "description": "Deletes an image asset by name."
   },
   {
-    "method": "DELETE",
+    "method": "'DELETE'",
     "path": "/api/assets/audio/:name",
     "description": "Deletes an audio asset by name."
   },
@@ -62,7 +62,7 @@
   {
     "method": "POST",
     "path": "/api/generate/video-idea",
-    "description": "Generates a new video idea."
+    "description": "Generates a new video idea. The request body should be a JSON object with 'name' and 'description' keys."
   },
   {
     "method": "POST",
@@ -83,5 +83,20 @@
     "method": "POST",
     "path": "/api/generate/tts",
     "description": "Converts text to speech and returns the audio."
+  },
+  {
+    "method": "POST",
+    "path": "/api/files",
+    "description": "Adds or updates a JSON file in the custom data folder. The request body should be a JSON object with 'filename' and 'content' keys."
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/files",
+    "description": "Deletes a JSON file from the custom data folder. The request body should be a JSON object with a 'filename' key."
+  },
+  {
+    "method": "POST",
+    "path": "/api/files/content",
+    "description": "Retrieves the content of a JSON file from the custom data folder. The filename should be provided in the request body as a JSON object with a 'filename' key."
   }
 ]

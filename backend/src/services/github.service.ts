@@ -13,6 +13,7 @@ const ASSETS_PATH = path.join(LOCAL_DATA_PATH, 'assets');
 const IMAGE_ASSETS_PATH = path.join(ASSETS_PATH, 'images');
 const AUDIO_ASSETS_PATH = path.join(ASSETS_PATH, 'audio');
 const VIDEO_ASSETS_PATH = path.join(ASSETS_PATH, 'videos');
+const CUSTOM_FILES_PATH = path.join(LOCAL_DATA_PATH, 'custom');
 
 
 class GithubService {
@@ -25,6 +26,7 @@ class GithubService {
         await fs.mkdir(IMAGE_ASSETS_PATH, { recursive: true });
         await fs.mkdir(AUDIO_ASSETS_PATH, { recursive: true });
         await fs.mkdir(VIDEO_ASSETS_PATH, { recursive: true });
+        await fs.mkdir(CUSTOM_FILES_PATH, { recursive: true });
 
 
         try {

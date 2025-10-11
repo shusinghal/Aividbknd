@@ -18,9 +18,9 @@ router.post('/scan-niche', async (req, res, next) => {
 
 router.post('/marketing-insights', async (req, res, next) => {
     try {
-        const { companyName, companyDescription } = req.body;
-        if (!companyName || !companyDescription) return res.status(400).json({ message: 'Company name and description are required.' });
-        const insights = await geminiService.generateMarketingInsights(companyName, companyDescription);
+        const { name, description } = req.body;
+        if (!name || !description) return res.status(400).json({ message: 'Company name and description are required.' });
+        const insights = await geminiService.generateMarketingInsights(name, description);
         res.json(insights);
     } catch (error) {
         next(error);
@@ -29,8 +29,9 @@ router.post('/marketing-insights', async (req, res, next) => {
 
 router.post('/video-idea', async (req, res, next) => {
     try {
-        const { company } = req.body;
-        if (!company) return res.status(400).json({ message: 'Company object is required.' });
+        const { name, description } = req.body;
+        if (!name || !description) return res.status(400).json({ message: 'Company name and description are required.' });
+        const company = { name, description };
         const videoIdea = await geminiService.runAiCollaboration(company);
         res.json(videoIdea);
     } catch (error) {
