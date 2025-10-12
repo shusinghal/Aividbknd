@@ -4,10 +4,17 @@ import * as path from 'path';
 import * as os from 'os';
 import config from '../config';
 
-
 // --- START: Vertex AI Client Configuration ---
 const project = process.env.GOOGLE_CLOUD_PROJECT;
 const location = process.env.GOOGLE_CLOUD_LOCATION || 'us-central1';
+const credentials = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+
+// --- Fail-fast validation to ensure environment is configured correctly ---
+if (!project || !credentials) {
+    throw new Error(
+        'FATAL: GOOGLE_CLOUD_PROJECT and GOOGLE_APPLICATION_CREDENTIALS environment variables must be set in your .env file.'
+    );
+}
 
 const vertexAI = new GoogleGenAI({
   vertexai: true,

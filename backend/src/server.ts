@@ -1,12 +1,12 @@
+import dotenv from 'dotenv';
+dotenv.config();
 
-import app from './app';
-import config from './config';
+import app from './app'; // Use the fully configured Express app
 import os from 'os';
 import { githubService } from './services/github.service';
 
-const PORT = Number(process.env.PORT || 8080);
+const PORT = process.env.PORT || 8080;
 const HOST = process.env.HOST || '0.0.0.0';
-
 function getLocalIp(): string | null {
   const ifaces = os.networkInterfaces();
   for (const name of Object.keys(ifaces)) {

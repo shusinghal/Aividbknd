@@ -5,7 +5,6 @@
 # Google Cloud credentials
 # Contains private keys and should never be committed.
 google_service_account.json
-*.json
 
 # Dependencies
 node_modules/
