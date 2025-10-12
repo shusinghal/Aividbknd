@@ -5,7 +5,7 @@ backend/node_modules
 backend/.env
 
 # Google Service Account Key
-backend/google_servive_account.json
+backend/google_service_account.json
 
 # Local data assets
 backend/data/assets

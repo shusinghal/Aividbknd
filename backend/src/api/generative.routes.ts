@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { geminiService } from '../services/gemini.service';
 import { elevenlabsService } from '../services/elevenlabs.service';
 import { googleTtsService } from '../services/tts.service';
+import {imageGenerationService} from '../services/imageGeneration.service';
 
 const router = Router();
 
@@ -61,17 +62,6 @@ router.post('/character-description', async (req, res, next) => {
     }
 });
 
-router.post('/single-image', async (req, res, next) => {
-    try {
-        const { sceneDescription, visualStyle, characterDescription } = req.body;
-        if (!sceneDescription || !visualStyle) return res.status(400).json({ message: 'sceneDescription and visualStyle are required.' });
-        const base64Image = await geminiService.generateSingleImage({ sceneDescription, visualStyle, characterDescription });
-        res.json({ base64Image });
-    } catch(error) {
-        next(error);
-    }
-});
-
 router.post('/tts', async (req, res, next) => {
     try {
         const { text, voice, speakingRate, pitch } = req.body;
@@ -85,6 +75,22 @@ router.post('/tts', async (req, res, next) => {
     } catch(error) {
         next(error);
     }
+
+
+router.post('/single-image', async (req, res, next) => {
+    try {
+        const { sceneDescription, visualStyle, characterDescription } = req.body;
+        if (!sceneDescription || !visualStyle) return res.status(400).json({ message: 'sceneDescription and visualStyle are required.' });
+
+        const prompt = `${sceneDescription}, ${visualStyle}` + (characterDescription ? `, featuring ${characterDescription}` : '');
+        const base64Images = await imageGenerationService.generateImage(prompt, '1:1', 1); // Request one 1:1 image
+
+        res.json({ base64Image: base64Images[0] }); // Assuming you want to return the first image
+    } catch(error) {
+        next(error);
+    }
+});
+
 });
 
 export default router;

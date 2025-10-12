@@ -1,0 +1,97 @@
+{
+  "coreProblem": "The overwhelming pressure, self-doubt, and creative burnout that comes with the constant demand for content creation, leading to writer's block and a feeling of being 'empty'.",
+  "targetEmotion": "Empathy, relief, empowerment, and a sense of authentic connection and understanding.",
+  "scenes": [
+    {
+      "name": "The Blank Page Stare (Cold Open)",
+      "description": "Starts with a 1-2 second 'cold open' of *just* the visual: a close-up on a laptop screen with a blinking cursor on an empty document, perhaps the subtle hum of the laptop or a soft, distant sigh. No music, no voiceover initially. Then, a rapid, jarring cut to a person's tired, frustrated face, staring blankly. Messy desk, crumpled papers, half-eaten snack. Shows genuine mental exhaustion and struggle.",
+      "duration": "0:02",
+      "effects": "Silence for first 1-2 seconds, then subtle audio design (hum, sigh). Dim, natural lighting. Slight camera shake (handheld feel). Soft focus on the person's eyes and expression. Muted color palette. Instant, punchy visual start to hook viewers.",
+      "id": "1760292158984_0",
+      "ffmpegCommands": "Error generating commands."
+    },
+    {
+      "name": "A Glimmer of Hope",
+      "description": "The person sighs deeply, then a rapid, subtle shift in their expression – a flicker of an idea, a hesitant thought. They lean forward, type a few words, then a very quick, subtle flash of a digital interface (Jasper.ai briefly shown, not a tutorial). This flash includes a visual cue of Jasper.ai providing an output (e.g., a short prompt suggestion, an outline bullet point appearing on screen) to demonstrate the 'spark' or 'co-pilot' role.",
+      "duration": "0:03",
+      "effects": "Slight shift to slightly brighter, more focused lighting. Quick, purposeful cuts. Focus on the user's hands gaining slight confidence. Gentle camera push-in. Jasper.ai visual remains brief, secondary to the user's emotion.",
+      "id": "1760292158984_1",
+      "ffmpegCommands": "Error generating commands."
+    },
+    {
+      "name": "Unleashed Creativity",
+      "description": "The person is now smiling faintly, engrossed, typing with ease and speed. Quick, dynamic cuts conveying not just *what* is being created, but *how quickly*. Show different content elements coming together on screen (e.g., a blog post outline, social media captions, an email draft, a quick montage of a social media calendar filling up or multiple headlines generating rapidly). Emphasize the user's active role: showing the person actively selecting, refining, customising AI suggestions (e.g., dragging elements, highlighting text, adding their own unique phrase), modifying or building upon an AI suggestion. They appear engaged and significantly less stressed.",
+      "duration": "0:04",
+      "effects": "Brighter, natural lighting. Smooth, confident camera movements. Upbeat visual rhythm with fast, flowing cuts between screen and face. Warmer color tones. Match music pace with faster cuts.",
+      "id": "1760292158984_2",
+      "ffmpegCommands": "Error generating commands."
+    },
+    {
+      "name": "The Sigh of Relief",
+      "description": "The person leans back from their laptop, taking a deep, satisfied breath. A genuine, relaxed smile spreads across their face. They close the laptop or simply look away, with a palpable sense of accomplishment and peace. Perhaps a quick shot of them looking out a window or stretching contentedly. The feeling of 'joy in creation, not dread' is quickly evident.",
+      "duration": "0:03",
+      "effects": "Warm, soft, natural lighting. Slow, steady camera movement. Focus on the genuine emotion and peaceful resolution. Slightly blurred background.",
+      "id": "1760292158984_3",
+      "ffmpegCommands": "Error generating commands."
+    }
+  ],
+  "script": [
+    "Another blank page. Another deadline. It’s like my brain just… switches off. The ideas are in there, somewhere, but getting them out? Feels impossible.",
+    "You know that feeling? When you just need a little push? A spark? I thought I was alone in that struggle.",
+    "But what if the push could come from somewhere else? A co-pilot for those moments when your own engine sputters. It’s not about doing it *for* you, it’s about reminding you what you’re capable of. Unlocking *your* voice.",
+    "And suddenly, the words flow. The pressure lifts. It's not cheating; it's just... finding your rhythm again. Finding the joy in creating, instead of the dread. That's real. Ready to find *your* rhythm again?"
+  ],
+  "numberOfImages": 15,
+  "videoLength": "0:15",
+  "ctaGoal": "Discover your creative flow and explore new possibilities for overcoming content blocks. Ready to rediscover your joy in creating? Try [Tool Name] (Link in bio).",
+  "voiceTone": "Empathetic, warm, relatable, authentic, urgent in problem-setting, quickly transitioning to hopeful and calming towards the end.",
+  "visualStyle": "Raw, authentic, handheld, natural lighting, unpolished, and focused on genuine human emotion. Fast-paced for engagement.",
+  "musicPace": "Starts with silence, then subtle melancholic sound design, quickly shifts to hopeful, builds gently and faster to uplifting and inspiring, then calms rapidly to peaceful and reflective.",
+  "heading": "Ever Feel Like This? Your Brain's Best Friend When It's Running on Empty 🧠⚡",
+  "hashtags": [
+    "#CreativeBlock",
+    "#WriterStruggles",
+    "#ContentCreatorBurnout",
+    "#BurnoutRelief",
+    "#FindYourFlow",
+    "#AIAssistedWriting",
+    "#NoMoreBlankPage",
+    "#CreatorsLife",
+    "#OvercomeWritersBlock",
+    "#AuthenticCreation",
+    "#JasperAI"
+  ],
+  "description": "We've all been there. Staring at a blank screen, feeling the pressure, wondering if the words will ever come. This is for every creative soul who's felt overwhelmed. It's about finding that spark again, not replacing your voice, but empowering it. What's your secret to breaking through creative blocks? Have you ever considered a creative co-pilot like AI? Share your thoughts below!",
+  "preferredPlatform": [
+    "TikTok",
+    "Instagram Reels",
+    "YouTube Shorts"
+  ],
+  "onScreenText": [
+    {
+      "time": "0:00",
+      "duration": "0:02",
+      "text": "Is Your Brain on Empty?"
+    },
+    {
+      "time": "0:03",
+      "duration": "0:03",
+      "text": "The pressure is real."
+    },
+    {
+      "time": "0:06",
+      "duration": "0:04",
+      "text": "Unlock Your Creative Flow"
+    },
+    {
+      "time": "0:10",
+      "duration": "0:03",
+      "text": "Joy in creation, not dread."
+    },
+    {
+      "time": "0:13",
+      "duration": "0:02",
+      "text": "Find Your Rhythm. Try [Tool Name]. Link in Bio."
+    }
+  ]
+}
