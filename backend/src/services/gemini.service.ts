@@ -1,5 +1,3 @@
-import dotenv from 'dotenv';
-dotenv.config();
 import { GoogleGenAI, Type } from "@google/genai";
 import * as fs from 'fs/promises';
 import * as path from 'path';
@@ -42,13 +40,7 @@ interface VideoIdea {
 }
 
 class GeminiService {
-    private ai: GoogleGenAI;
-
-    constructor(apiKey: string) {
-        if (!apiKey) throw new Error("Gemini API key is not configured.");
-        this.ai = new GoogleGenAI({ apiKey });
-    }
-    
+    // Constructor is no longer needed as we are using the global vertexAI client.
     // --- Public Methods ---
 
     public async scanForCompanies(niche: string): Promise<any> {
@@ -67,8 +59,8 @@ class GeminiService {
             required: ["companies"]
         };
         const prompt = `Search for companies with strong affiliate programs and highly-rated products in the '${niche}' niche. Provide a list of company names and a brief description for each.`;
-        const response = await this.ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+        const response = await vertexAI.models.generateContent({
+            model: 'gemini-1.5-flash-001',
             contents: prompt,
             config: { responseMimeType: "application/json", responseSchema: schema }
         });
@@ -86,8 +78,8 @@ class GeminiService {
             required: ["materials", "toolkit"]
         };
         const prompt = `For the company '${companyName}', described as '${companyDescription}', generate a 'materials' and 'toolkit' summary for a content marketer. For 'materials', detail their target audience, key products/services, and brand voice. For 'toolkit', list their primary social media platforms, successful content formats, and core messaging angles.`;
-        const response = await this.ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+        const response = await vertexAI.models.generateContent({
+            model: 'gemini-1.5-flash-001',
             contents: prompt,
             config: { responseMimeType: "application/json", responseSchema: schema }
         });
@@ -98,8 +90,8 @@ class GeminiService {
     public async runAiCollaboration(company: Company): Promise<any> {
         const initialPrompt = `For "${company.name}", a company described as "${company.description}", create a full viral video content plan. The plan should feel emotionally authentic and human, not like a sales pitch. Use the "Unfiltered Human Moment" framework. Respond ONLY with a valid JSON object based on the VideoIdea interface. The JSON should have keys: coreProblem, targetEmotion, scenes (an array of objects with name, description, duration, effects), script, numberOfImages, videoLength, ctaGoal, voiceTone, visualStyle, musicPace, heading, hashtags, description, preferredPlatform (an array).`;
         
-       const initialResponse = await this.ai.models.generateContent({
-           model: 'gemini-2.5-flash', contents: initialPrompt, config: { responseMimeType: "application/json" }
+       const initialResponse = await vertexAI.models.generateContent({
+           model: 'gemini-1.5-flash-001', contents: initialPrompt, config: { responseMimeType: "application/json" }
        });
        if (!initialResponse.text) throw new Error('Empty initial response from Gemini');
        let currentVideoIdea = JSON.parse(initialResponse.text as string);
@@ -107,13 +99,13 @@ class GeminiService {
         const feedbackLog: string[] = [];
         for (const role of roles) {
             const feedbackPrompt = `You are a "${role}". Critique this video concept: ${JSON.stringify(currentVideoIdea)}. Provide concise, actionable feedback based on your role.`;
-            const feedbackResponse = await this.ai.models.generateContent({ model: 'gemini-2.5-flash', contents: feedbackPrompt });
+            const feedbackResponse = await vertexAI.models.generateContent({ model: 'gemini-1.5-flash-001', contents: feedbackPrompt });
             feedbackLog.push(`[${role.split(':')[0]}]: ${feedbackResponse.text ?? ''}`);
         }
 
         const finalPrompt = `You are a Creative Director. Refine this initial concept: ${JSON.stringify(currentVideoIdea)} using this feedback from your team: ${feedbackLog.join('\n')}. Output ONLY the final, updated JSON object. Ensure it is a single, valid JSON object and nothing else.`;
-        const finalResponse = await this.ai.models.generateContent({
-            model: 'gemini-2.5-flash', contents: finalPrompt, config: { responseMimeType: "application/json" }
+        const finalResponse = await vertexAI.models.generateContent({
+            model: 'gemini-1.5-flash-001', contents: finalPrompt, config: { responseMimeType: "application/json" }
         });
         if (!finalResponse.text) throw new Error('Empty final response from Gemini');
         return JSON.parse(finalResponse.text as string);
@@ -128,7 +120,7 @@ class GeminiService {
 
         Respond with ONLY the character description. For example: "A woman in her late 20s with messy brown hair, wearing a simple grey hoodie and glasses, looking tired but hopeful."`;
         
-        const response = await this.ai.models.generateContent({model: 'gemini-2.5-flash', contents: prompt});
+        const response = await vertexAI.models.generateContent({model: 'gemini-1.5-flash-001', contents: prompt});
         if (!response.text) return '';
         return response.text.trim();
     }
@@ -140,7 +132,7 @@ class GeminiService {
             : `${sceneDescription}, ${visualStyle}`;
 
         const response = await vertexAI.models.generateImages({
-            model: 'imagegeneration@0.0.5',
+            model: 'imagegeneration@0.0.6',
             prompt: prompt,
             config: { numberOfImages: 1, outputMimeType: 'image/jpeg', aspectRatio: '4:3' },
         });
@@ -229,4 +221,4 @@ class GeminiService {
     }
 }
 
-export const geminiService = new GeminiService(config.apiKeys.gemini!);
+export const geminiService = new GeminiService();
