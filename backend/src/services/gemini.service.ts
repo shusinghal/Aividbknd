@@ -1,8 +1,22 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import { GoogleGenAI, Type } from "@google/genai";
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as os from 'os';
 import config from '../config';
+
+
+// --- START: Vertex AI Client Configuration ---
+const project = process.env.GOOGLE_CLOUD_PROJECT;
+const location = process.env.GOOGLE_CLOUD_LOCATION || 'us-central1';
+
+const vertexAI = new GoogleGenAI({
+  vertexai: true,
+  project: project,
+  location: location,
+});
+
 // Local fallback roles to avoid importing frontend files into the backend runtime.
 const roles: string[] = [
     'The Story Weaver (Emotional Core): Your focus is on emotion, vulnerability, and authenticity. Review the script to ensure it feels real, human, and sounds like a lived experience, not a sales pitch. Guard against marketing jargon and clichés.',
@@ -125,8 +139,8 @@ class GeminiService {
             ? `${sceneDescription}. The main character is: ${characterDescription}. Style: ${visualStyle}. IMPORTANT: Ensure the character in this image matches this description precisely.`
             : `${sceneDescription}, ${visualStyle}`;
 
-        const response = await this.ai.models.generateImages({
-            model: 'imagen-4.0-generate-001',
+        const response = await vertexAI.models.generateImages({
+            model: 'imagegeneration@0.0.5',
             prompt: prompt,
             config: { numberOfImages: 1, outputMimeType: 'image/jpeg', aspectRatio: '4:3' },
         });
