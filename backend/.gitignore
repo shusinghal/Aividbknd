@@ -1,0 +1,14 @@
+# Environment variables
+# Contains sensitive data like API keys and credentials paths.
+.env
+
+# Google Cloud credentials
+# Contains private keys and should never be committed.
+google_service_account.json
+*.json
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
