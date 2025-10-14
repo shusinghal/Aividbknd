@@ -75,15 +75,14 @@ router.post('/tts', async (req, res, next) => {
     } catch(error) {
         next(error);
     }
-
+});
 
 router.post('/single-image', async (req, res, next) => {
     try {
         const { sceneDescription, visualStyle, characterDescription } = req.body;
         if (!sceneDescription || !visualStyle) return res.status(400).json({ message: 'sceneDescription and visualStyle are required.' });
 
-        const prompt = `${sceneDescription}, ${visualStyle}` + (characterDescription ? `, featuring ${characterDescription}` : '');
-        const base64Images = await imageGenerationService.generateImage(prompt, '1:1', 1); // Request one 1:1 image
+        const base64Images = await imageGenerationService.generateImage(`${sceneDescription}, ${visualStyle}`, characterDescription, '1:1', 1);
 
         res.json({ base64Image: base64Images[0] }); // Assuming you want to return the first image
     } catch(error) {
@@ -105,6 +104,6 @@ router.post('/single-image', async (req, res, next) => {
 //     }
 // });
 
-});
+
 
 export default router;
