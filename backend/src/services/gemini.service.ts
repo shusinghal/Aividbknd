@@ -119,22 +119,22 @@ class GeminiService {
         return response.text.trim();
     }
     
-    public async generateSingleImage(payload: { sceneDescription: string, visualStyle: string, characterDescription: string | null }): Promise<string> {
-        const { sceneDescription, visualStyle, characterDescription } = payload;
-        const prompt = characterDescription
-            ? `${sceneDescription}. The main character is: ${characterDescription}. Style: ${visualStyle}. IMPORTANT: Ensure the character in this image matches this description precisely.`
-            : `${sceneDescription}, ${visualStyle}`;
+    // public async generateSingleImage(payload: { sceneDescription: string, visualStyle: string, characterDescription: string | null }): Promise<string> {
+    //     const { sceneDescription, visualStyle, characterDescription } = payload;
+    //     const prompt = characterDescription
+    //         ? `${sceneDescription}. The main character is: ${characterDescription}. Style: ${visualStyle}. IMPORTANT: Ensure the character in this image matches this description precisely.`
+    //         : `${sceneDescription}, ${visualStyle}`;
 
-        const response = await this.ai.models.generateImages({
-            model: 'imagen-4.0-generate-001',
-            prompt: prompt,
-            config: { numberOfImages: 1, outputMimeType: 'image/jpeg', aspectRatio: '4:3' },
-        });
-        if (!response.generatedImages || response.generatedImages.length === 0) throw new Error('No images generated');
-        const img = response.generatedImages[0];
-        if (!img || !img.image || !img.image.imageBytes) throw new Error('Malformed image response');
-        return img.image.imageBytes as string;
-    }
+    //     const response = await this.ai.models.generateImages({
+    //         model: 'imagen-4.0-generate-001',
+    //         prompt: prompt,
+    //         config: { numberOfImages: 1, outputMimeType: 'image/jpeg', aspectRatio: '4:3' },
+    //     });
+    //     if (!response.generatedImages || response.generatedImages.length === 0) throw new Error('No images generated');
+    //     const img = response.generatedImages[0];
+    //     if (!img || !img.image || !img.image.imageBytes) throw new Error('Malformed image response');
+    //     return img.image.imageBytes as string;
+    //}
 
     public async createVideoFromAssets(imageFiles: {path: string, duration: number}[], audioFile: string, outputPath: string): Promise<void> {
         return new Promise((resolve, reject) => {
@@ -171,6 +171,8 @@ class GeminiService {
                 .save(outputPath);
         });
     }
+
+    
 
     public async generateAndSaveAssets(company: Company, videoIdea: VideoIdea): Promise<void> {
         const generationId = Date.now().toString();

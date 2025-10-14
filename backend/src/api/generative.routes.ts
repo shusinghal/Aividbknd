@@ -90,6 +90,20 @@ router.post('/single-image', async (req, res, next) => {
         next(error);
     }
 });
+// router.post('/single-image', async (req, res, next) => {
+//     try {
+//         const { prompt , characterDescription } = req.body; // Assuming the client sends a 'prompt' for the image
+//         if (!prompt || characterDescription ) return res.status(400).json({ message: 'Prompt is required.' });
+
+//         // Call the Gemini service to generate an image based on the prompt
+//         // This assumes you have a method like 'geminiService.generateImage'
+//         const imageUrl = await geminiService.generateSingleImage(prompt, characterDescription); 
+
+//         res.json({ imageUrl: imageUrl });
+//     } catch(error) {
+//         next(error);
+//     }
+// });
 
 });
 
