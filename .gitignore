@@ -9,3 +9,5 @@ backend/google_service_account.json
 
 # Local data assets
 backend/data/assets
+
+ffmpeg/**

@@ -1,10 +1,16 @@
-import { Router } from 'express';
-import { geminiService } from '../services/gemini.service';
-import { elevenlabsService } from '../services/elevenlabs.service';
-import { googleTtsService } from '../services/tts.service';
-import {imageGenerationService} from '../services/imageGeneration.service';
 
-const router = Router();
+// FIX: Import Buffer and process to resolve type errors in Node.js environment.
+import { Buffer } from 'buffer';
+import process from 'process';
+import express from 'express';
+import fs from 'fs/promises';
+import path from 'path';
+import os from 'os';
+import { geminiService } from '../services/gemini.service';
+import { googleTtsService } from '../services/tts.service';
+import { imageGenerationService } from '../services/imageGeneration.service';
+
+const router = express.Router();
 
 router.post('/scan-niche', async (req, res, next) => {
     try {
@@ -42,9 +48,12 @@ router.post('/video-idea', async (req, res, next) => {
 
 router.post('/assets', async (req, res, next) => {
     try {
-        const { companyName, videoIdea } = req.body;
-        if (!companyName || !videoIdea) return res.status(400).json({ message: 'Company and videoIdea are required.' });
-        await geminiService.generateAndSaveAssets(companyName, videoIdea); // This now generates and saves the video too
+        const { companyName, companyDescription, videoIdea } = req.body;
+        if (!companyName || !companyDescription || !videoIdea) {
+            return res.status(400).json({ message: 'companyName, companyDescription, and videoIdea are required.' });
+        }
+        const company = { name: companyName, description: companyDescription };
+        await geminiService.generateAndSaveAssets(company, videoIdea);
         res.status(200).json({ message: 'Assets and video generated successfully.' });
     } catch (error) {
         next(error);
@@ -68,7 +77,6 @@ router.post('/tts', async (req, res, next) => {
         const audioBlob = await googleTtsService.synthesize({ text, voice, speakingRate, pitch });
         
         res.setHeader('Content-Type', 'audio/mpeg');
-        // Convert Blob to Buffer to send
         const buffer = Buffer.from(await audioBlob.arrayBuffer());
         res.send(buffer);
 
@@ -79,31 +87,85 @@ router.post('/tts', async (req, res, next) => {
 
 router.post('/single-image', async (req, res, next) => {
     try {
-        const { sceneDescription, visualStyle, characterDescription } = req.body;
-        if (!sceneDescription || !visualStyle) return res.status(400).json({ message: 'sceneDescription and visualStyle are required.' });
+        const { prompt, characterDescription } = req.body;
+        if (!prompt) return res.status(400).json({ message: 'A prompt is required.' });
 
-        const base64Images = await imageGenerationService.generateImage(`${sceneDescription}, ${visualStyle}`, characterDescription, '1:1', 1);
-
-        res.json({ base64Image: base64Images[0] }); // Assuming you want to return the first image
+        // Assuming imageGenerationService exists and abstracts the image generation call
+        // Using 9:16 aspect ratio for vertical video format
+        const base64Images = await imageGenerationService.generateImage(prompt, characterDescription, '9:16', 1);
+        res.json({ base64Image: base64Images[0] });
     } catch(error) {
         next(error);
     }
 });
-// router.post('/single-image', async (req, res, next) => {
-//     try {
-//         const { prompt , characterDescription } = req.body; // Assuming the client sends a 'prompt' for the image
-//         if (!prompt || characterDescription ) return res.status(400).json({ message: 'Prompt is required.' });
 
-//         // Call the Gemini service to generate an image based on the prompt
-//         // This assumes you have a method like 'geminiService.generateImage'
-//         const imageUrl = await geminiService.generateSingleImage(prompt, characterDescription); 
+router.post('/ffmpeg-commands', async (req, res, next) => {
+    try {
+        const { scenes } = req.body;
+        if (!scenes || !Array.isArray(scenes) || scenes.length === 0) {
+            return res.status(400).json({ message: 'A valid "scenes" array is required in the request body.' });
+        }
+        for (const scene of scenes) {
+            if (!scene.id || !scene.effect || !scene.duration) {
+                return res.status(400).json({ message: 'Each scene object must contain an "id", "effect", and "duration".' });
+            }
+        }
+        const commandsMap = await geminiService.generateFfmpegCommands(scenes);
+        res.status(200).json({ commandsMap });
+    } catch (error) {
+        console.error('Error in /ffmpeg-commands route:', error);
+        next(error);
+    }
+});
 
-//         res.json({ imageUrl: imageUrl });
-//     } catch(error) {
-//         next(error);
-//     }
-// });
+router.post('/render-video', async (req, res, next) => {
+    try {
+        const { audio, scenes, metadata } = req.body;
+        if (!audio || !audio.base64 || !scenes || !Array.isArray(scenes)) {
+            return res.status(400).json({ message: 'Invalid payload. Audio (with base64 content) and a scenes array are required.' });
+        }
 
+        const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'video-render-'));
+        
+        const audioBuffer = Buffer.from(audio.base64, 'base64');
+        const audioPath = path.join(tempDir, 'narration.mp3');
+        await fs.writeFile(audioPath, audioBuffer);
 
+        const imageFiles = [];
+        for (const [index, scene] of scenes.entries()) {
+            if (!scene.image || !scene.image.base64) {
+                await fs.rm(tempDir, { recursive: true, force: true });
+                return res.status(400).json({ message: `Scene at index ${index} is missing image data.` });
+            }
+            const imageBuffer = Buffer.from(scene.image.base64, 'base64');
+            const imagePath = path.join(tempDir, `scene_${index}.jpg`);
+            await fs.writeFile(imagePath, imageBuffer);
+            imageFiles.push({ 
+                path: imagePath, 
+                duration: parseFloat(scene.duration) || 3,
+                ffmpegCommand: scene.effects?.ffmpeg
+            });
+        }
+
+        const safeTitle = (metadata?.title || 'video').replace(/[^a-zA-Z0-9]/g, '_');
+        const videoFileName = `${Date.now()}_${safeTitle}.mp4`;
+        
+        // Assume a /public/videos directory exists at the root for serving rendered videos
+        const publicDir = path.join(process.cwd(), 'public', 'videos');
+        await fs.mkdir(publicDir, { recursive: true });
+        const videoOutputPath = path.join(publicDir, videoFileName);
+
+        await geminiService.createVideoFromAssets(imageFiles, audioPath, videoOutputPath);
+
+        await fs.rm(tempDir, { recursive: true, force: true });
+        
+        const videoUrl = `/videos/${videoFileName}`;
+        res.json({ videoUrl });
+
+    } catch (error) {
+        console.error('Error in /render-video route:', error);
+        next(error);
+    }
+});
 
 export default router;

@@ -1,3 +1,8 @@
+
+
+
+// FIX: Import Buffer to resolve type errors in Node.js environment.
+import { Buffer } from 'buffer';
 import { GoogleGenAI, Type } from "@google/genai";
 import * as fs from 'fs/promises';
 import * as path from 'path';
@@ -59,7 +64,7 @@ class GeminiService {
             config: { responseMimeType: "application/json", responseSchema: schema }
         });
         if (!response.text) throw new Error('Empty response from Gemini');
-        return JSON.parse(response.text as string);
+        return JSON.parse(response.text);
     }
 
     public async generateMarketingInsights(companyName: string, companyDescription: string): Promise<any> {
@@ -78,7 +83,7 @@ class GeminiService {
             config: { responseMimeType: "application/json", responseSchema: schema }
         });
         if (!response.text) throw new Error('Empty response from Gemini');
-        return JSON.parse(response.text as string);
+        return JSON.parse(response.text);
     }
     
     public async runAiCollaboration(company: Company): Promise<any> {
@@ -88,7 +93,7 @@ class GeminiService {
            model: 'gemini-2.5-flash', contents: initialPrompt, config: { responseMimeType: "application/json" }
        });
        if (!initialResponse.text) throw new Error('Empty initial response from Gemini');
-       let currentVideoIdea = JSON.parse(initialResponse.text as string);
+       let currentVideoIdea = JSON.parse(initialResponse.text);
 
         const feedbackLog: string[] = [];
         for (const role of roles) {
@@ -102,7 +107,7 @@ class GeminiService {
             model: 'gemini-2.5-flash', contents: finalPrompt, config: { responseMimeType: "application/json" }
         });
         if (!finalResponse.text) throw new Error('Empty final response from Gemini');
-        return JSON.parse(finalResponse.text as string);
+        return JSON.parse(finalResponse.text);
     }
     
     public async generateCharacterDescription(videoIdea: VideoIdea): Promise<string> {
@@ -119,60 +124,171 @@ class GeminiService {
         return response.text.trim();
     }
     
-    // public async generateSingleImage(payload: { sceneDescription: string, visualStyle: string, characterDescription: string | null }): Promise<string> {
-    //     const { sceneDescription, visualStyle, characterDescription } = payload;
-    //     const prompt = characterDescription
-    //         ? `${sceneDescription}. The main character is: ${characterDescription}. Style: ${visualStyle}. IMPORTANT: Ensure the character in this image matches this description precisely.`
-    //         : `${sceneDescription}, ${visualStyle}`;
+    public async generateFfmpegCommands(scenes: { id: string, effect: string, duration: string }[]): Promise<Record<string, string>> {
+        const schemaProperties: Record<string, any> = {};
+        scenes.forEach(scene => {
+            schemaProperties[scene.id] = {
+                type: Type.STRING,
+                description: `The FFMPEG -vf command for the effect: '${scene.effect}' for a ${scene.duration} second clip.`
+            };
+        });
 
-    //     const response = await this.ai.models.generateImages({
-    //         model: 'imagen-4.0-generate-001',
-    //         prompt: prompt,
-    //         config: { numberOfImages: 1, outputMimeType: 'image/jpeg', aspectRatio: '4:3' },
-    //     });
-    //     if (!response.generatedImages || response.generatedImages.length === 0) throw new Error('No images generated');
-    //     const img = response.generatedImages[0];
-    //     if (!img || !img.image || !img.image.imageBytes) throw new Error('Malformed image response');
-    //     return img.image.imageBytes as string;
-    //}
+        const responseSchema = {
+            type: Type.OBJECT,
+            properties: schemaProperties,
+            required: scenes.map(s => s.id)
+        };
+        
+        const model = 'gemini-2.5-pro';
 
-    public async createVideoFromAssets(imageFiles: {path: string, duration: number}[], audioFile: string, outputPath: string): Promise<void> {
+        const prompt = `
+            You are an expert FFMPEG engineer. Your task is to convert natural language descriptions of video effects into precise FFMPEG filter graph strings for the "-vf" flag.
+
+            **IMPORTANT RULES:**
+            1.  **Output Format:** You MUST return ONLY a valid JSON object that matches the provided schema. Do not include any markdown, explanations, or any text outside of the JSON structure.
+            2.  **Command Content:** Provide ONLY the filter graph string itself. DO NOT include "ffmpeg -i input.jpg" or the output filename.
+            3.  **Dimensions:** Assume all source images are for vertical video with dimensions 1080x1920 (width x height).
+            4.  **Duration:** Use the provided scene duration (in seconds) to calculate timings. Assume a frame rate of 30fps for calculations (e.g., duration in frames = scene_duration * 30).
+            5.  **Escaping:** Be careful with quotes inside the filter graph. Escape them properly with a backslash (e.g., \\"text\\").
+            6.  **Pixel Format:** Ensure the output has a widely compatible pixel format by ending the filter chain with ",format=yuv420p".
+
+            **INPUT SCENES:**
+            ${JSON.stringify(scenes.map(s => ({id: s.id, effect: s.effect, duration: s.duration})), null, 2)}
+
+            **EXAMPLE:**
+            If the input is:
+            [
+              {"id": "scene_1", "effect": "slow zoom in", "duration": "5"},
+              {"id": "scene_2", "effect": "fade to black at the end", "duration": "4"}
+            ]
+
+            Your JSON output should be:
+            {
+              "scene_1": "zoompan=z='min(zoom+0.001,1.2)':d=150:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920,format=yuv420p",
+              "scene_2": "fade=t=out:st=3:d=1,format=yuv420p"
+            }
+
+            Now, generate the commands for the provided input scenes.
+        `;
+
+        try {
+            const response = await this.ai.models.generateContent({
+                model: model,
+                contents: prompt,
+                config: {
+                    responseMimeType: "application/json",
+                    responseSchema: responseSchema,
+                    temperature: 0.2,
+                }
+            });
+            
+            if (!response.text) {
+                throw new Error('Empty response from Gemini while generating FFMPEG commands.');
+            }
+            
+            const jsonText = response.text.trim();
+            const commandsMap = JSON.parse(jsonText);
+            
+            console.log('Successfully generated FFMPEG commands:', commandsMap);
+            return commandsMap;
+
+        } catch (error) {
+            console.error("Error calling Gemini API for FFMPEG commands:", error);
+            const errorMap: Record<string, string> = {};
+            scenes.forEach(scene => {
+                errorMap[scene.id] = 'Error: AI command generation failed.';
+            });
+            return errorMap;
+        }
+    }
+
+    public async generateSingleImage(payload: { sceneDescription: string, visualStyle: string, characterDescription: string | null }): Promise<string> {
+        const { sceneDescription, visualStyle, characterDescription } = payload;
+        const prompt = characterDescription
+            ? `${sceneDescription}. The main character is: ${characterDescription}. Style: ${visualStyle}. IMPORTANT: Ensure the character in this image matches this description precisely.`
+            : `${sceneDescription}, ${visualStyle}`;
+
+        const response = await this.ai.models.generateImages({
+            model: 'imagen-4.0-generate-001',
+            prompt: prompt,
+            config: { numberOfImages: 1, outputMimeType: 'image/jpeg', aspectRatio: '9:16' },
+        });
+        if (!response.generatedImages || response.generatedImages.length === 0) throw new Error('No images generated');
+        const img = response.generatedImages[0];
+        if (!img || !img.image || !img.image.imageBytes) throw new Error('Malformed image response');
+        return img.image.imageBytes as string;
+    }
+
+    public async createVideoFromAssets(imageFiles: {path: string, duration: number, ffmpegCommand?: string}[], audioFile: string, outputPath: string): Promise<void> {
         return new Promise((resolve, reject) => {
             const command = ffmpeg();
-
-            // Create a complex filter to concatenate images with specified durations
-            const videoInputs: string[] = [];
+    
             const filterComplex: string[] = [];
-            let streamCounter = 0;
-
+    
+            // Add inputs and build the filter graph for each image
             imageFiles.forEach((img, index) => {
-                command.input(img.path);
-                videoInputs.push(`[${index}:v]`);
-                filterComplex.push(`[${index}:v]format=yuv420p,fade=in:st=0:d=0.5,fade=out:st=${img.duration - 0.5}:d=0.5[v${index}]`);
+                command.input(img.path)
+                    .inputOptions([
+                        '-loop 1',          // Loop the image
+                        `-t ${img.duration}`  // Set duration for this input
+                    ]);
+                
+                // Check if a valid, non-error command was provided
+                const isCommandValid = img.ffmpegCommand && 
+                                     img.ffmpegCommand.trim() !== '{}' && 
+                                     img.ffmpegCommand.trim() !== '' && 
+                                     !img.ffmpegCommand.startsWith('Error');
+    
+                // Use the provided command or a default fade effect
+                let vfCommand = isCommandValid
+                    ? img.ffmpegCommand
+                    : `fade=in:st=0:d=0.5,fade=out:st=${img.duration - 0.5}:d=0.5`;
+    
+                // The AI is prompted to add format=yuv420p. If not present, we add it for compatibility.
+                if (vfCommand && !vfCommand.includes('format=yuv420p')) {
+                    vfCommand += ',format=yuv420p';
+                }
+    
+                // Define a complete filter chain for this input: scale to 1080x1920, then apply the effect.
+                const filterString = `[${index}:v]scale=1080:1920,setsar=1[scaled${index}]; [scaled${index}]${vfCommand}[v${index}]`;
+                filterComplex.push(filterString);
             });
-
+    
+            // Add the audio input
             command.input(audioFile);
-
-            const concatFilter = videoInputs.map((_, i) => `[v${i}]`).join('') + `concat=n=${imageFiles.length}:v=1:a=0[v]`;
+    
+            // Build the final concat filter string to combine all processed video streams
+            const concatStreams = imageFiles.map((_, i) => `[v${i}]`).join('');
+            const concatFilter = `${concatStreams}concat=n=${imageFiles.length}:v=1:a=0[v]`;
             filterComplex.push(concatFilter);
-
+    
             command
                 .complexFilter(filterComplex)
                 .outputOptions([
-                    '-map "[v]"',
-                    `-map ${imageFiles.length}:a`,
-                    '-c:v libx264',
-                    '-c:a aac',
-                    '-r 30', // framerate
-                    '-shortest'
+                    '-map "[v]"',                  // Map the final video stream
+                    `-map ${imageFiles.length}:a`, // Map the audio stream
+                    '-c:v libx264',                // Use a common video codec
+                    '-c:a aac',                    // Use a common audio codec
+                    '-r 30',                       // Set framerate to 30
+                    '-pix_fmt yuv420p',            // Ensure output pixel format is compatible
+                    '-shortest'                    // Finish encoding when the shortest stream ends (the audio)
                 ])
-                .on('error', (err) => reject(err))
-                .on('end', () => resolve())
+                .on('start', function(commandLine) {
+                    console.log('Spawned Ffmpeg with command: ' + commandLine);
+                })
+                .on('error', (err, stdout, stderr) => {
+                    console.error('FFMPEG Error:', err.message);
+                    console.error('FFMPEG stdout:', stdout);
+                    console.error('FFMPEG stderr:', stderr);
+                    reject(new Error(`FFMPEG error: ${err.message}\n${stderr}`));
+                })
+                .on('end', () => {
+                    console.log('FFMPEG processing finished successfully.');
+                    resolve();
+                })
                 .save(outputPath);
         });
     }
-
-    
 
     public async generateAndSaveAssets(company: Company, videoIdea: VideoIdea): Promise<void> {
         const generationId = Date.now().toString();
@@ -184,14 +300,26 @@ class GeminiService {
         const audioBuffer = Buffer.from(await audioBlob.arrayBuffer());
         const audioFilePath = path.join(tempDir, 'narration.mp3');
         await fs.writeFile(audioFilePath, audioBuffer);
+        
+        // Generate FFMPEG commands for all scenes first
+        const scenesForFfmpeg = videoIdea.scenes.map(s => ({
+            id: s.id,
+            effect: s.effects,
+            duration: s.duration
+        }));
+        const ffmpegCommandsMap = await this.generateFfmpegCommands(scenesForFfmpeg);
 
-        const imageFilePaths: {path: string, duration: number}[] = [];
+        const imageFilePaths: {path: string, duration: number, ffmpegCommand: string}[] = [];
         for (const [index, scene] of videoIdea.scenes.entries()) {
-            const base64Image = await this.generateSingleImage({ sceneDescription: scene.description, visualStyle: videoIdea.visualStyle, characterDescription: characterDescription });
+            const base64Image = await this.generateSingleImage({ sceneDescription: scene.description, visualStyle: videoIdea.visualStyle, characterDescription });
             const imageBuffer = Buffer.from(base64Image, 'base64');
             const imagePath = path.join(tempDir, `scene_${index}.jpg`);
             await fs.writeFile(imagePath, imageBuffer);
-            imageFilePaths.push({ path: imagePath, duration: parseFloat(scene.duration) || 3 });
+            imageFilePaths.push({ 
+                path: imagePath, 
+                duration: parseFloat(scene.duration) || 3,
+                ffmpegCommand: ffmpegCommandsMap[scene.id] || '' // Add the generated command
+            });
         }
 
         const videoOutputPath = path.join(tempDir, 'output.mp4');

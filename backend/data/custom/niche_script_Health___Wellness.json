@@ -7,48 +7,48 @@
       "description": "Starts with a rapid, impactful visual (e.g., grimace mid-lift, sweat dripping, heavy breathing) overlaid with text like 'THIS is the real 5 AM.' or 'Behind the perfect photo...', *then* cuts to a close-up of an alarm clock going off at 5 AM. A hand slowly reaches out, hesitates, then silences it. Person groans, slowly sits up, rubs eyes, clearly tired.",
       "duration": "3 seconds",
       "effects": "Immediate visual punch to grab attention. Soft, natural light (dawn breaking), slight camera shake to mimic grogginess. Focus on the internal debate through quicker, heavier movements. Dynamic on-screen text: 'The 5 AM Battle' or 'Sleep vs. Goals.'",
-      "id": "1760471682932_0",
-      "ffmpegCommands": "Error generating commands."
+      "id": "1760523854868_0",
+      "ffmpegCommands": "eq=gamma=1.05:contrast=1.05:saturation=1.1,frei0r=shake:intensity=0.01,drawtext=text='The 5 AM Battle':fontsize=120:fontcolor=white@0.9:x=(w-text_w)/2:y=h/4:enable='between(t,0.5,2.5)':alpha='if(lt(t,0.5),0,if(lt(t,1.5),(t-0.5),1))',format=yuv420p"
     },
     {
       "name": "The Inner Battle",
       "description": "Person standing in front of a mirror in workout clothes, looking at their reflection with a mix of fatigue and self-scrutiny. A quick, *perceptible* flash of a 'perfect' social media physique on a phone screen, *precisely synchronized with the VO*. Then, a quick, deliberate head shake, a deep breath, and a subtle shift from doubt to resolve.",
       "duration": "4 seconds",
       "effects": "Reflective surfaces, rapid cuts to an 'ideal' image for a fraction of a second to represent comparison. Subtle but clear change in facial expression. Dynamic on-screen text: 'Comparison is a Killer.' or 'Fight Your Inner Critic.'",
-      "id": "1760471682932_1",
-      "ffmpegCommands": "Error generating commands."
+      "id": "1760523854868_1",
+      "ffmpegCommands": "geq=lum='if(between(t,1.5,1.6),255,p(X,Y))',drawtext=text='Comparison is a Killer.':fontsize=90:fontcolor=white@0.9:x='(w-text_w)/2+rand(-3,3)':y='h*0.75+rand(-3,3)':enable='between(t,1,3.5)',format=yuv420p"
     },
     {
       "name": "The Grind",
       "description": "A rapid-cut montage (0.5-1.5 seconds per clip) of short, raw clips: Struggling with a heavy lift (form not perfect, grimace), tired on a run (breathing heavy, pushing through), failing a rep, wiping sweat from their brow, looking exhausted but still pushing. Emphasize *effort* and *endurance* over perfection.",
       "duration": "10 seconds",
       "effects": "Close-ups on straining muscles, sweat, heavy breathing sound effects. Dynamic, rapid, slightly desaturated cuts. Handheld camera feel for authenticity. Dynamic on-screen text: 'It's Not Pretty. It's Progress.' or 'The Unseen Grind.'",
-      "id": "1760471682932_2",
-      "ffmpegCommands": "Error generating commands."
+      "id": "1760523854868_2",
+      "ffmpegCommands": "hue=s=0.8,frei0r=shake:intensity=0.02,drawtext=text='It\\'s Not Pretty. It\\'s Progress.':fontsize=100:fontcolor=white@0.9:x=(w-text_w)/2:y=h/2:box=1:boxcolor=black@0.5:boxborderw=10:enable='between(t,1,9)',format=yuv420p"
     },
     {
       "name": "The Temptation",
       "description": "Quick shot of a tempting, unhealthy food item (e.g., donut, pizza slice, fast food wrapper). The person pauses, *briefly touching or hesitating over the unhealthy item with longing*, then makes a deliberate choice to pick up a Bodybuilding.com branded water bottle, a piece of fruit, or a Bodybuilding.com protein shake instead. A quiet, almost unnoticed moment of discipline.",
       "duration": "5 seconds",
       "effects": "Warm, inviting lighting on the 'temptation,' then a cooler, crisp lighting on the healthier choice. Sound of a subtle internal 'gulp.' Subtle brand integration of Bodybuilding.com products. Dynamic on-screen text: 'Discipline Wins.' or 'Small Choices, Big Impact.'",
-      "id": "1760471682932_3",
-      "ffmpegCommands": "Error generating commands."
+      "id": "1760523854868_3",
+      "ffmpegCommands": "lutrgb=r='gammaval(1-0.1*tanh(t-2.5))':b='gammaval(1+0.1*tanh(t-2.5))',drawtext=text='Discipline Wins.':fontsize=110:fontcolor=white@0.9:x=(w-text_w)/2:y=h*0.8:enable='gte(t,2.5)':alpha='if(lt(t,3),0,if(lt(t,3.5),(t-3)/0.5,1))',format=yuv420p"
     },
     {
       "name": "The Quiet Victory",
       "description": "A small, personal breakthrough. Maybe completing that rep they failed before, a moment of focused, smooth movement they just mastered, or a satisfied but tired smile after a challenging session. Not a grand celebration, but a quiet, internal moment of pride and relief. Could be looking at their watch after hitting a target.",
       "duration": "8 seconds",
       "effects": "Soft, focused lighting on the person's expression. Sound of a satisfied exhale or a quiet 'yes'. *Subtle* increase in music tempo and warmth, feeling like a gentle sigh of relief or warm internal glow, not a dramatic crescendo. Dynamic on-screen text: 'Quiet Victories.' or 'Proof of Grit.'",
-      "id": "1760471682932_4",
-      "ffmpegCommands": "Error generating commands."
+      "id": "1760523854868_4",
+      "ffmpegCommands": "vignette,eq=saturation='1+0.2*(t/8)',colorbalance=rh='0.1*(t/8)',drawtext=text='Quiet Victories.':fontsize=90:fontcolor=white@0.8:x=(w-text_w)/2:y=h*0.2:enable='gte(t,2)':alpha='if(lt(t,2),0,if(lt(t,4),(t-2)/2,1))',format=yuv420p"
     },
     {
       "name": "Why We Keep Going",
       "description": "Person looking out a window at a sunrise, or at their own reflection again, but this time with a clear, determined, and understanding look in their eyes. *Preceded by a very quick (1-2 second), multi-frame montage showing diverse hands (different skin tones, ages) silently performing similar acts of discipline or effort (e.g., re-racking weights, tying laces, pouring a shake) to visually reinforce 'You're not alone'.* A subtle nod of connection with the broader fitness community. A well-worn Bodybuilding.com branded gym bag or fitness journal is visible. On-screen text for the CTA.",
       "duration": "5 seconds",
       "effects": "Warm, inspiring lighting. A sense of peace and renewed purpose. Slow motion for emphasis on resolve. Organic, personal community connection visuals. Subtle brand integration of Bodybuilding.com products. On-screen text for the CTA.",
-      "id": "1760471682932_5",
-      "ffmpegCommands": "Error generating commands."
+      "id": "1760523854868_5",
+      "ffmpegCommands": "setpts=2.0*PTS,eq=gamma=1.05:saturation=1.2,colorbalance=rh=0.1,drawtext=text='Join the Community\\nBodybuilding.com':fontsize=80:fontcolor=white@0.9:x=(w-text_w)/2:y=h*0.8:line_spacing=10:enable='gte(t,1)':alpha='if(lt(t,1),0,if(lt(t,2),(t-1),1))',format=yuv420p"
     }
   ],
   "script": "VO (Soft, reflective, a little tired at first, then growing in conviction):\n\n\"5 AM. Again. Every fiber in my body screams 'sleep'.\"\n\n(Sound of a faint, almost mocking, social media notification chime)\n\n\"The highlight reels don't show *this*.\"\n\n(Sound of heavy breathing, weights clanging, shoes squeaking)\n\n\"This isn't always pretty. It's heavy. It's repetitive. Sometimes, it's just... failure.\"\n\n(Sound of a stomach rumble, tempting sizzle)\n\n\"And the choices? They never stop. The easy way, or the way you promised yourself.\"\n\n(A quiet sigh of relief, then a deep, determined breath)\n\n\"But then there are these moments. The one rep you thought you couldn't get. The feeling of breaking through. The silent pride of showing up, even when no one's watching.\"\n\n(Music swells slightly, more hopeful)\n\n\"It's not about perfection. It's about consistency. It's about finding your grit, day after day. It's about the belief that the struggle *is* the strength.\"\n\n\"You're not alone in this fight. This journey. This commitment to something more.\"\n\n(On-screen text appears: \"Your Journey. Your Fight. Your Resolve.\")\n\n\"Find what empowers your next step.\"",
