@@ -13,7 +13,7 @@ export function errorHandler(err: any, req: Request, res: Response, next: NextFu
     
     res.status(500).json({
         success: false,
-        message: 'An internal server error occurred.',
-        error: message,
+        message: message, // Use the actual error message for the main message
+        // You can keep the 'error' field for backward compatibility or remove it.
     });
 }

@@ -57,6 +57,7 @@ Follow these steps to get the backend server running locally.
     GITHUB_NICHES_REPO_URL="https://raw.githubusercontent.com/..."
 
     # Generative AI Services
+    # --- Generative AI Services ---
     GEMINI_API_KEY="AIzaSy..."
     ELEVENLABS_API_KEY="sk_..."
     PEXELS_API_KEY="..."
@@ -68,6 +69,10 @@ Follow these steps to get the backend server running locally.
     # Replace all newline characters with `\n`.
     # For example: "-----BEGIN PRIVATE KEY-----\nMIIC/A...\n-----END PRIVATE KEY-----\n"
     GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n..."
+    # --- Google Cloud Services (TTS, etc.) ---
+    # Path to your service account JSON key file.
+    # The auth library will automatically use this file.
+    GOOGLE_APPLICATION_CREDENTIALS="./google_service_account.json"
     ```
 
 ---

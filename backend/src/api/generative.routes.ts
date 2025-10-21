@@ -168,4 +168,17 @@ router.post('/render-video', async (req, res, next) => {
     }
 });
 
+router.post('/ai-text-utility', async (req, res, next) => {
+    try {
+        const { task, data } = req.body;
+        if (!task || !data) {
+            return res.status(400).json({ message: 'A "task" and "data" object are required.' });
+        }
+        const result = await geminiService.performTextUtility(task, data);
+        res.json({ result });
+    } catch (error) {
+        next(error);
+    }
+});
+
 export default router;

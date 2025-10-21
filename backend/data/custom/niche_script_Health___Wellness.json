@@ -1,85 +1,87 @@
 {
-  "coreProblem": "The silent, often invisible, mental and emotional struggle with consistency, self-doubt, and the daily grind involved in pursuing personal fitness goals, especially when motivation wanes and progress feels slow.",
-  "targetEmotion": "Empathy, Relatability, Quiet Determination, Shared Resilience, and Inspiration through authenticity.",
+  "coreProblem": "The silent internal battle and self-doubt that comes with long-term fitness goals, especially when progress feels slow or invisible, leading to moments of wanting to give up.",
+  "targetEmotion": "Validation, empathy, quiet determination, inspiration, relatability.",
   "scenes": [
     {
-      "name": "The Alarm's Call",
-      "description": "Starts with a rapid, impactful visual (e.g., grimace mid-lift, sweat dripping, heavy breathing) overlaid with text like 'THIS is the real 5 AM.' or 'Behind the perfect photo...', *then* cuts to a close-up of an alarm clock going off at 5 AM. A hand slowly reaches out, hesitates, then silences it. Person groans, slowly sits up, rubs eyes, clearly tired.",
-      "duration": "3 seconds",
-      "effects": "Immediate visual punch to grab attention. Soft, natural light (dawn breaking), slight camera shake to mimic grogginess. Focus on the internal debate through quicker, heavier movements. Dynamic on-screen text: 'The 5 AM Battle' or 'Sleep vs. Goals.'",
-      "id": "1760523854868_0",
-      "ffmpegCommands": "eq=gamma=1.05:contrast=1.05:saturation=1.1,frei0r=shake:intensity=0.01,drawtext=text='The 5 AM Battle':fontsize=120:fontcolor=white@0.9:x=(w-text_w)/2:y=h/4:enable='between(t,0.5,2.5)':alpha='if(lt(t,0.5),0,if(lt(t,1.5),(t-0.5),1))',format=yuv420p"
+      "name": "The Alarm's Edge",
+      "description": "Starts *in media res* with a super-quick (1s) flash of the person looking utterly defeated at the gym (from Scene 2), then cuts sharply back. A close-up of an alarm clock (phone) showing 5:00 AM, rapidly cutting to a close-up of the person's face showing immediate, visceral exhaustion/frustration (grimace, deep sigh, rubbing eyes). Hand reaches to snooze, then hesitates. Quick cut to a slightly messy bedroom, still dark outside. Person (gender neutral, relatable) in bed, clearly struggling to get up, low energy.",
+      "duration": 5,
+      "effects": "Sharp, brief burst of alarm sound (max 1s), then muted. Quick, jarring cuts. On-screen text overlay: 'Ever feel like this?' or 'The battle before the gym.' Soft, natural morning light trying to break through, gentle distant city sounds.",
+      "id": "1760877612228_0",
+      "ffmpegCommands": "blend=all_expr='if(mod(t,1.5)<0.05,255,A)',eq=gamma=1.1:contrast=1.05,drawtext=text='Ever feel like this?':fontcolor=white:fontsize=80:x=(w-text_w)/2:y=h*0.8:shadowcolor=black@0.7:shadowx=2:shadowy=2,format=yuv420p"
     },
     {
-      "name": "The Inner Battle",
-      "description": "Person standing in front of a mirror in workout clothes, looking at their reflection with a mix of fatigue and self-scrutiny. A quick, *perceptible* flash of a 'perfect' social media physique on a phone screen, *precisely synchronized with the VO*. Then, a quick, deliberate head shake, a deep breath, and a subtle shift from doubt to resolve.",
-      "duration": "4 seconds",
-      "effects": "Reflective surfaces, rapid cuts to an 'ideal' image for a fraction of a second to represent comparison. Subtle but clear change in facial expression. Dynamic on-screen text: 'Comparison is a Killer.' or 'Fight Your Inner Critic.'",
-      "id": "1760523854868_1",
-      "ffmpegCommands": "geq=lum='if(between(t,1.5,1.6),255,p(X,Y))',drawtext=text='Comparison is a Killer.':fontsize=90:fontcolor=white@0.9:x='(w-text_w)/2+rand(-3,3)':y='h*0.75+rand(-3,3)':enable='between(t,1,3.5)',format=yuv420p"
+      "name": "The Mental Wall",
+      "description": "Dynamic transition (fast wipe/jump cut) to a gritty gym setting (home gym or commercial, not pristine). Person is at the squat rack or lifting weights, but they're not moving. A shorter, but intense blank stare, expression of deep mental fatigue, rubbing their eyes or temple. A heavy sigh, followed by a moment of absolute stillness. A *very* quick (subliminal 1s) montage of 2-3 brief, jarring flashbacks of past failed lifts or frustrated moments.",
+      "duration": 10,
+      "effects": "Muted gym sounds, absolute silence for 1-2s after sigh. Jarring, rapid blur effect for flashback montage. Internal monologue voiceover. On-screen text overlay: 'Am I even making progress?' / 'The urge to just… quit.' Focus on facial expressions and lack of movement.",
+      "id": "1760877612228_1",
+      "ffmpegCommands": "boxblur=luma_radius='5*abs(sin(t*10))':luma_power=1,vignette=angle=PI/5,drawtext=text='Am I even making progress?':fontcolor=white:fontsize=70:x=(w-text_w)/2:y=h*0.2:shadowcolor=black@0.7:shadowx=2:shadowy=2:enable='between(t,1,5)',drawtext=text='The urge to just... quit.':fontcolor=white:fontsize=70:x=(w-text_w)/2:y=h*0.8:shadowcolor=black@0.7:shadowx=2:shadowy=2:enable='between(t,6,10)',format=yuv420p"
     },
     {
-      "name": "The Grind",
-      "description": "A rapid-cut montage (0.5-1.5 seconds per clip) of short, raw clips: Struggling with a heavy lift (form not perfect, grimace), tired on a run (breathing heavy, pushing through), failing a rep, wiping sweat from their brow, looking exhausted but still pushing. Emphasize *effort* and *endurance* over perfection.",
-      "duration": "10 seconds",
-      "effects": "Close-ups on straining muscles, sweat, heavy breathing sound effects. Dynamic, rapid, slightly desaturated cuts. Handheld camera feel for authenticity. Dynamic on-screen text: 'It's Not Pretty. It's Progress.' or 'The Unseen Grind.'",
-      "id": "1760523854868_2",
-      "ffmpegCommands": "hue=s=0.8,frei0r=shake:intensity=0.02,drawtext=text='It\\'s Not Pretty. It\\'s Progress.':fontsize=100:fontcolor=white@0.9:x=(w-text_w)/2:y=h/2:box=1:boxcolor=black@0.5:boxborderw=10:enable='between(t,1,9)',format=yuv420p"
+      "name": "Just One More",
+      "description": "Following a momentary complete silence, the person takes a deep breath, shakes their head slightly with a precise, isolated close-up, signaling the internal shift. With clear, determined effort, they start their set. It's not perfect, they're gritting their teeth, but they *do it*. Show the raw effort, the strain, the intense focus. Not a triumphant roar, but a quiet, internal victory. No subtle product glances, only the pure grit of the moment.",
+      "duration": 12,
+      "effects": "Momentary complete silence before the deep breath. Focus on muscle contraction, heavy breathing, sound of weights clanking. Uplifting but subtle music begins to swell, acting as a pacer. On-screen text overlay: 'Just one more. Just for me.'",
+      "id": "1760877612228_2",
+      "ffmpegCommands": "vignette=a='(PI/4) * (1 - t/12)',drawtext=text='Just one more. Just for me.':fontcolor=white:fontsize=75:x=(w-text_w)/2:y=h*0.85:shadowcolor=black@0.7:shadowx=2:shadowy=2:enable='gte(t,6)',format=yuv420p"
     },
     {
-      "name": "The Temptation",
-      "description": "Quick shot of a tempting, unhealthy food item (e.g., donut, pizza slice, fast food wrapper). The person pauses, *briefly touching or hesitating over the unhealthy item with longing*, then makes a deliberate choice to pick up a Bodybuilding.com branded water bottle, a piece of fruit, or a Bodybuilding.com protein shake instead. A quiet, almost unnoticed moment of discipline.",
-      "duration": "5 seconds",
-      "effects": "Warm, inviting lighting on the 'temptation,' then a cooler, crisp lighting on the healthier choice. Sound of a subtle internal 'gulp.' Subtle brand integration of Bodybuilding.com products. Dynamic on-screen text: 'Discipline Wins.' or 'Small Choices, Big Impact.'",
-      "id": "1760523854868_3",
-      "ffmpegCommands": "lutrgb=r='gammaval(1-0.1*tanh(t-2.5))':b='gammaval(1+0.1*tanh(t-2.5))',drawtext=text='Discipline Wins.':fontsize=110:fontcolor=white@0.9:x=(w-text_w)/2:y=h*0.8:enable='gte(t,2.5)':alpha='if(lt(t,3),0,if(lt(t,3.5),(t-3)/0.5,1))',format=yuv420p"
+      "name": "The Quiet Win",
+      "description": "Person finishes their set, slumps slightly, clearly exhausted but with a faint, genuine, almost imperceptible smile or nod of self-approval. This victory is not for the camera; it’s for *themselves*. They wipe sweat from their brow. Shot of them walking away, shoulders a little straighter, head held a little higher, but still tired.",
+      "duration": 8,
+      "effects": "Music becomes slightly more hopeful and subtly dynamic. Natural sounds of the gym, the slight thud of weights being racked, a satisfied exhale. On-screen text overlay: 'The win no one sees.'",
+      "id": "1760877612228_3",
+      "ffmpegCommands": "eq=contrast='1+0.1*t/8':gamma='1-0.05*t/8',drawtext=text='The win no one sees.':fontcolor=white:fontsize=80:x=(w-text_w)/2:y=h*0.5:shadowcolor=black@0.7:shadowx=2:shadowy=2:enable='between(t,2,7)',format=yuv420p"
     },
     {
-      "name": "The Quiet Victory",
-      "description": "A small, personal breakthrough. Maybe completing that rep they failed before, a moment of focused, smooth movement they just mastered, or a satisfied but tired smile after a challenging session. Not a grand celebration, but a quiet, internal moment of pride and relief. Could be looking at their watch after hitting a target.",
-      "duration": "8 seconds",
-      "effects": "Soft, focused lighting on the person's expression. Sound of a satisfied exhale or a quiet 'yes'. *Subtle* increase in music tempo and warmth, feeling like a gentle sigh of relief or warm internal glow, not a dramatic crescendo. Dynamic on-screen text: 'Quiet Victories.' or 'Proof of Grit.'",
-      "id": "1760523854868_4",
-      "ffmpegCommands": "vignette,eq=saturation='1+0.2*(t/8)',colorbalance=rh='0.1*(t/8)',drawtext=text='Quiet Victories.':fontsize=90:fontcolor=white@0.8:x=(w-text_w)/2:y=h*0.2:enable='gte(t,2)':alpha='if(lt(t,2),0,if(lt(t,4),(t-2)/2,1))',format=yuv420p"
-    },
-    {
-      "name": "Why We Keep Going",
-      "description": "Person looking out a window at a sunrise, or at their own reflection again, but this time with a clear, determined, and understanding look in their eyes. *Preceded by a very quick (1-2 second), multi-frame montage showing diverse hands (different skin tones, ages) silently performing similar acts of discipline or effort (e.g., re-racking weights, tying laces, pouring a shake) to visually reinforce 'You're not alone'.* A subtle nod of connection with the broader fitness community. A well-worn Bodybuilding.com branded gym bag or fitness journal is visible. On-screen text for the CTA.",
-      "duration": "5 seconds",
-      "effects": "Warm, inspiring lighting. A sense of peace and renewed purpose. Slow motion for emphasis on resolve. Organic, personal community connection visuals. Subtle brand integration of Bodybuilding.com products. On-screen text for the CTA.",
-      "id": "1760523854868_5",
-      "ffmpegCommands": "setpts=2.0*PTS,eq=gamma=1.05:saturation=1.2,colorbalance=rh=0.1,drawtext=text='Join the Community\\nBodybuilding.com':fontsize=80:fontcolor=white@0.9:x=(w-text_w)/2:y=h*0.8:line_spacing=10:enable='gte(t,1)':alpha='if(lt(t,1),0,if(lt(t,2),(t-1),1))',format=yuv420p"
+      "name": "Beyond the Reps",
+      "description": "Person sitting somewhere quiet, maybe stretching or looking out a window. A sense of hard-won peace and accomplishment. No grand gestures, just quiet contemplation. The sun is now fully up, or light is brighter. The person subtly looks towards the implied shared space (not directly at camera) as the final voiceover delivers its message, gently guiding to the community aspect.",
+      "duration": 7,
+      "effects": "Warm, natural light. Soft, inspiring music, subtly reaching its reflective peak. Voiceover reflection. On-screen text overlay: 'The real battle isn't with the weight. It's with the voice that tells you to quit.'",
+      "id": "1760877612228_4",
+      "ffmpegCommands": "curves=preset=warm,gblur=sigma=0.5,drawtext=text='The real battle isn''t with the weight.\\nIt''s with the voice that tells you to quit.':fontcolor=white:fontsize=60:x=(w-text_w)/2:y=(h-text_h)/2:shadowcolor=black@0.7:shadowx=2:shadowy=2:enable='gte(t,1)',format=yuv420p"
     }
   ],
-  "script": "VO (Soft, reflective, a little tired at first, then growing in conviction):\n\n\"5 AM. Again. Every fiber in my body screams 'sleep'.\"\n\n(Sound of a faint, almost mocking, social media notification chime)\n\n\"The highlight reels don't show *this*.\"\n\n(Sound of heavy breathing, weights clanging, shoes squeaking)\n\n\"This isn't always pretty. It's heavy. It's repetitive. Sometimes, it's just... failure.\"\n\n(Sound of a stomach rumble, tempting sizzle)\n\n\"And the choices? They never stop. The easy way, or the way you promised yourself.\"\n\n(A quiet sigh of relief, then a deep, determined breath)\n\n\"But then there are these moments. The one rep you thought you couldn't get. The feeling of breaking through. The silent pride of showing up, even when no one's watching.\"\n\n(Music swells slightly, more hopeful)\n\n\"It's not about perfection. It's about consistency. It's about finding your grit, day after day. It's about the belief that the struggle *is* the strength.\"\n\n\"You're not alone in this fight. This journey. This commitment to something more.\"\n\n(On-screen text appears: \"Your Journey. Your Fight. Your Resolve.\")\n\n\"Find what empowers your next step.\"",
-  "numberOfImages": 25,
-  "videoLength": "30-45 seconds (optimized for short-form platforms)",
-  "ctaGoal": "Drive traffic to a dedicated Bodybuilding.com landing page (e.g., 'Your Unseen Fight: Fuel Your Grit') to explore supplements, tools, and community resources that support their authentic fitness journey, positioning the brand as a supportive partner in their quest for strength and resilience. The goal is engagement and brand affinity, leading to discovery.",
-  "voiceTone": "Authentic, introspective, empathetic, gradually shifting to determined and inspiring. The voice should sound like a relatable internal monologue.",
-  "visualStyle": "Raw, natural, documentary-style. Slightly desaturated colors in moments of struggle, transitioning to warmer, more hopeful tones in moments of resolve and quiet victory. Emphasizes human expression, effort, and real-world environments over polished studio shots. Dynamic, concise on-screen text overlays throughout to reinforce key messages, aid accessibility, and boost engagement.",
-  "musicPace": "Starts slow and contemplative, with a melancholic yet determined undertone. Gradually builds *subtly* with a hopeful, quietly uplifting orchestral or acoustic feel towards the end. Not overly dramatic or a triumphant crescendo, but emotionally resonant and supportive of the faster-paced narrative and internal emotional arc. Consider subtle integration of trending sounds/music in the background to increase discoverability, ensuring it doesn't overpower the authentic VO and primary music.",
-  "heading": "The Unseen Fight: Why We Keep Going",
+  "script": [
+    "**(Scene 1: Early Morning Doubt)**",
+    "*Voiceover (soft, tired, internal monologue, impactful line delivered within first 2-3 seconds):* \"The bed feels… undefeated.\"",
+    "",
+    "**(Scene 2: The Mental Wall)**",
+    "*Voiceover (frustrated, questioning, rapid delivery to match quick cuts):* \"Am I even making progress? Is this worth it? This feeling… it never really goes away, does it? The urge to just… stop.\"",
+    "",
+    "**(Scene 3: The Small Push)**",
+    "*Voiceover (a slight shift, more resolved):* \"But what if I just try one more? Just… one. Not for anyone else. Not for the 'gram. Just for me. To prove it to myself.\"",
+    "",
+    "**(Scene 4: The Unseen Triumph)**",
+    "*Voiceover (exhaling, a hint of satisfaction):* \"Okay. Yeah. That's it. That's the win. The one no one sees.\"",
+    "",
+    "**(Scene 5: Reflective Close)**",
+    "*Voiceover (calm, inspiring, a shared secret):* \"Because the real battle isn't with the weight. It's with the voice that tells you to quit. And every single day you show up, even when you don't feel like it… that’s where the strength truly builds. That's the grind. And it's okay if it's messy. It's real.\""
+  ],
+  "numberOfImages": 0,
+  "videoLength": 42,
+  "ctaGoal": "To foster community connection and shared experience. Encourage viewers to share *their* unfiltered moments and engage with the creator's journey.",
+  "voiceTone": "Authentic, raw, vulnerable, empathetic, slightly tired at first, then quietly determined and inspiring.",
+  "visualStyle": "Gritty realism, natural lighting, focus on expressions and effort, slightly desaturated colors (not overly bright or 'perfect'), handheld camera feel for intimacy. On-screen text in an authentic, readable font (e.g., slightly rough sans-serif) to reinforce key messages.",
+  "musicPace": "Starts sharp and melancholic (hook), builds subtly and dynamically with the effort, acting as an invisible pacer, ending on a soft, hopeful, and reflective note. Acoustic/cinematic instrumental, complementing rather than dominating the narrative.",
+  "heading": "The Unfiltered Grind: What No One Sees.",
   "hashtags": [
     "#UnfilteredFitness",
-    "#MyFitnessJourney",
     "#RealTalkFitness",
-    "#FitnessStruggle",
-    "#ConsistencyIsKey",
+    "#TheGrindIsReal",
+    "#FitnessJourney",
     "#MentalStrength",
-    "#NoOneSeesTheGrind",
-    "#FitnessMotivation",
+    "#Motivation",
+    "#DontQuit",
     "#Bodybuildingcom",
-    "#YouAreNotAlone",
-    "#BeyondTheGym",
-    "#MentalToughnessFitness",
-    "#DailyDiscipline",
-    "#BeyondMotivation"
+    "#FitnessStruggles",
+    "#GymLifeRealities"
   ],
-  "description": "Who else battles this every single day? 👇 The real fight isn't always in the gym; it's the unseen struggle to show up, stay consistent, and overcome the inner critic. This is a raw, emotionally authentic look at those internal battles and quiet victories that truly define a fitness journey. You're not alone in this fight. Share your story in the comments. And for tools and community that truly get it, discover what fuels your relentless pursuit at Bodybuilding.com [link in bio].",
+  "description": "Beyond the perfect reps and highlight reels. This is the raw, quiet battle we all face on our fitness journey. The moments of doubt, the internal pep talks, the sheer will to just show up. If you've ever felt this, you're not alone. Share your 'unfiltered' moment below. If this resonated, follow for more real stories and tips on navigating your fitness journey.",
   "preferredPlatform": [
     "TikTok",
     "Instagram Reels",
-    "YouTube Shorts",
-    "Facebook Video"
+    "YouTube Shorts"
   ]
 }

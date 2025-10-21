@@ -1,6 +1,3 @@
-
-
-
 // FIX: Import Buffer to resolve type errors in Node.js environment.
 import { Buffer } from 'buffer';
 import { GoogleGenAI, Type } from "@google/genai";
@@ -19,6 +16,7 @@ const roles: string[] = [
 import { githubService } from './github.service';
 import { elevenlabsService } from './elevenlabs.service';
 import ffmpeg from 'fluent-ffmpeg';
+
 import fetch from 'node-fetch';
 
 // Reuse frontend types
@@ -26,6 +24,7 @@ interface Company { name: string; description: string; [key: string]: any; }
 interface Scene { id: string; name: string; description: string; duration: string; effects: string; }
 interface VideoIdea {
   scenes: Scene[];
+  onScreenText?: { time: string; duration: string; text: string }[];
   script: string;
   voiceTone: string;
   visualStyle: string;
@@ -34,6 +33,15 @@ interface VideoIdea {
 
 class GeminiService {
     private ai: GoogleGenAI;
+
+    /**
+     * Escapes text for use in an FFMPEG drawtext filter.
+     * @param text The text to escape.
+     * @returns The escaped text.
+     */
+    private escapeFfmpegText(text: string): string {
+        return text.replace(/'/g, "'\\''").replace(/:/g, '\\:').replace(/%/g, '\\%');
+    }
 
     constructor(apiKey: string) {
         if (!apiKey) throw new Error("Gemini API key is not configured.");
@@ -151,6 +159,8 @@ class GeminiService {
             4.  **Duration:** Use the provided scene duration (in seconds) to calculate timings. Assume a frame rate of 30fps for calculations (e.g., duration in frames = scene_duration * 30).
             5.  **Escaping:** Be careful with quotes inside the filter graph. Escape them properly with a backslash (e.g., \\"text\\").
             6.  **Pixel Format:** Ensure the output has a widely compatible pixel format by ending the filter chain with ",format=yuv420p".
+            7.  **No 'translate' filter:** Do NOT use a filter named 'translate'. To achieve movement or panning, use the 'zoompan' filter with expressions for 'x' and 'y' based on the time 't'. For example, to pan right, you could use "zoompan=z=1:x='t*50'".
+
 
             **INPUT SCENES:**
             ${JSON.stringify(scenes.map(s => ({id: s.id, effect: s.effect, duration: s.duration})), null, 2)}
@@ -194,6 +204,7 @@ class GeminiService {
 
         } catch (error) {
             console.error("Error calling Gemini API for FFMPEG commands:", error);
+            // FIX: Ensure a value is returned for every scene ID, even on error.
             const errorMap: Record<string, string> = {};
             scenes.forEach(scene => {
                 errorMap[scene.id] = 'Error: AI command generation failed.';
@@ -219,7 +230,7 @@ class GeminiService {
         return img.image.imageBytes as string;
     }
 
-    public async createVideoFromAssets(imageFiles: {path: string, duration: number, ffmpegCommand?: string}[], audioFile: string, outputPath: string): Promise<void> {
+    public async createVideoFromAssets(imageFiles: {path: string, duration: number, ffmpegCommand?: string, onScreenText?: string}[], audioFile: string, outputPath: string): Promise<void> {
         return new Promise((resolve, reject) => {
             const command = ffmpeg();
     
@@ -232,7 +243,7 @@ class GeminiService {
                         '-loop 1',          // Loop the image
                         `-t ${img.duration}`  // Set duration for this input
                     ]);
-                
+                 
                 // Check if a valid, non-error command was provided
                 const isCommandValid = img.ffmpegCommand && 
                                      img.ffmpegCommand.trim() !== '{}' && 
@@ -242,7 +253,23 @@ class GeminiService {
                 // Use the provided command or a default fade effect
                 let vfCommand = isCommandValid
                     ? img.ffmpegCommand
-                    : `fade=in:st=0:d=0.5,fade=out:st=${img.duration - 0.5}:d=0.5`;
+                    : `fade=in:st=0:d=0.5,fade=out:st=${(img.duration - 0.5).toFixed(1)}:d=0.5`;
+
+                // If there is on-screen text for this scene, add the drawtext filter.
+                if (img.onScreenText) {
+                    const escapedText = this.escapeFfmpegText(img.onScreenText);
+                    // This drawtext filter centers the text, with a white font and a semi-transparent black box.
+                    // Determine the correct font path based on the operating system for cross-platform compatibility.
+                    const fontPath = os.platform() === 'win32' 
+                        // FFmpeg on Windows requires special escaping for the drive letter colon.
+                        ? 'C\\:/Windows/Fonts/arial.ttf' 
+                        // A common font path for Debian/Ubuntu. You may need to install fonts like `apt-get install fonts-dejavu`.
+                        : '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf';
+
+                    const drawTextFilter = `drawtext=text='${escapedText}':fontfile='${fontPath}':fontsize=60:fontcolor=white:x=(w-text_w)/2:y=(h-text_h)/2:box=1:boxcolor=black@0.5:boxborderw=10`;
+                    // Append the drawtext filter to the existing visual effects.
+                    vfCommand = `${vfCommand},${drawTextFilter}`;
+                }
     
                 // The AI is prompted to add format=yuv420p. If not present, we add it for compatibility.
                 if (vfCommand && !vfCommand.includes('format=yuv420p')) {
@@ -266,7 +293,7 @@ class GeminiService {
                 .complexFilter(filterComplex)
                 .outputOptions([
                     '-map "[v]"',                  // Map the final video stream
-                    `-map ${imageFiles.length}:a`, // Map the audio stream
+                    `-map ${imageFiles.length}:a`,
                     '-c:v libx264',                // Use a common video codec
                     '-c:a aac',                    // Use a common audio codec
                     '-r 30',                       // Set framerate to 30
@@ -290,6 +317,134 @@ class GeminiService {
         });
     }
 
+    public async performTextUtility(task: string, data: any): Promise<any> {
+        switch (task) {
+            case 'analyzeRenderError':
+                return this.analyzeRenderError(data);
+            case 'formatBody':
+                return this.formatJsonBody(data.body);
+            case 'suggestHeaders':
+                return this.suggestHttpHeaders(data.body);
+            case 'suggestFix':
+                return this.suggestApiFix(data);
+            default:
+                throw new Error(`Unknown text utility task: ${task}`);
+        }
+    }
+
+    public async formatJsonBody(body: string): Promise<string> {
+        try {
+            const parsed = JSON.parse(body);
+            return JSON.stringify(parsed, null, 2);
+        } catch (e) {
+            return body; // Not JSON, return as is.
+        }
+    }
+
+    public async suggestHttpHeaders(body: string): Promise<string> {
+        const prompt = `
+            Based on the following request body, suggest appropriate HTTP headers.
+            If the body is JSON, suggest "Content-Type: application/json".
+            Always include a User-Agent.
+            Provide ONLY the headers, one per line (e.g., "Header-Name: value").
+
+            Body:
+            ${body}
+        `;
+        const response = await this.ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: prompt,
+        });
+        if (!response.text) throw new Error("Failed to get analysis from Gemini for the render error.");
+        return response.text.trim();
+    }
+
+    public async suggestApiFix(data: any): Promise<any> {
+        const { baseUrl, endpoint, headers, requestBody, responseBody } = data;
+        const prompt = `
+            I made an API request and got an error. Here are the details:
+            - Base URL: ${baseUrl}
+            - Endpoint: ${endpoint}
+            - Headers:\n${headers}
+            - Request Body:\n${requestBody}
+            - Response Body:\n${responseBody}
+
+            Analyze the request and response, and suggest a fix. Your response must be a JSON object with three optional keys: "updatedEndpoint", "updatedHeaders", "updatedBody", and a mandatory key "explanation".
+            - "explanation": A clear, concise explanation of the problem and the fix.
+            - "updated...": Only include a key if you are changing its value.
+
+            Example response if the endpoint was wrong:
+            {
+                "updatedEndpoint": "/api/v2/users",
+                "explanation": "The endpoint '/api/v1/users' seems to be deprecated. I've updated it to '/api/v2/users' which is the current version."
+            }
+        `;
+        const response = await this.ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: prompt,
+            config: {
+                responseMimeType: "application/json",
+            },
+        });
+        
+        const responseText = response.text;
+        if (!responseText) {
+            throw new Error("Failed to get a valid text response from Gemini for API fix suggestion.");
+        }
+        const jsonString = this._extractJson(response.text);
+        if (!jsonString) {
+             throw new Error("Failed to extract JSON from Gemini response for API fix suggestion.");
+        }
+        return JSON.parse(jsonString);
+    }
+    private _extractJson(text: string): string {
+        const match = text.match(/```json\n([\s\S]*?)\n```/);
+        return match ? match[1].trim() : text.trim();
+    }
+
+    public async analyzeRenderError(data: any): Promise<string> {
+        const { error, request } = data;
+        const prompt = `
+            You are an expert FFMPEG and backend engineer. A video rendering process failed.
+            Analyze the following error message and the request payload that was sent to the rendering endpoint.
+
+            **Error Message:**
+            \`\`\`
+            ${error}
+            \`\`\`
+
+            **Request Payload (sent to the rendering service):**
+            \`\`\`json
+            ${JSON.stringify(request, null, 2)}
+            \`\`\`
+
+            **Your Task:**
+            1.  Identify the root cause of the error. Be specific. For FFMPEG errors, point to the exact filter or parameter that is wrong.
+            2.  Provide a clear, step-by-step solution.
+            3.  If the error is in the FFMPEG command, provide the corrected command.
+            4.  Format your response as a JSON object with two keys: "analysis" and "solution".
+
+            **Example JSON Output:**
+            \`\`\`json
+            {
+              "analysis": "The FFMPEG error 'Filter not found' for 'frei0r_ripple' indicates an incorrect filter name was used. The frei0r filter library syntax requires 'frei0r=filtername', not an underscore.",
+              "solution": "The FFMPEG command for the scene with the 'ripple' effect needs to be corrected. The prompt used to generate the command should be updated to enforce the 'frei0r=ripple' syntax. The corrected FFMPEG filter string would be 'frei0r=ripple:amplitude=0.05,format=yuv420p'."
+            }
+            \`\`\`
+        `;
+
+        const response = await this.ai.models.generateContent({
+            model: "gemini-2.5-pro",
+            contents: prompt,
+            config: {
+                responseMimeType: "application/json"
+            }
+        });
+
+        if (!response.text) throw new Error("Failed to get analysis from Gemini for the render error.");
+        return response.text;
+    }
+
     public async generateAndSaveAssets(company: Company, videoIdea: VideoIdea): Promise<void> {
         const generationId = Date.now().toString();
         const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'narrative-nexus-'));
@@ -309,7 +464,7 @@ class GeminiService {
         }));
         const ffmpegCommandsMap = await this.generateFfmpegCommands(scenesForFfmpeg);
 
-        const imageFilePaths: {path: string, duration: number, ffmpegCommand: string}[] = [];
+        const imageFilePaths: {path: string, duration: number, ffmpegCommand: string, onScreenText?: string}[] = [];
         for (const [index, scene] of videoIdea.scenes.entries()) {
             const base64Image = await this.generateSingleImage({ sceneDescription: scene.description, visualStyle: videoIdea.visualStyle, characterDescription });
             const imageBuffer = Buffer.from(base64Image, 'base64');
@@ -318,7 +473,14 @@ class GeminiService {
             imageFilePaths.push({ 
                 path: imagePath, 
                 duration: parseFloat(scene.duration) || 3,
-                ffmpegCommand: ffmpegCommandsMap[scene.id] || '' // Add the generated command
+                ffmpegCommand: ffmpegCommandsMap[scene.id] || '', // Add the generated command
+                onScreenText: videoIdea.onScreenText?.find(txt => {
+                    const sceneStartTime = videoIdea.scenes.slice(0, index).reduce((acc, s) => acc + parseFloat(s.duration), 0);
+                    const sceneEndTime = sceneStartTime + parseFloat(scene.duration);
+                    const textStartTime = parseFloat(txt.time);
+                    // Check if the text's start time falls within the current scene's time range
+                    return textStartTime >= sceneStartTime && textStartTime < sceneEndTime;
+                })?.text
             });
         }
 

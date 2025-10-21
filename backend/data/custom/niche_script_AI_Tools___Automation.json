@@ -1,0 +1,92 @@
+{
+  "coreProblem": "The soul-crushing cycle of creative burnout, staring at a blank screen, and feeling utterly stuck, despite having passion and ideas. It's the silent battle with writer's block that drains joy from creation and makes you question your abilities.",
+  "targetEmotion": "Empathy, validation, hope, relief, empowerment, inspiration, renewed joy.",
+  "scenes": [
+    {
+      "name": "The Blank Stare",
+      "description": "Rapid cuts: Close-up on a person staring intently, then dejectedly, at a laptop screen showing a blinking cursor on a blank document. Messy desk, coffee cups, signs of prolonged struggle. Quick zoom in on their slumping posture and tired eyes.",
+      "duration": 2,
+      "effects": "Muted colors, quick, sharp handheld camera feel. Ambient sound of distant city noise or faint, hesitant keyboard clicks. Focus on the instant, intense relatability of the struggle. Bold, on-screen text overlay: 'Stuck staring at a blank screen again?'",
+      "id": "1760883238918_0",
+      "ffmpegCommands": "eq=saturation=0.8,zoompan=z=1.02:x='2*sin(t*10)':y='2*cos(t*15)':d=60:s=1080x1920,drawtext=text='Stuck staring at a blank screen again?':fontcolor=white:fontsize=70:x=(w-text_w)/2:y=h*0.75:font=Arial:style=Bold:shadowcolor=black@0.6:shadowx=2:shadowy=2,format=yuv420p"
+    },
+    {
+      "name": "The Inner Turmoil",
+      "description": "Quick cuts: person running hands through hair, sighing deeply, typing a few words then deleting them. A brief moment of profound silence (1-2 seconds) as they stare blankly, followed by restless pacing. Zoom in on their face – tired, stressed, almost defeated. Emphasize the mental exhaustion before renewed frustration.",
+      "duration": 3,
+      "effects": "Quick cuts, increased tempo of background sound (subtly), close-ups on expressions. A sharp 1-second silence after hesitant actions, then a burst of frustrated movement. Focus on the raw human struggle and internal monologue. On-screen text overlay: 'This is what creative burnout feels like.'",
+      "id": "1760883238918_1",
+      "ffmpegCommands": "zoompan=z='min(zoom+0.001,1.1)':d=90:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920,drawtext=text='This is what creative burnout feels like.':fontcolor=white:fontsize=70:x=(w-text_w)/2:y=h/2:font=Arial:style=Bold:shadowcolor=black@0.6:shadowx=2:shadowy=2,format=yuv420p"
+    },
+    {
+      "name": "A Glimmer of Hope",
+      "description": "The person takes a quick break, scrolls on their phone. A flash of something intriguing on the screen – a headline about 'breaking creative blocks with new tech' or 'AI-powered idea generation.' It's not explicitly Jasper, but a clear concept of *smart assistance*. A flicker of curiosity, a sharp upward shift in their eyes.",
+      "duration": 2,
+      "effects": "Slight shift to warmer lighting, a subtle, upward inflection in music. A *very quick* handheld shot of the phone screen, showing a brief, intriguing conceptual headline/image related to creative solutions (e.g., stylized chat interface showing a conceptual output), not a direct product ad.",
+      "id": "1760883238918_2",
+      "ffmpegCommands": "colorbalance=rs=0.1:bs=-0.1,zoompan=z=1.03:x='3*sin(t*25)':y='3*cos(t*30)':d=60:s=1080x1920,format=yuv420p"
+    },
+    {
+      "name": "Tentative Exploration",
+      "description": "Back at the laptop, they hesitantly open a new tab. A brief shot of them typing a relatable prompt (e.g., 'Help me brainstorm blog ideas for sustainable living' or 'Craft a compelling opening for a sci-fi novel'). A quick moment of anticipation, a deep breath before hitting enter. Skeptical but willing to try.",
+      "duration": 3,
+      "effects": "Focus on their hands, the screen. Sound of a few confident clicks, then a quick moment of expectant silence. Camera holds steady, anticipating the outcome. On-screen text overlay: 'What if AI could jumpstart *your* ideas?'",
+      "id": "1760883238918_3",
+      "ffmpegCommands": "drawtext=text='What if AI could jumpstart *your* ideas?':fontcolor=white:fontsize=72:x=(w-text_w)/2:y=h/2:font=Arial:style=Bold:shadowcolor=black@0.6:shadowx=2:shadowy=2:alpha='if(lt(t,0.5),0,min(1,(t-0.5)/1))',format=yuv420p"
+    },
+    {
+      "name": "The Breakthrough",
+      "description": "Their eyes widen slightly. A small, genuine smile spreads. They read the screen, nod, and a brief flash of the AI-generated bullet points or headline appears on screen. Then, they confidently start typing *themselves*, building upon what they see, perhaps adding a handwritten note or sketching an accompanying idea. It's the 'aha!' moment of extending, not just copying, with their own human touch.",
+      "duration": 3,
+      "effects": "Lighting brightens, colors become more vibrant. Music swells slightly, a subtle 'lightbulb' moment without being cheesy, emphasizing the emotional shift. Quick visual flash of initial AI output, then clear focus on the user's active, creative expansion. On-screen text overlay: 'Not replacing you, *amplifying* you.'",
+      "id": "1760883238918_4",
+      "ffmpegCommands": "eq=brightness='if(lt(t,0.2),0.4,min(0.1,t*0.05))':saturation='min(1.25, 1+t*0.1)',drawtext=text='Not replacing you, *amplifying* you.':fontcolor=white:fontsize=70:x=(w-text_w)/2:y=h*0.8:font=Arial:style=Bold:shadowcolor=black@0.6:shadowx=2:shadowy=2:enable='gt(t,0.5)',format=yuv420p"
+    },
+    {
+      "name": "Creative Flow & Joy",
+      "description": "Time lapse of them working with renewed energy. They are smiling, engaged, perhaps sketching ideas or making notes alongside their typing. Show them taking short, refreshed breaks, then returning to work with genuine enthusiasm and productive focus. Emphasize joyful *engagement* and ease of creation, not lack of effort.",
+      "duration": 8,
+      "effects": "Upbeat, smooth tempo music, warm, natural light. Fluid camera movements, showing continuous, productive work. Focus on their relaxed posture and engaged expression, highlighting active human creativity. On-screen text overlay: 'Rediscover the joy of creating.'",
+      "id": "1760883238918_5",
+      "ffmpegCommands": "colorbalance=rs=0.05:bs=-0.05,zoompan=z='min(1.08,1+t/10)':d=240:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)+t*4':s=1080x1920,drawtext=text='Rediscover the joy of creating.':fontcolor=white:fontsize=72:x=(w-text_w)/2:y=h*0.85:font=Arial:style=Bold:shadowcolor=black@0.6:shadowx=2:shadowy=2:alpha='if(lt(t,1),0,min(1,(t-1)/1.5))',format=yuv420p"
+    },
+    {
+      "name": "Accomplishment & Connection",
+      "description": "They lean back, looking at their finished work with pride. They share it with a friend or colleague (via video call or in person), who reacts positively, genuinely impressed by the *quality and originality* of *their unique voice* shining through. The focus is on the human connection and the joy of completing a meaningful creative task that is truly *theirs*.",
+      "duration": 3,
+      "effects": "Satisfied sigh, eye contact, sense of completion. Gentle, uplifting music. The final shot is of them smiling, content and empowered, with a clear, concise on-screen CTA.",
+      "id": "1760883238918_6",
+      "ffmpegCommands": "eq=brightness=0.03:gamma=1.05,zoompan=z='min(zoom+0.001,1.05)':d=90:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920,drawtext=text='Start Creating Today':fontcolor=white:fontsize=80:x=(w-text_w)/2:y=h*0.8:font=Arial:style=Bold:shadowcolor=black@0.5:shadowx=2:shadowy=2:enable='gt(t,0.5)',format=yuv420p"
+    }
+  ],
+  "script": "Another day, another blank page. You know that feeling, right? That pit in your stomach when the ideas just... aren't there. Or they're there, but they feel flat. You love what you do, but sometimes, the grind just grinds you down.\n\nYou scroll, you search, you hope for a spark. Anything to break free from the silence. What if there was something that understood your *needs*, something that could thoughtfully *process your prompts* and then give you a starting point?\n\nAnd then... a flicker. Not a solution handed to you, but a whisper of an idea. A new angle. Just enough to get *your* brain, *your* creativity, firing again. It's not taking over; it's giving you back your joy.\n\nThat's the feeling. The weight lifts. The words flow with *ease*. It's still *you* creating, but now, it feels effortless. It’s what passion feels like, amplified. More human, not less.",
+  "numberOfImages": 7,
+  "videoLength": 24,
+  "ctaGoal": "Drive engagement, spark curiosity about overcoming creative blocks, and encourage viewers to explore how Jasper.ai can amplify their unique creativity. (Subtle call to action in voiceover, reinforced with clear on-screen text: 'Discover your amplified creativity. Link in bio.' or 'Rediscover Your Flow. Jasper.ai').",
+  "voiceTone": "Empathetic, warm, relatable, inspiring, slightly reflective initially, then becoming hopeful and encouraging. A friendly, trustworthy voice.",
+  "visualStyle": "Authentic, documentary-style, natural lighting, sharp handheld feel in initial struggling scenes, gradually transitioning to cleaner, more vibrant, and stable shots as relief and flow set in. Strong focus on facial expressions and genuine human emotion. Crucial use of concise, bold on-screen text overlays for key messages, especially in the first few seconds to grab attention and reinforce the narrative.",
+  "musicPace": "Starts slow, slightly melancholic/tense, then transitions to a hopeful, gentle, and finally uplifting, inspiring pace. Instrumental only, no lyrics, designed to underscore emotional shifts.",
+  "heading": "Ever felt like this? Your creativity, amplified.",
+  "hashtags": [
+    "#CreativeBlock",
+    "#WriterLife",
+    "#ContentCreator",
+    "#CreativeFlow",
+    "#HumanCreativity",
+    "#InspirationBoost",
+    "#AIforCreators",
+    "#JasperAI",
+    "#UnlockYourPotential",
+    "#NoMoreBlankPage",
+    "#WriterStruggles",
+    "#AItoolsforCreatives",
+    "#TellMeYourStruggles"
+  ],
+  "description": "We've all been there: staring at a blank page, feeling completely drained. 😩 That creative burnout is real, but what if there was a way to reignite your spark and amplify *your* unique voice? ✨ This isn't about finding shortcuts; it's about rediscovering the pure joy in your creative process. Watch how a little help can make you feel MORE human, not less. 👇",
+  "preferredPlatform": [
+    "TikTok",
+    "Instagram Reels",
+    "YouTube Shorts",
+    "Facebook Video"
+  ]
+}

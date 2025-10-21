@@ -1,4 +1,4 @@
-import { GoogleGenAI, Modality, GenerateContentResponse } from "@google/genai";
+import { GoogleGenAI, GenerateImagesResponse } from "@google/genai";
 
 class ImageGenerationService {
     private ai: GoogleGenAI;
@@ -35,25 +35,19 @@ class ImageGenerationService {
         console.log(`Attempting to generate image for final prompt: "${finalPrompt}"`);
 
         try {
-            const response: GenerateContentResponse = await this.ai.models.generateContent({
-                model: 'gemini-2.5-flash-image',
-                contents: {
-                    parts: [{ text: finalPrompt }],
-                },
+            // FIX: Use the 'generateImages' method with a valid Imagen model for image generation.
+            const response: GenerateImagesResponse = await this.ai.models.generateImages({
+                model: 'imagen-4.0-generate-001',
+                prompt: finalPrompt,
                 config: {
-                    // CORRECT: Specify that the desired response is an image
-                    responseModalities: [Modality.IMAGE],
+                    numberOfImages: sampleCount,
+                    aspectRatio: aspectRatio as "1:1" | "9:16" | "16:9" | "4:3" | "3:4",
+                    outputMimeType: 'image/jpeg',
                 },
             });
             
-            const images: string[] = [];
-            if (response.candidates && response.candidates.length > 0) {
-                for (const part of response.candidates?.[0]?.content?.parts ?? []) {
-                    if (part.inlineData) {
-                        images.push(part?.inlineData?.data ?? '');
-                    }
-                }
-            }
+            // FIX: Correctly map the response from `generateImages`.
+            const images = response.generatedImages?.map(img => img.image.imageBytes as string) ?? [];
 
             if (images.length > 0) {
                 return images;
