@@ -15,7 +15,8 @@ const roles: string[] = [
 ];
 import { githubService } from './github.service';
 import { elevenlabsService } from './elevenlabs.service';
-import ffmpeg from 'fluent-ffmpeg';
+import { FFmpeg } from '@ffmpeg/ffmpeg';
+import { fetchFile } from '@ffmpeg/util';
 
 import fetch from 'node-fetch';
 
@@ -153,11 +154,14 @@ class GeminiService {
             You are an expert FFMPEG engineer. Your task is to convert natural language descriptions of video effects into precise FFMPEG filter graph strings for the "-vf" flag.
 
             **IMPORTANT RULES:**
-            1.  **Output Format:** You MUST return ONLY a valid JSON object that matches the provided schema. Do not include any markdown, explanations, or any text outside of the JSON structure.
-            2.  **Command Content:** Provide ONLY the filter graph string itself. DO NOT include "ffmpeg -i input.jpg" or the output filename.
-            3.  **Dimensions:** Assume all source images are for vertical video with dimensions 1080x1920 (width x height).
-            4.  **Duration:** Use the provided scene duration (in seconds) to calculate timings. Assume a frame rate of 30fps for calculations (e.g., duration in frames = scene_duration * 30).
-            5.  **Escaping:** Be careful with quotes inside the filter graph. Escape them properly with a backslash (e.g., \\"text\\").
+            1. **Limitation:** Use the standard library of FFMPEG filters only. Do NOT reference any third-party or external filters/plugins.
+            2. **Output Only:** Your response MUST be a JSON object where each key is the scene ID and the value is the corresponding FFMPEG filter graph string.
+            3. **No Explanations:** Do NOT include any explanations, notes, or additional text outside of the JSON object.
+            4.  **Output Format:** You MUST return ONLY a valid JSON object that matches the provided schema. Do not include any markdown, explanations, or any text outside of the JSON structure.
+            5.  **Command Content:** Provide ONLY the filter graph string itself. DO NOT include "ffmpeg -i input.jpg" or the output filename.
+            6.  **Dimensions:** Assume all source images are for vertical video with dimensions 1080x1920 (width x height).
+            7.  **Duration:** Use the provided scene duration (in seconds) to calculate timings. Assume a frame rate of 30fps for calculations (e.g., duration in frames = scene_duration * 30).
+            8.  **Escaping:** Be careful with quotes inside the filter graph. Escape them properly with a backslash (e.g., \\"text\\").
             6.  **Pixel Format:** Ensure the output has a widely compatible pixel format by ending the filter chain with ",format=yuv420p".
             7.  **No 'translate' filter:** Do NOT use a filter named 'translate'. To achieve movement or panning, use the 'zoompan' filter with expressions for 'x' and 'y' based on the time 't'. For example, to pan right, you could use "zoompan=z=1:x='t*50'".
 
@@ -230,91 +234,88 @@ class GeminiService {
         return img.image.imageBytes as string;
     }
 
-    public async createVideoFromAssets(imageFiles: {path: string, duration: number, ffmpegCommand?: string, onScreenText?: string}[], audioFile: string, outputPath: string): Promise<void> {
-        return new Promise((resolve, reject) => {
-            const command = ffmpeg();
-    
-            const filterComplex: string[] = [];
-    
-            // Add inputs and build the filter graph for each image
-            imageFiles.forEach((img, index) => {
-                command.input(img.path)
-                    .inputOptions([
-                        '-loop 1',          // Loop the image
-                        `-t ${img.duration}`  // Set duration for this input
-                    ]);
-                 
-                // Check if a valid, non-error command was provided
-                const isCommandValid = img.ffmpegCommand && 
-                                     img.ffmpegCommand.trim() !== '{}' && 
-                                     img.ffmpegCommand.trim() !== '' && 
-                                     !img.ffmpegCommand.startsWith('Error');
-    
-                // Use the provided command or a default fade effect
-                let vfCommand = isCommandValid
-                    ? img.ffmpegCommand
-                    : `fade=in:st=0:d=0.5,fade=out:st=${(img.duration - 0.5).toFixed(1)}:d=0.5`;
-
-                // If there is on-screen text for this scene, add the drawtext filter.
-                if (img.onScreenText) {
-                    const escapedText = this.escapeFfmpegText(img.onScreenText);
-                    // This drawtext filter centers the text, with a white font and a semi-transparent black box.
-                    // Determine the correct font path based on the operating system for cross-platform compatibility.
-                    const fontPath = os.platform() === 'win32' 
-                        // FFmpeg on Windows requires special escaping for the drive letter colon.
-                        ? 'C\\:/Windows/Fonts/arial.ttf' 
-                        // A common font path for Debian/Ubuntu. You may need to install fonts like `apt-get install fonts-dejavu`.
-                        : '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf';
-
-                    const drawTextFilter = `drawtext=text='${escapedText}':fontfile='${fontPath}':fontsize=60:fontcolor=white:x=(w-text_w)/2:y=(h-text_h)/2:box=1:boxcolor=black@0.5:boxborderw=10`;
-                    // Append the drawtext filter to the existing visual effects.
-                    vfCommand = `${vfCommand},${drawTextFilter}`;
-                }
-    
-                // The AI is prompted to add format=yuv420p. If not present, we add it for compatibility.
-                if (vfCommand && !vfCommand.includes('format=yuv420p')) {
-                    vfCommand += ',format=yuv420p';
-                }
-    
-                // Define a complete filter chain for this input: scale to 1080x1920, then apply the effect.
-                const filterString = `[${index}:v]scale=1080:1920,setsar=1[scaled${index}]; [scaled${index}]${vfCommand}[v${index}]`;
-                filterComplex.push(filterString);
-            });
-    
-            // Add the audio input
-            command.input(audioFile);
-    
-            // Build the final concat filter string to combine all processed video streams
-            const concatStreams = imageFiles.map((_, i) => `[v${i}]`).join('');
-            const concatFilter = `${concatStreams}concat=n=${imageFiles.length}:v=1:a=0[v]`;
-            filterComplex.push(concatFilter);
-    
-            command
-                .complexFilter(filterComplex)
-                .outputOptions([
-                    '-map "[v]"',                  // Map the final video stream
-                    `-map ${imageFiles.length}:a`,
-                    '-c:v libx264',                // Use a common video codec
-                    '-c:a aac',                    // Use a common audio codec
-                    '-r 30',                       // Set framerate to 30
-                    '-pix_fmt yuv420p',            // Ensure output pixel format is compatible
-                    '-shortest'                    // Finish encoding when the shortest stream ends (the audio)
-                ])
-                .on('start', function(commandLine) {
-                    console.log('Spawned Ffmpeg with command: ' + commandLine);
-                })
-                .on('error', (err, stdout, stderr) => {
-                    console.error('FFMPEG Error:', err.message);
-                    console.error('FFMPEG stdout:', stdout);
-                    console.error('FFMPEG stderr:', stderr);
-                    reject(new Error(`FFMPEG error: ${err.message}\n${stderr}`));
-                })
-                .on('end', () => {
-                    console.log('FFMPEG processing finished successfully.');
-                    resolve();
-                })
-                .save(outputPath);
+    public async createVideoFromAssets(imageFiles: { path: string, duration: number, ffmpegCommand?: string, onScreenText?: string }[], audioFile: string, outputPath: string): Promise<void> {
+        const ffmpeg = new FFmpeg();
+        ffmpeg.on('log', ({ message }) => {
+            console.log(message);
         });
+        await ffmpeg.load({}); // In Node.js, core URLs are loaded automatically
+
+        const args: string[] = [];
+        const filterComplex: string[] = [];
+
+        // Write files to in-memory filesystem and build command arguments
+        for (const [index, img] of imageFiles.entries()) {
+            const inMemoryPath = `img${index}.jpg`;
+            await ffmpeg.writeFile(inMemoryPath, await fetchFile(img.path));
+            args.push('-loop', '1', '-t', `${img.duration}`, '-i', inMemoryPath);
+
+            const isCommandValid = img.ffmpegCommand &&
+                img.ffmpegCommand.trim() !== '{}' &&
+                img.ffmpegCommand.trim() !== '' &&
+                !img.ffmpegCommand.startsWith('Error');
+
+            let vfCommand = isCommandValid
+                ? img.ffmpegCommand
+                : `fade=in:st=0:d=0.5,fade=out:st=${(img.duration - 0.5).toFixed(1)}:d=0.5`;
+
+            if (img.onScreenText) {
+                // NOTE: @ffmpeg/ffmpeg runs in a wasm container, which doesn't have access to system fonts.
+                // For drawtext to work, you must load a font file into the in-memory filesystem.
+                // This example assumes a font file `arial.ttf` is in the project's root.
+                // You will need to acquire a font and place it there.
+                const fontFileName = 'arial.ttf';
+                try {
+                    // Only write the font file once
+                    if (!(await ffmpeg.listDir('/')).map(f => f.name).includes(fontFileName)) {
+                        const fontPath = path.join(process.cwd(), fontFileName); // Assumes font is in project root
+                        await ffmpeg.writeFile(fontFileName, await fetchFile(fontPath));
+                    }
+                    const escapedText = this.escapeFfmpegText(img.onScreenText);
+                    const drawTextFilter = `drawtext=text='${escapedText}':fontfile=/${fontFileName}:fontsize=60:fontcolor=white:x=(w-text_w)/2:y=(h-text_h)/2:box=1:boxcolor=black@0.5:boxborderw=10`;
+                    vfCommand = `${vfCommand},${drawTextFilter}`;
+                } catch (fontError) {
+                    console.error(`Could not load font file: ${fontFileName}. Skipping on-screen text. Error: ${fontError}`);
+                }
+            }
+
+            if (vfCommand && !vfCommand.includes('format=yuv420p')) {
+                vfCommand += ',format=yuv420p';
+            }
+
+            const filterString = `[${index}:v]scale=1080:1920,setsar=1[scaled${index}]; [scaled${index}]${vfCommand}[v${index}]`;
+            filterComplex.push(filterString);
+        }
+
+        // Add audio
+        const audioInMemoryPath = 'audio.mp3';
+        await ffmpeg.writeFile(audioInMemoryPath, await fetchFile(audioFile));
+        args.push('-i', audioInMemoryPath);
+
+        // Build final concat filter
+        const concatStreams = imageFiles.map((_, i) => `[v${i}]`).join('');
+        const concatFilter = `${concatStreams}concat=n=${imageFiles.length}:v=1:a=0[v]`;
+        filterComplex.push(concatFilter);
+
+        args.push(
+            '-filter_complex', filterComplex.join(';'),
+            '-map', '[v]',
+            '-map', `${imageFiles.length}:a`,
+            '-c:v', 'libx264',
+            '-c:a', 'aac',
+            '-r', '30',
+            '-pix_fmt', 'yuv420p',
+            '-shortest',
+            'output.mp4' // Output filename in the in-memory filesystem
+        );
+
+        console.log('Running FFMPEG with args:', args.join(' '));
+        await ffmpeg.exec(args);
+
+        const data = await ffmpeg.readFile('output.mp4');
+        await fs.writeFile(outputPath, data);
+
+        console.log('FFMPEG processing finished successfully.');
     }
 
     public async performTextUtility(task: string, data: any): Promise<any> {
@@ -434,7 +435,7 @@ class GeminiService {
         `;
 
         const response = await this.ai.models.generateContent({
-            model: "gemini-2.5-pro",
+            model: "gemini-2.5-flash",
             contents: prompt,
             config: {
                 responseMimeType: "application/json"
