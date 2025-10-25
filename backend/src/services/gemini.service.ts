@@ -1,6 +1,7 @@
 // FIX: Import Buffer to resolve type errors in Node.js environment.
 import { Buffer } from 'buffer';
 import { GoogleGenAI, Type } from "@google/genai";
+import { spawn } from 'child_process';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as os from 'os';
@@ -15,8 +16,6 @@ const roles: string[] = [
 ];
 import { githubService } from './github.service';
 import { elevenlabsService } from './elevenlabs.service';
-import { FFmpeg } from '@ffmpeg/ffmpeg';
-import { fetchFile } from '@ffmpeg/util';
 
 import fetch from 'node-fetch';
 
@@ -234,91 +233,84 @@ class GeminiService {
         return img.image.imageBytes as string;
     }
 
-    public async createVideoFromAssets(imageFiles: { path: string, duration: number, ffmpegCommand?: string, onScreenText?: string }[], audioFile: string, outputPath: string): Promise<void> {
-        const ffmpeg = new FFmpeg();
-        ffmpeg.on('log', ({ message }) => {
-            console.log(message);
-        });
-        await ffmpeg.load({}); // In Node.js, core URLs are loaded automatically
+    public async createVideoFromAssets(imageFiles: { path: string, duration: number, ffmpegCommand?: string, onScreenText?: string }[], audioFile: string, outputPath: string): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const args: string[] = [];
 
-        const args: string[] = [];
-        const filterComplex: string[] = [];
+            // 1. Add all image inputs
+            imageFiles.forEach(file => {
+                // For each image, specify it's a looped single-frame input with a specific duration
+                args.push('-loop', '1', '-t', `${file.duration}`, '-i', file.path);
+            });
 
-        // Write files to in-memory filesystem and build command arguments
-        for (const [index, img] of imageFiles.entries()) {
-            const inMemoryPath = `img${index}.jpg`;
-            const fileData = await fs.readFile(img.path);
-            await ffmpeg.writeFile(inMemoryPath, fileData);
-            args.push('-loop', '1', '-t', `${img.duration}`, '-i', inMemoryPath);
+            // 2. Add audio input
+            args.push('-i', audioFile);
 
-            const isCommandValid = img.ffmpegCommand &&
-                img.ffmpegCommand.trim() !== '{}' &&
-                img.ffmpegCommand.trim() !== '' &&
-                !img.ffmpegCommand.startsWith('Error');
+            // 3. Build the complex filter string
+            const filterComplexParts = imageFiles.map((file, index) => {
+                const isCommandValid = file.ffmpegCommand &&
+                    file.ffmpegCommand.trim() !== '{}' &&
+                    file.ffmpegCommand.trim() !== '' &&
+                    !file.ffmpegCommand.startsWith('Error');
 
-            let vfCommand = isCommandValid
-                ? img.ffmpegCommand
-                : `fade=in:st=0:d=0.5,fade=out:st=${(img.duration - 0.5).toFixed(1)}:d=0.5`;
+                let vfCommand = isCommandValid
+                    ? file.ffmpegCommand
+                    : `fade=in:st=0:d=0.5,fade=out:st=${(file.duration - 0.5).toFixed(1)}:d=0.5`;
 
-            if (img.onScreenText) {
-                // NOTE: @ffmpeg/ffmpeg runs in a wasm container, which doesn't have access to system fonts.
-                // For drawtext to work, you must load a font file into the in-memory filesystem.
-                // This example assumes a font file `arial.ttf` is in the project's root.
-                // You will need to acquire a font and place it there.
-                const fontFileName = 'arial.ttf';
-                try {
-                    // Only write the font file once
-                    if (!(await ffmpeg.listDir('/')).map(f => f.name).includes(fontFileName)) {
-                        const fontPath = path.join(process.cwd(), fontFileName); // Assumes font is in project root
-                        const fontData = await fs.readFile(fontPath);
-                        await ffmpeg.writeFile(fontFileName, fontData);
-                    }
-                    const escapedText = this.escapeFfmpegText(img.onScreenText);
-                    const drawTextFilter = `drawtext=text='${escapedText}':fontfile=/${fontFileName}:fontsize=60:fontcolor=white:x=(w-text_w)/2:y=(h-text_h)/2:box=1:boxcolor=black@0.5:boxborderw=10`;
+                if (file.onScreenText) {
+                    const fontPath = 'C:/Windows/Fonts/Arial.ttf'; // Example for Windows. Use a reliable path.
+                    const escapedText = this.escapeFfmpegText(file.onScreenText);
+                    const drawTextFilter = `drawtext=fontfile='${fontPath}':text='${escapedText}':fontsize=60:fontcolor=white:x=(w-text_w)/2:y=(h-text_h)/2:box=1:boxcolor=black@0.5:boxborderw=10`;
                     vfCommand = `${vfCommand},${drawTextFilter}`;
-                } catch (fontError) {
-                    console.error(`Could not load font file: ${fontFileName}. Skipping on-screen text. Error: ${fontError}`);
                 }
-            }
 
-            if (vfCommand && !vfCommand.includes('format=yuv420p')) {
-                vfCommand += ',format=yuv420p';
-            }
+                if (vfCommand && !vfCommand.includes('format=yuv420p')) {
+                    vfCommand += ',format=yuv420p';
+                }
 
-            const filterString = `[${index}:v]scale=1080:1920,setsar=1[scaled${index}]; [scaled${index}]${vfCommand}[v${index}]`;
-            filterComplex.push(filterString);
-        }
+                return `[${index}:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[scaled${index}];[scaled${index}]${vfCommand}[v${index}]`;
+            });
 
-        // Add audio
-        const audioInMemoryPath = 'audio.mp3';
-        const audioData = await fs.readFile(audioFile);
-        await ffmpeg.writeFile(audioInMemoryPath, audioData);
-        args.push('-i', audioInMemoryPath);
+            const concatFilter = imageFiles.map((_, index) => `[v${index}]`).join('') + `concat=n=${imageFiles.length}:v=1:a=0[v]`;
+            const fullFilter = `${filterComplexParts.join(';')};${concatFilter}`;
 
-        // Build final concat filter
-        const concatStreams = imageFiles.map((_, i) => `[v${i}]`).join('');
-        const concatFilter = `${concatStreams}concat=n=${imageFiles.length}:v=1:a=0[v]`;
-        filterComplex.push(concatFilter);
+            args.push('-filter_complex', fullFilter);
 
-        args.push(
-            '-filter_complex', filterComplex.join(';'),
-            '-map', '[v]',
-            '-map', `${imageFiles.length}:a`,
-            '-c:v', 'libx264',
-            '-c:a', 'aac',
-            '-r', '30',
-            '-pix_fmt', 'yuv420p',
-            '-shortest',
-            'output.mp4' // Output filename in the in-memory filesystem
-        );
+            // 4. Map streams and set output options
+            args.push(
+                '-map', '[v]',
+                '-map', `${imageFiles.length}:a`,
+                '-c:v', 'libx264',
+                '-c:a', 'aac',
+                '-pix_fmt', 'yuv420p',
+                '-r', '30',
+                '-shortest',
+                outputPath
+            );
 
-        console.log('Running FFMPEG with args:', args.join(' '));
-        await ffmpeg.exec(args);
+            // 5. Spawn the process and handle events
+            console.log('Spawning FFmpeg with args:', ['ffmpeg', ...args].join(' '));
+            const ffmpegProcess = spawn('ffmpeg', args);
+            let stderr = '';
 
-        const data = await ffmpeg.readFile('output.mp4');
-        await fs.writeFile(outputPath, data);
+            ffmpegProcess.stderr.on('data', (data) => {
+                stderr += data.toString();
+                console.log(`FFmpeg stderr: ${data}`); // For real-time logging
+            });
 
-        console.log('FFMPEG processing finished successfully.');
+            ffmpegProcess.on('close', (code) => {
+                if (code === 0) {
+                    console.log('FFMPEG processing finished successfully.');
+                    resolve(outputPath);
+                } else {
+                    reject(new Error(`FFmpeg process exited with code ${code}:\n${stderr}`));
+                }
+            });
+
+            ffmpegProcess.on('error', (err) => {
+                reject(new Error(`Failed to start FFmpeg process: ${err.message}`));
+            });
+        });
     }
 
     public async performTextUtility(task: string, data: any): Promise<any> {

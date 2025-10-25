@@ -6,11 +6,15 @@ import express from 'express';
 import fs from 'fs/promises';
 import path from 'path';
 import os from 'os';
+import multer from 'multer';
 import { geminiService } from '../services/gemini.service';
 import { googleTtsService } from '../services/tts.service';
 import { imageGenerationService } from '../services/imageGeneration.service';
 
 const router = express.Router();
+
+// Configure multer for multipart/form-data handling
+const upload = multer({ dest: os.tmpdir() });
 
 router.post('/scan-niche', async (req, res, next) => {
     try {
@@ -118,46 +122,50 @@ router.post('/ffmpeg-commands', async (req, res, next) => {
     }
 });
 
-router.post('/render-video', async (req, res, next) => {
+router.post('/render-video', upload.fields([
+    { name: 'audio', maxCount: 1 },
+    { name: 'scene_image' } // Allows multiple files with this field name
+]) as express.RequestHandler, async (req, res, next) => {
+    // Get the temporary directory used by multer for cleanup.
+    const tempDir = os.tmpdir();
     try {
-        const { audio, scenes, metadata } = req.body;
-        if (!audio || !audio.base64 || !scenes || !Array.isArray(scenes)) {
-            return res.status(400).json({ message: 'Invalid payload. Audio (with base64 content) and a scenes array are required.' });
+        const { metadata: metadataString } = req.body;
+        const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+
+        if (!metadataString || !files.audio || !files.scene_image) {
+            return res.status(400).json({ message: 'Invalid payload. "metadata", "audio", and "scene_image" fields are required.' });
         }
 
-        const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'video-render-'));
-        
-        const audioBuffer = Buffer.from(audio.base64, 'base64');
-        const audioPath = path.join(tempDir, 'narration.mp3');
-        await fs.writeFile(audioPath, audioBuffer);
+        const metadata = JSON.parse(metadataString);
+        const scenes = metadata.scenes;
 
+        if (!scenes || !Array.isArray(scenes) || scenes.length !== files.scene_image.length) {
+            return res.status(400).json({ message: 'Mismatch between scene metadata and number of uploaded images.' });
+        }
+
+        const audioFile = files.audio[0];
+        const audioPath = audioFile.path;
+
+        // Map uploaded image files to scene data based on their order.
+        // This relies on the frontend sending files in the same order as the scene metadata.
         const imageFiles = [];
         for (const [index, scene] of scenes.entries()) {
-            if (!scene.image || !scene.image.base64) {
-                await fs.rm(tempDir, { recursive: true, force: true });
-                return res.status(400).json({ message: `Scene at index ${index} is missing image data.` });
-            }
-            const imageBuffer = Buffer.from(scene.image.base64, 'base64');
-            const imagePath = path.join(tempDir, `scene_${index}.jpg`);
-            await fs.writeFile(imagePath, imageBuffer);
-            imageFiles.push({ 
-                path: imagePath, 
+            const imageFile = files.scene_image[index];
+            imageFiles.push({
+                path: imageFile.path,
                 duration: parseFloat(scene.duration) || 3,
                 ffmpegCommand: scene.effects?.ffmpeg
             });
         }
 
         const safeTitle = (metadata?.title || 'video').replace(/[^a-zA-Z0-9]/g, '_');
-        const videoFileName = `${Date.now()}_${safeTitle}.mp4`;
-        
-        // Assume a /public/videos directory exists at the root for serving rendered videos
+        const videoFileName = `${safeTitle}_${Date.now()}.mp4`;
+
         const publicDir = path.join(process.cwd(), 'public', 'videos');
         await fs.mkdir(publicDir, { recursive: true });
         const videoOutputPath = path.join(publicDir, videoFileName);
 
         await geminiService.createVideoFromAssets(imageFiles, audioPath, videoOutputPath);
-
-        await fs.rm(tempDir, { recursive: true, force: true });
         
         const videoUrl = `/videos/${videoFileName}`;
         res.json({ videoUrl });
@@ -165,6 +173,19 @@ router.post('/render-video', async (req, res, next) => {
     } catch (error) {
         console.error('Error in /render-video route:', error);
         next(error);
+    } finally {
+        // Cleanup the temporary directory created by multer
+        if (tempDir) {
+            // Clean up individual files created by multer within the temp directory
+            const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+            if (files) {
+                for (const field in files) {
+                    for (const file of files[field]) {
+                        await fs.unlink(file.path).catch(err => console.error(`Failed to delete temp file ${file.path}:`, err));
+                    }
+                }
+            }
+        }
     }
 });
 

@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { githubService } from '../services/github.service';
@@ -12,23 +12,33 @@ interface AssetRequestBody {
     content: string; // base64 encoded
 }
 
+/**
+ * Middleware to validate the filename for JSON file operations.
+ */
+const validateJsonFilename = (req: Request, res: Response, next: NextFunction) => {
+    const filename = req.body.filename || req.params.filename;
+
+    if (!filename || typeof filename !== 'string') {
+        return res.status(400).json({ message: 'Filename is required.' });
+    }
+
+    // Basic validation: ensure filename is simple and ends with .json
+    if (!/^[a-zA-Z0-9_-]+\.json$/.test(filename)) {
+        return res.status(400).json({ message: 'Invalid filename. Only alphanumeric characters, underscores, and hyphens are allowed, and it must end with .json' });
+    }
+
+    // Prevent directory traversal
+    if (filename.includes('..')) {
+        return res.status(400).json({ message: 'Invalid filename.' });
+    }
+
+    next();
+};
+
 // POST /api/files - Add/update a JSON file
-router.post('/', async (req, res, next) => {
+router.post('/', validateJsonFilename, async (req, res, next) => {
     try {
         const { filename, content } = req.body;
-
-        if (!filename || typeof filename !== 'string') {
-            return res.status(400).json({ message: 'Filename is required in the request body.' });
-        }
-
-        // Basic validation: ensure filename is simple and ends with .json
-        if (!/^[a-zA-Z0-9_-]+\.json$/.test(filename)) {
-            return res.status(400).json({ message: 'Invalid filename. Only alphanumeric characters, underscores, and hyphens are allowed, and it must end with .json' });
-        }
-        // Prevent directory traversal
-        if (filename.includes('..')) {
-            return res.status(400).json({ message: 'Invalid filename.' });
-        }
 
         if (typeof content !== 'object' || content === null) {
             return res.status(400).json({ message: 'Request body must contain a valid JSON object as content.' });
@@ -44,22 +54,9 @@ router.post('/', async (req, res, next) => {
 });
 
 // DELETE /api/files - Delete a JSON file
-router.delete('/', async (req, res, next) => {
+router.delete('/', validateJsonFilename, async (req, res, next) => {
     try {
         const { filename } = req.body;
-
-        if (!filename || typeof filename !== 'string') {
-            return res.status(400).json({ message: 'Filename is required in the request body.' });
-        }
-
-        // Basic validation: ensure filename is simple and ends with .json
-        if (!/^[a-zA-Z0-9_-]+\.json$/.test(filename)) {
-            return res.status(400).json({ message: 'Invalid filename. Only alphanumeric characters, underscores, and hyphens are allowed, and it must end with .json' });
-        }
-        // Prevent directory traversal
-        if (filename.includes('..')) {
-            return res.status(400).json({ message: 'Invalid filename.' });
-        }
 
         const filePath = path.join(CUSTOM_DATA_PATH, filename);
 
@@ -77,22 +74,9 @@ router.delete('/', async (req, res, next) => {
 });
 
 // POST /api/files/content - Get content of a JSON file
-router.post('/content', async (req, res, next) => {
+router.post('/content', validateJsonFilename, async (req, res, next) => {
     try {
         const { filename } = req.body;
-
-        if (!filename || typeof filename !== 'string') {
-            return res.status(400).json({ message: 'Filename is required in the request body.' });
-        }
-
-        // Basic validation: ensure filename is simple and ends with .json
-        if (!/^[a-zA-Z0-9_-]+\.json$/.test(filename)) {
-            return res.status(400).json({ message: 'Invalid filename. Only alphanumeric characters, underscores, and hyphens are allowed, and it must end with .json' });
-        }
-        // Prevent directory traversal
-        if (filename.includes('..')) {
-            return res.status(400).json({ message: 'Invalid filename.' });
-        }
 
         const filePath = path.join(CUSTOM_DATA_PATH, filename);
 
