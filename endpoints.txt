@@ -26,8 +26,13 @@
   },
   {
     "method": "GET",
-    "path": "/api/assets/video-groups",
-    "description": "Retrieves assets grouped by video."
+    "path": "/api/assets/images",
+    "description": "Retrieves a list of image assets. Can be limited by a `count` query parameter to fetch the `n` most recent images (e.g., /api/assets/images?count=5)."
+  },
+  {
+    "method": "GET",
+    "path": "/api/assets/audio",
+    "description": "Retrieves a list of audio assets. Can be limited by a `count` query parameter to fetch the `n` most recent audio files (e.g., /api/assets/audio?count=5)."
   },
   {
     "method": "POST",
@@ -35,12 +40,17 @@
     "description": "Saves a new image asset."
   },
   {
+    "method": "POST",
+    "path": "/api/assets/audio",
+    "description": "Saves a new audio asset."
+  },
+  {
     "method": "DELETE",
     "path": "/api/assets/image/:name",
     "description": "Deletes an image asset by name."
   },
   {
-    "method": "'DELETE'",
+    "method": "DELETE",
     "path": "/api/assets/audio/:name",
     "description": "Deletes an audio asset by name."
   },

@@ -3,6 +3,9 @@ import app from './app';
 import config from './config';
 import os from 'os';
 import { githubService } from './services/github.service';
+import cors from 'cors';
+
+app.use(cors());
 
 const PORT = Number(process.env.PORT || 8080);
 const HOST = process.env.HOST || '0.0.0.0';

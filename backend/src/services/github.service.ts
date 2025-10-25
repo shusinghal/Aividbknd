@@ -9,10 +9,10 @@ interface Asset { name: string; url: string; sha: string; } // sha can be empty 
 const LOCAL_DATA_PATH = path.resolve(__dirname, '..', '..', 'data');
 const COMPANIES_FILE_PATH = path.join(LOCAL_DATA_PATH, 'companies.json');
 const NICHES_FILE_PATH = path.join(LOCAL_DATA_PATH, 'niches.json');
-const ASSETS_PATH = path.join(LOCAL_DATA_PATH, 'assets');
-const IMAGE_ASSETS_PATH = path.join(ASSETS_PATH, 'images');
-const AUDIO_ASSETS_PATH = path.join(ASSETS_PATH, 'audio');
-const VIDEO_ASSETS_PATH = path.join(ASSETS_PATH, 'videos');
+const PUBLIC_ASSETS_PATH = path.resolve(__dirname, '..', '..', 'public', 'assets');
+const IMAGE_ASSETS_PATH = path.join(PUBLIC_ASSETS_PATH, 'images');
+const AUDIO_ASSETS_PATH = path.join(PUBLIC_ASSETS_PATH, 'audio');
+const VIDEO_ASSETS_PATH = path.join(PUBLIC_ASSETS_PATH, 'videos');
 const CUSTOM_FILES_PATH = path.join(LOCAL_DATA_PATH, 'custom');
 
 
@@ -22,7 +22,7 @@ class GithubService {
     public async initializeLocalData(): Promise<void> {
         console.log('Initializing local data storage...');
         await fs.mkdir(LOCAL_DATA_PATH, { recursive: true });
-        await fs.mkdir(ASSETS_PATH, { recursive: true });
+        await fs.mkdir(PUBLIC_ASSETS_PATH, { recursive: true });
         await fs.mkdir(IMAGE_ASSETS_PATH, { recursive: true });
         await fs.mkdir(AUDIO_ASSETS_PATH, { recursive: true });
         await fs.mkdir(VIDEO_ASSETS_PATH, { recursive: true });
@@ -117,7 +117,7 @@ class GithubService {
             const files = await fs.readdir(assetPath);
             return files.map(file => ({
                 name: file,
-                url: path.join(assetPath, file),
+                url: `/assets/${assetType}s/${file}`, // Construct a web-accessible URL
                 sha: '' // Not applicable for local storage
             }));
         } catch (error) {
@@ -127,6 +127,8 @@ class GithubService {
             throw error;
         }
     }
+
+    
 
     public async deleteAsset(assetType: 'image' | 'audio' | 'video', fileName: string, sha: string): Promise<void> {
         const assetPath = this.getAssetPath(assetType);

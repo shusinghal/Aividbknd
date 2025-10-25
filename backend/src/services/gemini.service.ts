@@ -247,7 +247,8 @@ class GeminiService {
         // Write files to in-memory filesystem and build command arguments
         for (const [index, img] of imageFiles.entries()) {
             const inMemoryPath = `img${index}.jpg`;
-            await ffmpeg.writeFile(inMemoryPath, await fetchFile(img.path));
+            const fileData = await fs.readFile(img.path);
+            await ffmpeg.writeFile(inMemoryPath, fileData);
             args.push('-loop', '1', '-t', `${img.duration}`, '-i', inMemoryPath);
 
             const isCommandValid = img.ffmpegCommand &&
@@ -269,7 +270,8 @@ class GeminiService {
                     // Only write the font file once
                     if (!(await ffmpeg.listDir('/')).map(f => f.name).includes(fontFileName)) {
                         const fontPath = path.join(process.cwd(), fontFileName); // Assumes font is in project root
-                        await ffmpeg.writeFile(fontFileName, await fetchFile(fontPath));
+                        const fontData = await fs.readFile(fontPath);
+                        await ffmpeg.writeFile(fontFileName, fontData);
                     }
                     const escapedText = this.escapeFfmpegText(img.onScreenText);
                     const drawTextFilter = `drawtext=text='${escapedText}':fontfile=/${fontFileName}:fontsize=60:fontcolor=white:x=(w-text_w)/2:y=(h-text_h)/2:box=1:boxcolor=black@0.5:boxborderw=10`;
@@ -289,7 +291,8 @@ class GeminiService {
 
         // Add audio
         const audioInMemoryPath = 'audio.mp3';
-        await ffmpeg.writeFile(audioInMemoryPath, await fetchFile(audioFile));
+        const audioData = await fs.readFile(audioFile);
+        await ffmpeg.writeFile(audioInMemoryPath, audioData);
         args.push('-i', audioInMemoryPath);
 
         // Build final concat filter

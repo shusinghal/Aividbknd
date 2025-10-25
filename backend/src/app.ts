@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import { errorHandler } from './middleware/errorHandler';
+import path from 'path';
 import apiRoutes from './api';
 
 const app = express();
@@ -18,6 +19,9 @@ app.use(cors(corsOptions));
 app.options('*', cors(corsOptions)); // Enable preflight for all routes
 
 app.use(express.json({ limit: '10mb' })); // Allow larger payloads for images/audio
+
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // API Routes
 app.use('/api', apiRoutes);
