@@ -184,6 +184,9 @@ class GeminiService {
     }
 
     public async generateFfmpegCommands(scenes: { id: string, effect: string, duration: string }[]): Promise<Record<string, string>> {
+        // Using @sinclair/typebox would be a great refactor, but for now, let's fix the native schema.
+        // The key is to remove `additionalProperties` from the top-level `params` object
+        // and define it as a flexible record-like structure.
         const effectLayerSchema = {
             type: Type.OBJECT,
             properties: {
@@ -192,43 +195,53 @@ class GeminiService {
                 endTime: { type: Type.NUMBER, description: "End time of the effect in seconds from the beginning of the clip." },
                 params: {
                     type: Type.OBJECT,
-                    description: "Parameters for the effect. Values can be static or an object for animation.",
-                    additionalProperties: {
-                        oneOf: [
-                            { type: Type.STRING },
-                            { type: Type.NUMBER },
-                            { type: Type.BOOLEAN },
-                            {
+                    nullable: true, // Allow params to be omitted for effects like 'vignette'
+                    description: "A dictionary of parameters for the effect. Values can be static or an object for animation.",
+                    // FIX: Explicitly define all possible parameter keys to satisfy the API's non-empty `properties` rule.
+                    properties: {
+                        level: {
+                            oneOf: [{ type: Type.NUMBER }, {
                                 type: Type.OBJECT,
-                                properties: {
-                                    start: { oneOf: [{ type: Type.NUMBER }, { type: Type.STRING }] },
-                                    end: { oneOf: [{ type: Type.NUMBER }, { type: Type.STRING }] },
-                                    easing: { type: Type.STRING, enum: ['linear', 'easeIn', 'easeOut', 'easeInOut'] }
-                                },
+                                properties: { start: { type: Type.NUMBER }, end: { type: Type.NUMBER }, easing: { type: Type.STRING } },
                                 required: ['start', 'end']
-                            }
-                        ]
-                    },
+                            }]
+                        },
+                        direction: { type: Type.STRING },
+                        type: { type: Type.STRING },
+                        sigma: {
+                            oneOf: [{ type: Type.NUMBER }, {
+                                type: Type.OBJECT,
+                                properties: { start: { type: Type.NUMBER }, end: { type: Type.NUMBER }, easing: { type: Type.STRING } },
+                                required: ['start', 'end']
+                            }]
+                        },
+                        intensity: {
+                            oneOf: [{ type: Type.NUMBER }, {
+                                type: Type.OBJECT,
+                                properties: { start: { type: Type.NUMBER }, end: { type: Type.NUMBER }, easing: { type: Type.STRING } },
+                                required: ['start', 'end']
+                            }]
+                        }
+                    }
                 },
             },
-            required: ['name', 'startTime', 'endTime'],
+            required: ['name', 'startTime', 'endTime'], // `params` is correctly optional
         };
 
         const sceneEffectSchema = {
             type: Type.OBJECT,
+            // Add id to the schema for each item in the array
             properties: {
+                id: { type: Type.STRING },
                 effects: { type: Type.ARRAY, items: effectLayerSchema }
             },
-            required: ['effects']
+            required: ['id', 'effects']
         };
 
         const responseSchema = {
-            type: Type.OBJECT,
-            properties: scenes.reduce((acc, scene) => {
-                acc[scene.id] = sceneEffectSchema;
-                return acc;
-            }, {} as Record<string, any>),
-            required: scenes.map(s => s.id),
+            // The root of the response is now an ARRAY of scene effects
+            type: Type.ARRAY,
+            items: sceneEffectSchema
         };
 
         const prompt = `
@@ -244,21 +257,23 @@ class GeminiService {
             - **fisheye_wobble**: params: {} // No parameters needed
 
             **Rules:**
-            1. For each scene, provide a JSON object with an "effects" key, which is an array of effect layer objects.
-            2. Each effect layer object must have a 'name', 'startTime', and 'endTime'.
-            3. 'startTime' and 'endTime' are in seconds, relative to the clip's own duration.
-            4. For animated effects (like a blur that fades), use a parameter object with 'start', 'end', and an optional 'easing' ('linear', 'easeIn', 'easeOut', 'easeInOut').
-            5. For static effects or simple directional effects, use a direct value (e.g., "direction": "right").
-            6. Always try your best to represent the effect using the available primitives. Do not invent new effect names.
-            7. Respond ONLY with a valid JSON object matching the schema.
+            1. Your response MUST be a JSON array.
+            2. Each object in the array represents a scene and MUST contain an "id" and an "effects" key.
+            3. The "effects" key must be an array of effect layer objects.
+            4. Each effect layer object must have a 'name', 'startTime', and 'endTime'.
+            5. 'startTime' and 'endTime' are in seconds, relative to the clip's own duration.
+            6. For animated effects (like a blur that fades), use a parameter object with 'start', 'end', and an optional 'easing' ('linear', 'easeIn', 'easeOut', 'easeInOut').
+            7. For static effects or simple directional effects, use a direct value (e.g., "direction": "right").
+            8. Always try your best to represent the effect using the available primitives. Do not invent new effect names.
+            9. Respond ONLY with a valid JSON array matching the schema.
 
             **Example Request:**
             [{"id": "scene_1", "effect": "Start with a dreamy, soft focus that slowly sharpens over the first 3 seconds. Simultaneously, do a slow zoom-in across the entire 5-second clip."}]
 
             **Example Response:**
-            {
-              "scene_1": { "effects": [ { "name": "gaussianBlur", "startTime": 0, "endTime": 3, "params": { "sigma": { "start": 5, "end": 0 } } }, { "name": "zoom", "startTime": 0, "endTime": 5, "params": { "level": { "start": 1.0, "end": 1.15 } } } ] }
-            }
+            [
+              { "id": "scene_1", "effects": [ { "name": "gaussianBlur", "startTime": 0, "endTime": 3, "params": { "sigma": { "start": 5, "end": 0 } } }, { "name": "zoom", "startTime": 0, "endTime": 5, "params": { "level": { "start": 1.0, "end": 1.15 } } } ] }
+            ]
 
             **INPUT SCENES:**
             ${JSON.stringify(scenes.map(s => ({id: s.id, effect: s.effect})), null, 2)}
@@ -272,17 +287,21 @@ class GeminiService {
 
         if (!response.text) throw new Error('AI classification for FFMPEG effects failed.');
 
-        const structuredEffects = JSON.parse(response.text);
+        const structuredEffectsArray: {id: string, effects: EffectLayer[]}[] = JSON.parse(response.text);
 
         const finalCommands: Record<string, string> = {};
 
+        // Create a map for easy lookup
+        const effectsMap = new Map(structuredEffectsArray.map(item => [item.id, item.effects]));
+
         for (const scene of scenes) {
-            const effectLayers = structuredEffects[scene.id]?.effects;
+            const effectLayers = effectsMap.get(scene.id);
             if (Array.isArray(effectLayers) && effectLayers.length > 0) {
                 console.log(`[${scene.id}] Composing effect from structured layers:`, effectLayers);
                 finalCommands[scene.id] = ffmpegEffectsService.composer.compose(effectLayers as EffectLayer[], { duration: parseFloat(scene.duration), width: 1080, height: 1920 });
             } else {
                 console.log(`[${scene.id}] No valid effect layers found for '${scene.effect}'. Applying default format.`);
+                // This handles cases where the AI might fail to return an entry for a specific scene ID.
                 // Apply a default, safe filter if AI fails to provide a structure
                 finalCommands[scene.id] = 'format=yuv420p';
             }
@@ -325,10 +344,11 @@ class GeminiService {
 
             // 3. Build the complex filter string
             const filterComplexParts = imageFiles.map((file, index) => {
-                const isCommandValid = file.ffmpegCommand &&
+                // FIX: Ensure ffmpegCommand is a string before calling .trim() or other string methods.
+                const isCommandValid = typeof file.ffmpegCommand === 'string' &&
+                    file.ffmpegCommand &&
                     file.ffmpegCommand.trim() !== '{}' &&
-                    file.ffmpegCommand.trim() !== '' &&
-                    !file.ffmpegCommand.startsWith('Error');
+                    file.ffmpegCommand.trim() !== '';
 
                 let vfCommand = isCommandValid
                     // If a command exists, treat it as the primary filter.
