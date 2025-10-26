@@ -10,6 +10,7 @@ import multer from 'multer';
 import { geminiService } from '../services/gemini.service';
 import { googleTtsService } from '../services/tts.service';
 import { imageGenerationService } from '../services/imageGeneration.service';
+import { elevenlabsService } from '../services/elevenlabs.service';
 
 const router = express.Router();
 
@@ -71,6 +72,112 @@ router.post('/character-description', async (req, res, next) => {
         const description = await geminiService.generateCharacterDescription(videoIdea);
         res.json({ characterDescription: description });
     } catch(error) {
+        next(error);
+    }
+});
+
+router.post('/viral-audio', async (req, res, next) => {
+    try {
+        const { script, videoIdea, provider, elevenLabsVoiceId } = req.body;
+
+        // 1. Validate request body
+        if (!script || !videoIdea || !provider) {
+            return res.status(400).json({ message: 'script, videoIdea, and provider are required.' });
+        }
+        if (provider === 'elevenlabs' && !elevenLabsVoiceId) {
+            return res.status(400).json({ message: 'elevenLabsVoiceId is required for the elevenlabs provider.' });
+        }
+
+        // 2. Strategy Engine: Determine audio parameters
+        const getAudioParams = (idea: any) => {
+            let speakingRate = 1.0;
+            let pitch = 0.0;
+
+            const platform = idea.preferredPlatform?.[0]?.toLowerCase() || '';
+            const emotion = idea.targetEmotion?.toLowerCase() || '';
+            const musicPace = idea.musicPace?.toLowerCase() || '';
+
+            // Platform analysis
+            if (['tiktok', 'instagram shorts', 'facebook reels'].some(p => platform.includes(p))) {
+                speakingRate *= 1.20; // 20% faster for short-form video
+            }
+
+            // Emotion analysis
+            if (['urgent', 'exciting', 'energetic'].includes(emotion)) {
+                speakingRate *= 1.15;
+                pitch += 1.5;
+            } else if (['inspiring', 'uplifting'].includes(emotion)) {
+                speakingRate *= 1.05;
+                pitch += 1.0;
+            } else if (['calming', 'sad', 'empathetic'].includes(emotion)) {
+                speakingRate *= 0.85;
+                pitch -= 1.5;
+            } else if (['mysterious', 'dramatic'].includes(emotion)) {
+                speakingRate *= 0.75;
+            }
+
+            // Music pace adjustment
+            if (musicPace === 'uptempo') {
+                speakingRate = Math.max(speakingRate, 1.1);
+            } else if (musicPace === 'downtempo') {
+                speakingRate = Math.min(speakingRate, 1.0);
+            }
+
+            // Voice selection for Google
+            const voiceTone = idea.voiceTone?.toLowerCase() || '';
+            let voiceName = 'en-US-Studio-O'; // High-quality default
+            if (voiceTone.includes('empathetic') || voiceTone.includes('warm')) {
+                voiceName = 'en-US-Wavenet-F';
+            } else if (voiceTone.includes('professional') || voiceTone.includes('clear')) {
+                voiceName = 'en-US-Wavenet-D';
+            } else if (voiceTone.includes('energetic') || voiceTone.includes('youthful')) {
+                voiceName = 'en-US-Wavenet-J';
+            }
+
+            return {
+                speakingRate: parseFloat(speakingRate.toFixed(2)),
+                pitch: parseFloat(pitch.toFixed(2)),
+                voiceName: voiceName,
+                languageCode: 'en-US'
+            };
+        };
+
+        const params = getAudioParams(videoIdea);
+        let audioBlob: Blob;
+
+        // 3. Generate audio based on provider
+        switch (provider) {
+            case 'google':
+                audioBlob = await googleTtsService.synthesize({
+                    text: script,
+                    voice: { languageCode: params.languageCode, name: params.voiceName },
+                    speakingRate: params.speakingRate,
+                    pitch: params.pitch,
+                });
+                break;
+
+            case 'elevenlabs':
+                // Note: ElevenLabs API v1 doesn't directly support pitch/rate adjustments.
+                // We pass the voice ID and use default stability settings.
+                audioBlob = await elevenlabsService.generateAudio(
+                    script,
+                    elevenLabsVoiceId,
+                    { stability: 0.7, similarity_boost: 0.8 }
+                );
+                break;
+
+            default:
+                return res.status(400).json({ message: `Unsupported provider: ${provider}. Use 'google' or 'elevenlabs'.` });
+        }
+
+        // 4. Convert to base64 and send response
+        const audioBuffer = await audioBlob.arrayBuffer();
+        const base64Audio = Buffer.from(audioBuffer).toString('base64');
+
+        res.status(200).json({ base64Audio });
+
+    } catch (error) {
+        console.error('Error in /viral-audio route:', error);
         next(error);
     }
 });
@@ -154,14 +261,14 @@ router.post('/render-video', async (req, res, next) => {
         const safeTitle = (metadata?.title || 'video').replace(/[^a-zA-Z0-9]/g, '_');
         const videoFileName = `${safeTitle}_${Date.now()}.mp4`;
 
-        const publicDir = path.join(process.cwd(), 'public', 'videos');
-        await fs.mkdir(publicDir, { recursive: true });
-        const videoOutputPath = path.join(publicDir, videoFileName);
+        const videoAssetsPath = path.join(process.cwd(), 'public', 'assets', 'videos');
+        await fs.mkdir(videoAssetsPath, { recursive: true });
+        const videoOutputPath = path.join(videoAssetsPath, videoFileName);
         
         await geminiService.createVideoFromAssets(imageFiles, audioPath, videoOutputPath);
         
         // --- 4. Return the URL of the generated video ---
-        const videoUrl = `/videos/${videoFileName}`;
+        const videoUrl = `/assets/videos/${videoFileName}`;
         res.json({ videoUrl });
 
     } catch (error) {

@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 import config from '../config';
 
 class ElevenLabsService {
-    private apiKey = config.apiKeys.elevenlabs;
+    private apiKey = config.apiKeys.gemini;
     private baseUrl = 'https://api.elevenlabs.io/v1';
 
     private async request(endpoint: string, options: any = {}) {
@@ -29,16 +29,13 @@ class ElevenLabsService {
         return response.json();
     }
 
-    public async generateAudio(script: string, tone: string): Promise<Blob> {
-        // Note: The iterative voice selection logic would live in the Gemini service,
-        // which would then call this method with the final chosen voice ID.
-        // For simplicity here, we'll just pick a default. A real implementation would pass the voiceId.
-        const voiceId = '21m00Tcm4TlvDq8ikWAM'; // Rachel (default)
-        const response = await this.request(`/text-to-speech/${voiceId}`, {
+    public async generateAudio(script: string, voiceId: string, settings?: { stability?: number, similarity_boost?: number }): Promise<Blob> {
+        const response = await this.request(`/text-to-speech/${voiceId}/stream`, {
             method: 'POST',
             body: JSON.stringify({
                 text: script,
-                model_id: 'eleven_multilingual_v2'
+                model_id: 'eleven_multilingual_v2',
+                voice_settings: settings
             }),
         });
         return response.blob();

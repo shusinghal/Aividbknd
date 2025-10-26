@@ -15,10 +15,10 @@ const roles: string[] = [
     'The Realist (Feasibility, Impact & Monetization): Your focus is on bridging creativity with business goals. Evaluate the concept\'s feasibility within practical constraints (time, cost, tools). Provide data-driven insights on its potential for monetization and suggest small tweaks to improve ROI without harming the story\'s emotional core.',
 ];
 import { githubService } from './github.service';
-import { elevenlabsService } from './elevenlabs.service';
 import { ffmpegEffectsService, EffectLayer } from './ffmpeg.effects.service';
-
+ 
 import fetch from 'node-fetch';
+import { googleTtsService } from './tts.service';
 
 // Reuse frontend types
 interface Company { name: string; description: string; [key: string]: any; }
@@ -100,7 +100,7 @@ class GeminiService {
     }
     
     public async runAiCollaboration(company: Company): Promise<any> {
-        const initialPrompt = `For "${company.name}", a company described as "${company.description}", create a full viral video content plan. The plan should feel emotionally authentic and human, not like a sales pitch. Use the "Unfiltered Human Moment" framework. Respond ONLY with a valid JSON object based on the VideoIdea interface. The JSON should have keys: coreProblem, targetEmotion, scenes (an array of objects with name, description, duration, effects), script, numberOfImages, videoLength, ctaGoal, voiceTone, visualStyle, musicPace, heading, hashtags, description, preferredPlatform (an array).`;
+        const initialPrompt = `For "${company.name}", a company described as "${company.description}", create a full viral video content plan. The plan should feel emotionally authentic and human, not like a sales pitch. Use the "Unfiltered Human Moment" framework. Respond ONLY with a valid JSON object. The JSON should have keys: coreProblem, targetEmotion, images (an array of objects with id, description, duration, effects), script, videoLength, ctaGoal, voiceTone, visualStyle, musicPace, heading, hashtags, description, preferredPlatform (an array). Each object in the 'images' array represents a single visual shot.`;
         
        const initialResponse = await this.ai.models.generateContent({
            model: 'gemini-2.5-flash', contents: initialPrompt, config: { responseMimeType: "application/json" }
@@ -552,7 +552,14 @@ class GeminiService {
         
         const characterDescription = await this.generateCharacterDescription(videoIdea);
 
-        const audioBlob = await elevenlabsService.generateAudio(videoIdea.script, videoIdea.voiceTone);
+        // Switch from ElevenLabs to Google TTS
+        const audioBlob = await googleTtsService.synthesize({
+            text: videoIdea.script,
+            // These are default values; they could be made dynamic in the future
+            voice: { languageCode: 'en-US', name: 'en-US-Studio-O' },
+            speakingRate: 1,
+            pitch: 0,
+        });
         const audioBuffer = Buffer.from(await audioBlob.arrayBuffer());
         const audioFilePath = path.join(tempDir, 'narration.mp3');
         await fs.writeFile(audioFilePath, audioBuffer);
