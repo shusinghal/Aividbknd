@@ -121,71 +121,52 @@ router.post('/ffmpeg-commands', async (req, res, next) => {
         next(error);
     }
 });
-
-router.post('/render-video', upload.fields([
-    { name: 'audio', maxCount: 1 },
-    { name: 'scene_image' } // Allows multiple files with this field name
-]) as express.RequestHandler, async (req, res, next) => {
-    // Get the temporary directory used by multer for cleanup.
-    const tempDir = os.tmpdir();
+ 
+router.post('/render-video', async (req, res, next) => {
     try {
-        const { metadata: metadataString } = req.body;
-        const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+        const { metadata, audio, scenes } = req.body;
 
-        if (!metadataString || !files.audio || !files.scene_image) {
-            return res.status(400).json({ message: 'Invalid payload. "metadata", "audio", and "scene_image" fields are required.' });
+        // --- 1. Validate the new payload structure ---
+        if (!metadata || !audio?.fileName || !scenes || !Array.isArray(scenes) || scenes.length === 0) {
+            return res.status(400).json({ message: 'Invalid payload. "metadata", "audio.fileName", and a non-empty "scenes" array are required.' });
         }
 
-        const metadata = JSON.parse(metadataString);
-        const scenes = metadata.scenes;
-
-        if (!scenes || !Array.isArray(scenes) || scenes.length !== files.scene_image.length) {
-            return res.status(400).json({ message: 'Mismatch between scene metadata and number of uploaded images.' });
+        for (const scene of scenes) {
+            if (!scene.image?.fileName || !scene.duration) {
+                return res.status(400).json({ message: 'Each scene must have an "image.fileName" and a "duration".' });
+            }
         }
 
-        const audioFile = files.audio[0];
-        const audioPath = audioFile.path;
+        // --- 2. Construct local file paths from filenames ---
+        const assetsBasePath = path.join(process.cwd(), 'public', 'assets');
+        const audioPath = path.join(assetsBasePath, 'audio', audio.fileName);
 
-        // Map uploaded image files to scene data based on their order.
-        // This relies on the frontend sending files in the same order as the scene metadata.
-        const imageFiles = [];
-        for (const [index, scene] of scenes.entries()) {
-            const imageFile = files.scene_image[index];
-            imageFiles.push({
-                path: imageFile.path,
+        const imageFiles = scenes.map(scene => {
+            const imagePath = path.join(assetsBasePath, 'images', scene.image.fileName);
+            return {
+                path: imagePath,
                 duration: parseFloat(scene.duration) || 3,
-                ffmpegCommand: scene.effects?.ffmpeg
-            });
-        }
+                ffmpegCommand: scene.effects?.ffmpeg,
+            };
+        });
 
+        // --- 3. Prepare output path and render the video ---
         const safeTitle = (metadata?.title || 'video').replace(/[^a-zA-Z0-9]/g, '_');
         const videoFileName = `${safeTitle}_${Date.now()}.mp4`;
 
         const publicDir = path.join(process.cwd(), 'public', 'videos');
         await fs.mkdir(publicDir, { recursive: true });
         const videoOutputPath = path.join(publicDir, videoFileName);
-
+        
         await geminiService.createVideoFromAssets(imageFiles, audioPath, videoOutputPath);
         
+        // --- 4. Return the URL of the generated video ---
         const videoUrl = `/videos/${videoFileName}`;
         res.json({ videoUrl });
 
     } catch (error) {
         console.error('Error in /render-video route:', error);
         next(error);
-    } finally {
-        // Cleanup the temporary directory created by multer
-        if (tempDir) {
-            // Clean up individual files created by multer within the temp directory
-            const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-            if (files) {
-                for (const field in files) {
-                    for (const file of files[field]) {
-                        await fs.unlink(file.path).catch(err => console.error(`Failed to delete temp file ${file.path}:`, err));
-                    }
-                }
-            }
-        }
     }
 });
 

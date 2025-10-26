@@ -18,15 +18,14 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions)); // Enable preflight for all routes
 
-app.use(express.json({ limit: '10mb' })); // Allow larger payloads for images/audio
-
-// Serve static files from the 'public' directory
+// Apply global middleware BEFORE mounting API routes
+app.use(express.json({ limit: '10mb' })); // For parsing application/json
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // API Routes
 app.use('/api', apiRoutes);
 
-// Global Error Handler
+// Global Error Handler - should be last
 app.use(errorHandler);
 
 export default app;

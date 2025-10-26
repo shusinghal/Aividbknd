@@ -96,6 +96,21 @@
   },
   {
     "method": "POST",
+    "path": "/api/generate/ffmpeg-commands",
+    "description": "Generates FFMPEG filter commands for video scene effects."
+  },
+  {
+    "method": "POST",
+    "path": "/api/generate/render-video",
+    "description": "Renders a final video by combining image and audio assets using FFMPEG."
+  },
+  {
+    "method": "POST",
+    "path": "/api/generate/ai-text-utility",
+    "description": "A general-purpose endpoint for various AI-powered text utilities, such as analyzing errors or suggesting API fixes."
+  },
+  {
+    "method": "POST",
     "path": "/api/files",
     "description": "Adds or updates a JSON file in the custom data folder. The request body should be a JSON object with 'filename' and 'content' keys."
   },

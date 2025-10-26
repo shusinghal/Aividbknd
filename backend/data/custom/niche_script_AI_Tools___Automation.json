@@ -6,40 +6,40 @@
       "name": "Blank Screen Battle",
       "description": "Starts with a rapid-fire montage (1-second cuts) of frustration: Close-up on a laptop screen displaying a blank document with a blinking cursor, quickly followed by a shot of crumpled paper being tossed. A person (gender-neutral, relatable, 30s) is visibly frustrated: a quick sigh, running hands through hair, rapid typing and deleting words. Messy desk, late night or early morning ambiance.",
       "duration": "5s",
-      "effects": "Initially, audible silence except for a deep sigh or faint laptop hum, then a quick, melancholic piano note. Fast, dynamic cuts focusing on expressions of intense frustration. On-screen text immediately appears: 'Staring at a blank page again? 😩' followed by 'Creative Block SUCKS.' and 'The Pressure is REAL.'",
-      "id": "1761041961182_0",
+      "effects": "Simple Fade In/Out",
+      "id": "1761437299418_0",
       "ffmpegCommands": "drawtext=text='Staring at a blank page again? 😩':fontcolor=white:fontsize=70:x=(w-text_w)/2:y=h*0.4:box=1:boxcolor=black@0.5:boxborderw=10, drawtext=text='Creative Block SUCKS.':fontcolor=white:fontsize=80:x=(w-text_w)/2:y=h*0.5:box=1:boxcolor=black@0.5:boxborderw=10, drawtext=text='The Pressure is REAL.':fontcolor=white:fontsize=80:x=(w-text_w)/2:y=h*0.6:box=1:boxcolor=black@0.5:boxborderw=10,format=yuv420p"
     },
     {
       "name": "The Spark of Curiosity",
       "description": "The person leans back, briefly closing their eyes in defeat. A subtle, internal 'aha' moment visually implied by a fleeting shift in facial expression (as if recalling a friend's tip or an internal question like 'there must be an easier way'). They quickly sit up, eyes focusing. They open a new browser tab and rapidly type a search query like 'AI writing assistant' or 'content creation help'.",
       "duration": "5s",
-      "effects": "Subtle shift in lighting, a hint of blue light from the screen illuminating their face. Music adds a subtle, hopeful string section, picking up pace slightly. Quick camera push-in to capture the 'aha' moment.",
-      "id": "1761041961182_1",
+      "effects": "Simple Fade In/Out",
+      "id": "1761437299418_1",
       "ffmpegCommands": "zoompan=z='min(1+(0.2/5)*t, 1.2)':d=150:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920, eq=gamma_b='1+0.05*t',format=yuv420p"
     },
     {
       "name": "The Unfolding Discovery",
       "description": "The person navigates to Jasper.ai. After a brief hesitation, they quickly type a simple prompt (e.g., 'blog post ideas for small business marketing'). Their expression rapidly shifts from skepticism to genuine surprise and relief as coherent, relevant ideas and well-structured text dynamically appears on screen at an accelerated pace. They quickly highlight, copy, paste into their document, and begin refining. A quick, subtle glimpse of other potential uses (e.g., a browser tab for 'Social Media Captions' or an outline for a 'podcast script') flashes on screen.",
       "duration": "15s",
-      "effects": "Brighter screen light on their face. Music becomes more dynamic, with a faster, more energetic build. Rapid cuts between their surprised face and the fast-generating, intelligent text on screen, conveying a visual dialogue between user and tool. Text appears with a satisfying, accelerated animation.",
-      "id": "1761041961182_2",
+      "effects": "Simple Fade In/Out",
+      "id": "1761437299418_2",
       "ffmpegCommands": "eq=brightness='min(0.25, 0.015*t)':contrast='min(1.3, 1+0.02*t)',format=yuv420p"
     },
     {
       "name": "Flow and Fulfillment",
       "description": "The person is now smiling, genuinely engaged, typing and editing with fluid confidence. They add their personal touch, perhaps referencing a quick, handwritten note or integrating a unique, hand-drawn sketch (briefly visible) into the digital work. The messy desk remains, but the person is transformed – looking confident, inspired, and in control. They take a satisfying sip of their now-warm coffee. The crumpled paper from Scene 1 is now neatly discarded or repurposed nearby.",
       "duration": "7s",
-      "effects": "Brighter, more natural lighting on the person. Music swells gently with a sense of accomplishment and light energy. Aggressive time-lapse effect as words fly across the screen, showing heightened productivity. Focus on confident body language and the ease of creative flow.",
-      "id": "1761041961182_3",
+      "effects": "Simple Fade In/Out",
+      "id": "1761437299418_3",
       "ffmpegCommands": "eq=brightness=0.1:gamma=1.1, setpts=0.25*PTS,format=yuv420p"
     },
     {
       "name": "The Gentle Accomplishment",
       "description": "A close-up of their face, a look of peaceful satisfaction and relief. They click 'Save' or 'Publish' with a clear sense of triumph. A genuine, relieved smile spreads across their face. They lean back, stretching, a visible weight lifted from their shoulders, a feeling of 'I did it'.",
       "duration": "5s",
-      "effects": "Warm, inviting glow. Music resolves into a gentle, happy, and fulfilling melody. Quick zoom out to reveal the completed document/project on screen.",
-      "id": "1761041961182_4",
+      "effects": "Simple Fade In/Out",
+      "id": "1761437299418_4",
       "ffmpegCommands": "eq=brightness=0.05:gamma_r=1.1:gamma_b=0.9, vignette, zoompan=z='max(1.2 - (0.2/5)*t, 1.0)':d=150:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920,format=yuv420p"
     }
   ],

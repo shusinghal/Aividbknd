@@ -254,21 +254,29 @@ class GeminiService {
                     !file.ffmpegCommand.startsWith('Error');
 
                 let vfCommand = isCommandValid
-                    ? file.ffmpegCommand
-                    : `fade=in:st=0:d=0.5,fade=out:st=${(file.duration - 0.5).toFixed(1)}:d=0.5`;
+                    // If a command exists, treat it as the primary filter.
+                    // The comma ensures it's correctly chained with the subsequent format filter.
+                    ? file.ffmpegCommand!
+                    // Otherwise, use a default fade in/out.
+                    : `fade=in:st=0:d=0.5,fade=out:st=${(file.duration - 0.5).toFixed(1)}:d=0.5,format=yuv420p`;
 
                 if (file.onScreenText) {
-                    const fontPath = 'C:/Windows/Fonts/Arial.ttf'; // Example for Windows. Use a reliable path.
+                    const fontPath = 'C:/Windows/Fonts/Arial.ttf'; // Example for Windows. Use a reliable, cross-platform path or ensure font is available.
                     const escapedText = this.escapeFfmpegText(file.onScreenText);
                     const drawTextFilter = `drawtext=fontfile='${fontPath}':text='${escapedText}':fontsize=60:fontcolor=white:x=(w-text_w)/2:y=(h-text_h)/2:box=1:boxcolor=black@0.5:boxborderw=10`;
-                    vfCommand = `${vfCommand},${drawTextFilter}`;
+                    // If the command already has a format filter, insert drawtext before it.
+                    if (vfCommand.includes('format=yuv420p')) {
+                        vfCommand = vfCommand.replace('format=yuv420p', `${drawTextFilter},format=yuv420p`);
+                    } else {
+                        // Otherwise, append it.
+                        vfCommand += `,${drawTextFilter}`;
+                    }
                 }
 
-                if (vfCommand && !vfCommand.includes('format=yuv420p')) {
-                    vfCommand += ',format=yuv420p';
-                }
+                // The base filter chain for scaling and padding.
+                const baseFilter = `[${index}:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1`;
 
-                return `[${index}:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[scaled${index}];[scaled${index}]${vfCommand}[v${index}]`;
+                return `${baseFilter}[scaled${index}];[scaled${index}]${vfCommand}[v${index}]`;
             });
 
             const concatFilter = imageFiles.map((_, index) => `[v${index}]`).join('') + `concat=n=${imageFiles.length}:v=1:a=0[v]`;
