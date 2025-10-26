@@ -1,5 +1,6 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import { ffmpegEffectsService } from './ffmpeg.effects.service';
 
 // Type definitions
 interface Company { name: string; description: string; [key: string]: any; }
@@ -27,6 +28,7 @@ class GithubService {
         await fs.mkdir(AUDIO_ASSETS_PATH, { recursive: true });
         await fs.mkdir(VIDEO_ASSETS_PATH, { recursive: true });
         await fs.mkdir(CUSTOM_FILES_PATH, { recursive: true });
+        await ffmpegEffectsService.initialize();
 
 
         try {

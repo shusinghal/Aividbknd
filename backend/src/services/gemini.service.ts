@@ -16,6 +16,7 @@ const roles: string[] = [
 ];
 import { githubService } from './github.service';
 import { elevenlabsService } from './elevenlabs.service';
+import { ffmpegEffectsService } from './ffmpeg.effects.service';
 
 import fetch from 'node-fetch';
 
@@ -40,7 +41,11 @@ class GeminiService {
      * @returns The escaped text.
      */
     private escapeFfmpegText(text: string): string {
-        return text.replace(/'/g, "'\\''").replace(/:/g, '\\:').replace(/%/g, '\\%');
+        return text
+            .replace(/'/g, "'\\''") // Escape single quotes
+            .replace(/:/g, '\\:')   // Escape colons
+            .replace(/%/g, '\\%')   // Escape percentage signs
+            .replace(/#/g, '\\#');  // Escape hashtags (comment character)
     }
 
     constructor(apiKey: string) {
@@ -132,10 +137,75 @@ class GeminiService {
         return response.text.trim();
     }
     
-    public async generateFfmpegCommands(scenes: { id: string, effect: string, duration: string }[]): Promise<Record<string, string>> {
+    /**
+     * Validates an FFMPEG filter graph by running a dry-run command.
+     * @param command The FFMPEG filter graph string to validate.
+     * @returns A promise that resolves to an object with validation status and error message if any.
+     */
+    private async validateFfmpegCommand(command: string): Promise<{ isValid: boolean; error?: string }> {
+        // A simple check for placeholder or error commands.
+        if (!command || command.startsWith('Error:') || command.trim() === '{}') {
+            return { isValid: false, error: 'Generated command was empty or an error placeholder.' };
+        }
+
+        return new Promise((resolve) => {
+            // Use a null source and null output to test the filter graph without creating files.
+            // This is a "dry run" to check for syntax/filter errors.
+            const args = [
+                '-f', 'lavfi', '-i', 'nullsrc=s=1080x1920:d=1', // Dummy 1s video input
+                '-vf', command,
+                '-t', '1',          // Process for only 1 second
+                '-f', 'null',      // Discard output
+                '-'
+            ];
+
+            const ffmpegProcess = spawn('ffmpeg', args);
+            let stderr = '';
+
+            ffmpegProcess.stderr.on('data', (data) => {
+                stderr += data.toString();
+            });
+
+            ffmpegProcess.on('close', (code) => {
+                if (code === 0) {
+                    resolve({ isValid: true });
+                } else {
+                    // Filter out verbose but non-critical messages to get the root error.
+                    const errorLines = stderr.split('\n').filter(line => line.trim().length > 0 && !line.startsWith('frame='));
+                    resolve({ isValid: false, error: errorLines.join('\n') });
+                }
+            });
+
+            ffmpegProcess.on('error', (err) => {
+                // This happens if ffmpeg is not installed or can't be started.
+                resolve({ isValid: false, error: `Failed to start FFmpeg process: ${err.message}` });
+            });
+        });
+    }
+
+    private async getCorrectedFfmpegCommand(originalEffect: string, failedCommand: string, ffmpegError: string): Promise<string> {
+        const prompt = `
+            You are an FFMPEG expert. The following FFMPEG filter graph command failed to execute.
+            Your task is to analyze the error and provide a corrected, working command.
+            - Original Goal: "${originalEffect}"
+            - Failed Command: \`${failedCommand}\`
+            - FFMPEG Error: \`${ffmpegError}\`
+
+            Analyze the error and provide ONLY the corrected filter graph string. Do not include explanations.
+            Ensure the corrected command adheres to all original rules (e.g., ends with format=yuv420p, uses standard filters).
+            **REMINDER:** For time-based animations in "zoompan" x/y expressions, use the 't' (time in seconds) variable, not 'n' (frame number). The output MUST NOT be the same as the failed command; it must be corrected to work without errors.
+        `;
+        const response = await this.ai.models.generateContent({ model: 'gemini-2.5-pro', contents: prompt, config: { temperature: 0.1 } });
+        if (!response.text) {
+            return `Error: AI failed to correct command for effect: ${originalEffect}`;
+        }
+        return response.text.trim();
+    }
+
+    private async generateCommandsWithAI(scenes: { id: string, effect: string, duration: string }[]): Promise<Record<string, string>> {
         const schemaProperties: Record<string, any> = {};
         scenes.forEach(scene => {
-            schemaProperties[scene.id] = {
+             schemaProperties[scene.id] = {
                 type: Type.STRING,
                 description: `The FFMPEG -vf command for the effect: '${scene.effect}' for a ${scene.duration} second clip.`
             };
@@ -146,42 +216,45 @@ class GeminiService {
             properties: schemaProperties,
             required: scenes.map(s => s.id)
         };
-        
+
         const model = 'gemini-2.5-pro';
 
         const prompt = `
-            You are an expert FFMPEG engineer. Your task is to convert natural language descriptions of video effects into precise FFMPEG filter graph strings for the "-vf" flag.
-
-            **IMPORTANT RULES:**
-            1. **Limitation:** Use the standard library of FFMPEG filters only. Do NOT reference any third-party or external filters/plugins.
-            2. **Output Only:** Your response MUST be a JSON object where each key is the scene ID and the value is the corresponding FFMPEG filter graph string.
-            3. **No Explanations:** Do NOT include any explanations, notes, or additional text outside of the JSON object.
-            4.  **Output Format:** You MUST return ONLY a valid JSON object that matches the provided schema. Do not include any markdown, explanations, or any text outside of the JSON structure.
-            5.  **Command Content:** Provide ONLY the filter graph string itself. DO NOT include "ffmpeg -i input.jpg" or the output filename.
-            6.  **Dimensions:** Assume all source images are for vertical video with dimensions 1080x1920 (width x height).
-            7.  **Duration:** Use the provided scene duration (in seconds) to calculate timings. Assume a frame rate of 30fps for calculations (e.g., duration in frames = scene_duration * 30).
-            8.  **Escaping:** Be careful with quotes inside the filter graph. Escape them properly with a backslash (e.g., \\"text\\").
-            6.  **Pixel Format:** Ensure the output has a widely compatible pixel format by ending the filter chain with ",format=yuv420p".
-            7.  **No 'translate' filter:** Do NOT use a filter named 'translate'. To achieve movement or panning, use the 'zoompan' filter with expressions for 'x' and 'y' based on the time 't'. For example, to pan right, you could use "zoompan=z=1:x='t*50'".
-
-
-            **INPUT SCENES:**
+            You are an expert FFmpeg engineer. Your task is to convert natural language descriptions of video effects into precise FFmpeg filter graph strings for the -vf flag.
+            CONTEXT:
+            You must rely solely on filters documented in the official FFmpeg Filters Reference, which includes all standard, built-in filters available in the latest default FFmpeg installation. For real-world usage patterns and advanced filter combinations, you may also draw from the curated community resources at Awesome FFmpeg and LibHunt FFmpeg Libraries. Do not use any filters or techniques not supported by these sources.
+            IMPORTANT RULES:
+            - Strict Filter Limitation: You MUST use filters from the standard, built-in FFmpeg library ONLY. Do NOT use any third-party, external, or optional filter libraries (e.g., frei0r, g'mic, etc.). All commands must work on a default FFmpeg installation.
+            - Output Only: Your response MUST be a JSON object where each key is the scene ID and the value is the corresponding FFmpeg filter graph string.
+            - No Explanations: Do NOT include any explanations, notes, or additional text outside of the JSON object.
+            - Output Format: You MUST return ONLY a valid JSON object that matches the provided schema. Do not include any markdown, explanations, or any text outside of the JSON structure.
+            - Command Content: Provide ONLY the filter graph string itself. DO NOT include ffmpeg -i input.jpg or the output filename.
+            - Dimensions: Assume all source images are for vertical video with dimensions 1080x1920 (width x height).
+            - Duration: Use the provided scene duration (in seconds) to calculate timings. Assume a frame rate of 30fps for calculations (e.g., duration in frames = scene_duration * 30).
+            - Escaping: Be careful with quotes inside the filter graph. Escape them properly with a backslash (e.g., \"text\").
+            - Pixel Format: Ensure the output has a widely compatible pixel format by ending the filter chain with ,format=yuv420p.
+            - No 'translate' filter: Do NOT use a filter named translate. To achieve movement or panning, use the zoompan filter with expressions for x and y based on the time t. For example, to pan right, you could use zoompan=z=1:x='t*50'.
+            - Filter Inputs: Most filters (like eq, curves, vignette, crop, scale) accept only ONE video input. Do not chain multiple inputs into them (e.g., [in1][in2]filter). Filters like overlay or concat are exceptions that explicitly handle multiple inputs.
+            - Zoompan Time Variable: When creating animations in zoompan x/y expressions (like sine waves), you MUST use the t variable (time in seconds). The n variable (frame number) is often unavailable and will cause errors.
+            INPUT SCENES:
             ${JSON.stringify(scenes.map(s => ({id: s.id, effect: s.effect, duration: s.duration})), null, 2)}
-
-            **EXAMPLE:**
+            EXAMPLE:
             If the input is:
             [
-              {"id": "scene_1", "effect": "slow zoom in", "duration": "5"},
-              {"id": "scene_2", "effect": "fade to black at the end", "duration": "4"}
+            {"id": "scene_1", "effect": "slow zoom in", "duration": "5"},
+            {"id": "scene_2", "effect": "fade to black at the end", "duration": "4"}
             ]
+
 
             Your JSON output should be:
             {
-              "scene_1": "zoompan=z='min(zoom+0.001,1.2)':d=150:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920,format=yuv420p",
-              "scene_2": "fade=t=out:st=3:d=1,format=yuv420p"
+            "scene_1": "zoompan=z='min(zoom+0.001,1.2)':d=150:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920,format=yuv420p",
+            "scene_2": "fade=t=out:st=3:d=1,format=yuv420p"
             }
 
+            
             Now, generate the commands for the provided input scenes.
+
         `;
 
         try {
@@ -194,26 +267,109 @@ class GeminiService {
                     temperature: 0.2,
                 }
             });
-            
+
             if (!response.text) {
                 throw new Error('Empty response from Gemini while generating FFMPEG commands.');
             }
-            
+
             const jsonText = response.text.trim();
-            const commandsMap = JSON.parse(jsonText);
-            
-            console.log('Successfully generated FFMPEG commands:', commandsMap);
-            return commandsMap;
+            const initialCommands: Record<string, string> = JSON.parse(jsonText);
+            const validatedCommands: Record<string, string> = {};
+
+            console.log('Initial FFMPEG commands generated. Starting validation...');
+
+            for (const scene of scenes) {
+                const command = initialCommands[scene.id];
+                const validation = await this.validateFfmpegCommand(command);
+
+                if (validation.isValid) {
+                    console.log(`[${scene.id}] Validation SUCCESSFUL for command: ${command}`);
+                    validatedCommands[scene.id] = command;
+                } else {
+                    console.warn(`[${scene.id}] Validation FAILED for command: ${command}. Error: ${validation.error}`);
+                    console.log(`[${scene.id}] Attempting to self-correct...`);
+                    const correctedCommand = await this.getCorrectedFfmpegCommand(scene.effect, command, validation.error!);
+                    console.log(`[${scene.id}] AI suggested correction: ${correctedCommand}`);
+                    validatedCommands[scene.id] = correctedCommand; // We'll use the corrected one, but could re-validate
+                }
+            }
+
+            console.log('FFMPEG command validation and correction complete:', validatedCommands);
+            return validatedCommands;
 
         } catch (error) {
             console.error("Error calling Gemini API for FFMPEG commands:", error);
-            // FIX: Ensure a value is returned for every scene ID, even on error.
             const errorMap: Record<string, string> = {};
             scenes.forEach(scene => {
                 errorMap[scene.id] = 'Error: AI command generation failed.';
             });
             return errorMap;
         }
+    }
+
+    public async generateFfmpegCommands(scenes: { id: string, effect: string, duration: string }[]): Promise<Record<string, string>> {
+        const schemaProperties: Record<string, any> = {};
+        const availableEffects = ffmpegEffectsService.getAvailableEffects();
+        scenes.forEach(scene => {
+            schemaProperties[scene.id] = {
+                type: Type.STRING,
+                description: `The best matching effect key for: '${scene.effect}'. Must be one of [${availableEffects.join(', ')}] or '_GENERATE_'.`
+            };
+        });
+
+        const responseSchema = { type: Type.OBJECT, properties: schemaProperties, required: scenes.map(s => s.id) };
+
+        const prompt = `
+            You are an effect classification expert. Your task is to match a natural language effect description to a predefined effect key.
+
+            **Available Effect Keys:**
+            - ${availableEffects.join('\n- ')}
+
+            **Rules:**
+            1. For each scene, choose the best matching key from the list above.
+            2. If the description is vague, 'static' is a good default.
+            3. **IMPORTANT:** If no key is a good match for a complex or unique effect, you MUST use the special key "_GENERATE_".
+            4. Respond ONLY with a valid JSON object matching the schema.
+
+            **INPUT SCENES:**
+            ${JSON.stringify(scenes.map(s => ({id: s.id, effect: s.effect})), null, 2)}
+
+            **EXAMPLE:**
+            If input is: [{"id": "scene_1", "effect": "a gentle zoom"}, {"id": "scene_2", "effect": "a dizzying spiral while colors invert"}]
+            Your output should be: { "scene_1": "slow_zoom_in", "scene_2": "_GENERATE_" }
+        `;
+
+        const response = await this.ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: { responseMimeType: "application/json", responseSchema: responseSchema }
+        });
+
+        if (!response.text) throw new Error('AI classification for FFMPEG effects failed.');
+
+        const classifications = JSON.parse(response.text);
+        const finalCommands: Record<string, string> = {};
+        const scenesToGenerate: { id: string, effect: string, duration: string }[] = [];
+
+        for (const scene of scenes) {
+            const effectKey = classifications[scene.id];
+            const generator = ffmpegEffectsService.getEffect(effectKey);
+            if (effectKey && generator) {
+                console.log(`[${scene.id}] Classified as '${effectKey}'. Using template.`);
+                finalCommands[scene.id] = generator({ duration: parseFloat(scene.duration), width: 1080, height: 1920 });
+            } else {
+                console.log(`[${scene.id}] Classified as '_GENERATE_'. Queuing for AI generation.`);
+                scenesToGenerate.push(scene);
+            }
+        }
+
+        if (scenesToGenerate.length > 0) {
+            console.log(`Generating ${scenesToGenerate.length} commands with advanced AI...`);
+            const generatedCommands = await this.generateCommandsWithAI(scenesToGenerate);
+            Object.assign(finalCommands, generatedCommands);
+        }
+
+        return finalCommands;
     }
 
     public async generateSingleImage(payload: { sceneDescription: string, visualStyle: string, characterDescription: string | null }): Promise<string> {
@@ -488,12 +644,24 @@ class GeminiService {
             });
         }
 
+        // After successful video creation, save any newly generated effects
         const videoOutputPath = path.join(tempDir, 'output.mp4');
         await this.createVideoFromAssets(imageFilePaths, audioFilePath, videoOutputPath);
 
         const videoBuffer = await fs.readFile(videoOutputPath);
         const videoFileName = `${company.name.toLowerCase().replace(/\s+/g, '_')}_${generationId}.mp4`;
         if (githubService) await githubService.saveAsset('video', videoFileName, videoBuffer.toString('base64'));
+
+        // --- SELF-IMPROVEMENT STEP ---
+        // If video generation was successful, add any new AI-generated effects to our library.
+        for (const scene of videoIdea.scenes) {
+            const command = ffmpegCommandsMap[scene.id];
+            const isGenerated = !ffmpegEffectsService.getEffect(scene.effects.toLowerCase().replace(/\s+/g, '_'));
+            if (command && isGenerated && !command.startsWith('Error:')) {
+                const effectKey = scene.effects.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+                await ffmpegEffectsService.saveCustomEffect(effectKey, command);
+            }
+        }
 
         // Save audio and images as well
         const audioFileName = `${company.name.toLowerCase().replace(/\s+/g, '_')}_${generationId}.mp3`;

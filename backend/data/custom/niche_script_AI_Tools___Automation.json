@@ -1,72 +1,85 @@
 {
-  "coreProblem": "The paralyzing pressure of content creation, writer's block, and the feeling of inadequacy when trying to consistently produce high-quality, engaging text. The mental and emotional exhaustion from creative stagnation.",
-  "targetEmotion": "Empathy, relief, inspiration, authentic joy, empowerment.",
+  "coreProblem": "The immense pressure and mental block of generating high-quality content under deadlines, leading to creator burnout and self-doubt.",
+  "targetEmotion": "Empathy, immediate relief, surprise, and a quiet sense of hope/connection.",
   "scenes": [
     {
-      "name": "Blank Screen Battle",
-      "description": "Starts with a rapid-fire montage (1-second cuts) of frustration: Close-up on a laptop screen displaying a blank document with a blinking cursor, quickly followed by a shot of crumpled paper being tossed. A person (gender-neutral, relatable, 30s) is visibly frustrated: a quick sigh, running hands through hair, rapid typing and deleting words. Messy desk, late night or early morning ambiance.",
-      "duration": "5s",
-      "effects": "Simple Fade In/Out",
-      "id": "1761437299418_0",
-      "ffmpegCommands": "drawtext=text='Staring at a blank page again? 😩':fontcolor=white:fontsize=70:x=(w-text_w)/2:y=h*0.4:box=1:boxcolor=black@0.5:boxborderw=10, drawtext=text='Creative Block SUCKS.':fontcolor=white:fontsize=80:x=(w-text_w)/2:y=h*0.5:box=1:boxcolor=black@0.5:boxborderw=10, drawtext=text='The Pressure is REAL.':fontcolor=white:fontsize=80:x=(w-text_w)/2:y=h*0.6:box=1:boxcolor=black@0.5:boxborderw=10,format=yuv420p"
+      "name": "Blank Page Blues (Hook)",
+      "description": "Rapid cuts: A glaring, empty document on a laptop screen, quickly intercut with a close-up on a creator's (e.g., freelancer, small business owner) exasperated face – tired eyes, furrowed brow. This is in-media-res, at the peak of frustration.",
+      "duration": 2,
+      "effects": "Muted, cool lighting. Rapid camera cuts. Sound of sharp, frustrated keyboard taps, then a quick, defeated groan. Soft, melancholic piano music begins abruptly. Bold on-screen text: 'Creator burnout is REAL.'",
+      "id": "1761469670078_0",
+      "ffmpegCommands": "eq=saturation=0.7,curves=preset=cross_process,drawtext=text='Creator burnout is REAL.':fontcolor=white:fontsize=100:x=(w-text_w)/2:y=(h-text_h)/2:shadowcolor=black:shadowx=3:shadowy=3,format=yuv420p"
     },
     {
-      "name": "The Spark of Curiosity",
-      "description": "The person leans back, briefly closing their eyes in defeat. A subtle, internal 'aha' moment visually implied by a fleeting shift in facial expression (as if recalling a friend's tip or an internal question like 'there must be an easier way'). They quickly sit up, eyes focusing. They open a new browser tab and rapidly type a search query like 'AI writing assistant' or 'content creation help'.",
-      "duration": "5s",
-      "effects": "Simple Fade In/Out",
-      "id": "1761437299418_1",
-      "ffmpegCommands": "zoompan=z='min(1+(0.2/5)*t, 1.2)':d=150:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920, eq=gamma_b='1+0.05*t',format=yuv420p"
+      "name": "Hitting the Wall",
+      "description": "The creator pushes the laptop away, running hands through their hair, then burying their face in their hands. A moment of deep self-doubt and defeat. Out-of-focus shot of a calendar with a circled, looming deadline.",
+      "duration": 3,
+      "effects": "Slightly tighter framing. Music becomes more somber, almost pausing. A palpable depth of silence after the groan, emphasizing the mental void.",
+      "id": "1761469670078_1",
+      "ffmpegCommands": "zoompan=z='min(zoom+0.001,1.2)':d=90:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920,format=yuv420p"
     },
     {
-      "name": "The Unfolding Discovery",
-      "description": "The person navigates to Jasper.ai. After a brief hesitation, they quickly type a simple prompt (e.g., 'blog post ideas for small business marketing'). Their expression rapidly shifts from skepticism to genuine surprise and relief as coherent, relevant ideas and well-structured text dynamically appears on screen at an accelerated pace. They quickly highlight, copy, paste into their document, and begin refining. A quick, subtle glimpse of other potential uses (e.g., a browser tab for 'Social Media Captions' or an outline for a 'podcast script') flashes on screen.",
-      "duration": "15s",
-      "effects": "Simple Fade In/Out",
-      "id": "1761437299418_2",
-      "ffmpegCommands": "eq=brightness='min(0.25, 0.015*t)':contrast='min(1.3, 1+0.02*t)',format=yuv420p"
+      "name": "A Small Glimmer",
+      "description": "The creator hesitantly picks up their phone, swiftly scrolling. Their eyes briefly pause on a subtle, out-of-focus message/post from a friend mentioning a tool (just a hint), then they look back at the laptop with a flicker of curiosity. They quickly pull the laptop closer, opening a new tab, their fingers hovering over the keyboard in a moment of desperate pivot.",
+      "duration": 3,
+      "effects": "A subtle shift in lighting, a tiny bit warmer. Music introduces a faint, inquisitive string element. Sound of a quick, non-intrusive phone notification, followed by hesitant, quick clicks.",
+      "id": "1761469670078_2",
+      "ffmpegCommands": "eq=gamma=1.02,colorbalance=rs=0.05:bs=-0.05,format=yuv420p"
     },
     {
-      "name": "Flow and Fulfillment",
-      "description": "The person is now smiling, genuinely engaged, typing and editing with fluid confidence. They add their personal touch, perhaps referencing a quick, handwritten note or integrating a unique, hand-drawn sketch (briefly visible) into the digital work. The messy desk remains, but the person is transformed – looking confident, inspired, and in control. They take a satisfying sip of their now-warm coffee. The crumpled paper from Scene 1 is now neatly discarded or repurposed nearby.",
-      "duration": "7s",
-      "effects": "Simple Fade In/Out",
-      "id": "1761437299418_3",
-      "ffmpegCommands": "eq=brightness=0.1:gamma=1.1, setpts=0.25*PTS,format=yuv420p"
+      "name": "Unstuck",
+      "description": "Content begins to flow on the screen. The creator's face transforms from skepticism to surprise, then a growing, almost disbelieving smile. Emphasize their agency: they are actively typing, guiding the words, pausing to edit a phrase, or providing a prompt that clearly leads to the next paragraph, not just watching. It's a moment of effortless collaboration.",
+      "duration": 7,
+      "effects": "Brighter, warmer lighting. Dynamic but smooth camera work focusing on the screen and the creator's face. Music picks up a gentle, uplifting pace with a subtle beat. Smooth text animation on screen, with a subtle, clean 'Powered by Jasper AI' watermark appearing briefly in a corner of the screen.",
+      "id": "1761469670078_3",
+      "ffmpegCommands": "eq=brightness=0.03:gamma=1.05:saturation=1.1,zoompan=z='min(zoom+0.0007, 1.1)':d=210:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920,drawtext=text='Powered by Jasper AI':fontcolor=white@0.8:fontsize=40:x=w-text_w-30:y=h-text_h-30:enable='between(t,4,6.5)',format=yuv420p"
     },
     {
-      "name": "The Gentle Accomplishment",
-      "description": "A close-up of their face, a look of peaceful satisfaction and relief. They click 'Save' or 'Publish' with a clear sense of triumph. A genuine, relieved smile spreads across their face. They lean back, stretching, a visible weight lifted from their shoulders, a feeling of 'I did it'.",
-      "duration": "5s",
-      "effects": "Simple Fade In/Out",
-      "id": "1761437299418_4",
-      "ffmpegCommands": "eq=brightness=0.05:gamma_r=1.1:gamma_b=0.9, vignette, zoompan=z='max(1.2 - (0.2/5)*t, 1.0)':d=150:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920,format=yuv420p"
+      "name": "Breathing Room",
+      "description": "The creator leans back in their chair, taking a deep, slow, contented breath, a genuinely relieved smile spreading across their face. They look up from the screen, eyes sparkling with newfound energy and peace. The room still subtly messy, but the internal weight is visibly lifted. On-screen text overlay: 'Reclaiming my peace. Find your flow.'",
+      "duration": 7,
+      "effects": "Warm, golden hour-like lighting. Soft focus on the creator's face. Music becomes serene, inspiring, but gentle. Sound of a deep, contented sigh.",
+      "id": "1761469670078_4",
+      "ffmpegCommands": "curves=r='0/0.1\\:1/0.9':g='0/0\\:1/0.95':b='0/0.2\\:1/0.8',gblur=sigma=0.6,vignette=a=pi/5,format=yuv420p"
+    },
+    {
+      "name": "The Simple Solution",
+      "description": "A final, purposeful shot of the creator nodding slightly towards the screen, where the 'Jasper' interface and clear logo are undeniably visible and clean. It’s a quiet acknowledgment of the tool that empowered them.",
+      "duration": 3,
+      "effects": "Seamless transition. Music fades gently. A soft, grateful voiceover. On-screen text: 'Jasper AI: Your creative partner.'",
+      "id": "1761469670078_5",
+      "ffmpegCommands": "fade=t=in:st=0:d=1,drawtext=text='Jasper AI\\: Your creative partner.':fontcolor=white:fontsize=80:x=(w-text_w)/2:y=(h/2):shadowcolor=black:shadowx=2:shadowy=2:alpha='if(lt(t,0.5)\\,0\\,min(1,(t-0.5)/1.5))',format=yuv420p"
     }
   ],
-  "script": "You know that feeling... staring at a blank page. The cursor blinks, mocking you. The pressure is immense.\n\nHour after hour, trying to force it. The creative well feels dry. You question everything.\n\nWhat if it didn't have to be this hard? To break through the silence?\n\nSometimes, a little help is all you need. Not to replace your voice, but to amplify it. To remind you of the magic you already possess.\n\nClear the path. Let your true ideas breathe. Focus on your unique message, your human touch.\n\nFind your flow. Rediscover the joy of creation. Your words are waiting. Try Jasper.ai!",
-  "numberOfImages": 5,
-  "videoLength": "37s",
-  "ctaGoal": "Encourage immediate action and trial sign-ups. 'Try Jasper.ai - Link in Bio!' 'Discover your flow. Start your free trial today!'",
-  "voiceTone": "Empathetic, warm, reassuring, uplifting, authentic, and calm.",
-  "visualStyle": "Cinematic, natural lighting, slightly desaturated initially transitioning to warmer and brighter tones. Focus on close-ups of genuine human emotion and relatable, lived-in environments.",
-  "musicPace": "Starts slow and melancholic, gradually builds to a gentle, uplifting, and harmonious pace, resolving into a feeling of peace and accomplishment.",
-  "heading": "The Blank Page Battle: A Story of Finding Your Flow Again.",
+  "script": "Scene 1 (Whispered, frustrated, layered over visuals): \"Stuck. My brain feels like static.\"\nScene 2 (Internal, defeated): \"Just... empty. I can't do this anymore.\"\nScene 3 (Muttering, curious, with urgency): \"What if... this friend mentioned something... (Quick pause) I need another way.\"\nScene 4 (A small gasp, then growing awe): \"Whoa. It's... flowing. It's actually flowing!\"\nScene 5 (Deep, contented sigh): \"Finally. I can breathe again. I actually got it done.\"\nScene 6 (Soft, grateful whisper): \"Thank you, Jasper. Finally, I can breathe again. Find your creative flow with us. Link in bio.\"",
+  "numberOfImages": 10,
+  "videoLength": 25,
+  "ctaGoal": "To inspire viewers struggling with content creation to seek a solution that empowers their creativity, explicitly identifying 'Jasper AI' as that solution, and encouraging them to explore it to reclaim their time and energy. The direct CTA is 'learn more about Jasper AI' (link in bio).",
+  "voiceTone": "Sincere, relatable, empathetic, evolving from tired/defeated to surprised/hopeful/grateful.",
+  "visualStyle": "Authentic, raw, with a natural, almost documentary-like feel in the beginning, transitioning to warmer, more optimistic lighting and composition. Focus on human emotion over polished aesthetics. Essential: clear, readable on-screen subtitles for all dialogue, styled for native platform viewing.",
+  "musicPace": "Starts abrupt and melancholic, builds swiftly with an inquisitive and then gently uplifting melody, ending on a serene, hopeful note, matching the tighter cuts.",
+  "heading": "The Blank Page Nearly Broke Me. (Until Jasper AI.)",
   "hashtags": [
+    "#CreatorStruggles",
     "#WriterLife",
     "#CreativeBlock",
+    "#BurnoutIsReal",
+    "#FreelanceJourney",
+    "#SmallBusinessOwner",
+    "#GetUnstuck",
+    "#HumanStory",
+    "#AuthenticMoment",
     "#ContentCreation",
-    "#AIWriting",
+    "#AIForCreators",
     "#JasperAI",
-    "#FindYourFlow",
-    "#CreativeStruggle",
-    "#BeatTheBlock",
-    "#ContentCreatorLife"
+    "#AIWriting",
+    "#ContentAssistant",
+    "#ProductivityHacks"
   ],
-  "description": "Ever felt like the words just wouldn't come? You're not alone. Watch how one creator broke through the blank page battle and rediscovered their flow. What's your biggest content creation struggle right now? 👇 Ready to find your flow? Click the link in bio to try Jasper.ai today!",
+  "description": "Staring at a blank page for hours? You're not alone. The burnout is real. This is an unfiltered look at one of those moments, and the quiet relief of finding a way through. It's not just about a tool; it's about reclaiming your creative spark and your peace of mind. If you know, you know. Ready to beat the blank page? Discover how Jasper AI can help. Link in bio! What's your biggest content creation struggle?",
   "preferredPlatform": [
     "TikTok",
     "Instagram Reels",
-    "YouTube Shorts",
-    "LinkedIn"
+    "YouTube Shorts"
   ]
 }

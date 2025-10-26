@@ -1,4 +1,5 @@
-Spawning FFmpeg with args: ffmpeg -loop 1 -t 5 -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\beyond_the_reps_1761041323940_4 - Copy.jpg -loop 1 -t 5 -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\beyond_the_reps_1761041323940_4.jpg -loop 1 -t 15 -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\blank_screen_battle_1761041961182_0 - Copy.jpg -loop 1 -t 7 -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\blank_screen_battle_1761041961182_0.jpg -loop 1 -t 5 -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\flow_and_fulfillment_1761041961182_3 - Copy.jpg -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\audio\bodybuilding.com_1761041126316.mp3 -filter_complex [0:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[scaled0];[scaled0]drawtext=text='Staring at a blank page again? 😩':fontcolor=white:fontsize=70:x=(w-text_w)/2:y=h*0.4:box=1:boxcolor=black@0.5:boxborderw=10, drawtext=text='Creative Block SUCKS.':fontcolor=white:fontsize=80:x=(w-text_w)/2:y=h*0.5:box=1:boxcolor=black@0.5:boxborderw=10, drawtext=text='The Pressure is REAL.':fontcolor=white:fontsize=80:x=(w-text_w)/2:y=h*0.6:box=1:boxcolor=black@0.5:boxborderw=10,format=yuv420p[v0];[1:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[scaled1];[scaled1]zoompan=z='min(1+(0.2/5)*t, 1.2)':d=150:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920, eq=gamma_b='1+0.05*t',format=yuv420p[v1];[2:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[scaled2];[scaled2]eq=brightness='min(0.25, 0.015*t)':contrast='min(1.3, 1+0.02*t)',format=yuv420p[v2];[3:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[scaled3];[scaled3]eq=brightness=0.1:gamma=1.1, setpts=0.25*PTS,format=yuv420p[v3];[4:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[scaled4];[scaled4]eq=brightness=0.05:gamma_r=1.1:gamma_b=0.9, vignette, zoompan=z='max(1.2 - (0.2/5)*t, 1.0)':d=150:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920,format=yuv420p[v4];[v0][v1][v2][v3][v4]concat=n=5:v=1:a=0[v] -map [v] -map 5:a -c:v libx264 -c:a aac -pix_fmt yuv420p -r 30 -shortest C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\videos\The_Blank_Page_Battle__A_Story_of_Finding_Your_Flow_Again__1761438862833.mp4
+Spawning FFmpeg with args: ffmpeg -loop 1 -t 2 -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\beyond_the_reps_1761041323940_4 - Copy.jpg -loop 1 -t 3 -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\beyond_the_reps_1761041323940_4.jpg -loop 1 -t 3 -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\blank_screen_battle_1761041961182_0 - Copy.jpg -loop 1 -t 7 -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\blank_screen_battle_1761041961182_0.jpg -loop 1 -t 7 -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\flow_and_fulfillment_1761041961182_3 - Copy.jpg -loop 1 -t 3 -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\flow_and_fulfillment_1761041961182_3.jpg -loop 1 -t 2 -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\just_one_more_1761041323940_2 - Copy.jpg -loop 1 -t 2 -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\just_one_more_1761041323940_2.jpg -loop 1 -t 2 -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\the_alarm's_edge_1761041323940_0 - Copy.jpg -loop 1 -t 2 -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\the_alarm's_edge_1761041323940_0.jpg -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\audio\bodybuilding.com_1761041126316.mp3 -filter_complex [0:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[scaled0];[scaled0]eq=saturation=0.7,curves=preset=cross_process,drawtext=text='Creator burnout is REAL.':fontcolor=white:fontsize=100:x=(w-text_w)/2:y=(h-text_h)/2:shadowcolor=black:shadowx=3:shadowy=3,format=yuv420p[v0];[1:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[scaled1];[scaled1]zoompan=z='min(zoom+0.001,1.2)':d=90:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920,format=yuv420p[v1];[2:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[scaled2];[scaled2]eq=gamma=1.02,colorbalance=rs=0.05:bs=-0.05,format=yuv420p[v2];[3:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[scaled3];[scaled3]eq=brightness=0.03:gamma=1.05:saturation=1.1,zoompan=z='min(zoom+0.0007, 1.1)':d=210:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920,drawtext=text='Powered by Jasper AI':fontcolor=white@0.8:fontsize=40:x=w-text_w-30:y=h-text_h-30:enable='between(t,4,6.5)',format=yuv420p[v3];[4:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[scaled4];[scaled4]curves=r='0/0.1\:1/0.9':g='0/0\:1/0.95':b='0/0.2\:1/0.8',gblur=sigma=0.6,vignette=a=pi/5,format=yuv420p[v4];[5:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[scaled5];[scaled5]fade=t=in:st=0:d=1,drawtext=text='Jasper AI\: Your creative partner.':fontcolor=white:fontsize=80:x=(w-text_w)/2:y=(h/2):shadowcolor=black:shadowx=2:shadowy=2:alpha='if(lt(t,0.5)\,0\,min(1,(t-0.5)/1.5))',format=yuv420p[v5];[6:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[scaled6];[scaled6]eq=saturation=0.7,curves=preset=cross_process,drawtext=text='Creator burnout 
+is REAL.':fontcolor=white:fontsize=100:x=(w-text_w)/2:y=(h-text_h)/2:shadowcolor=black:shadowx=3:shadowy=3,format=yuv420p[v6];[7:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[scaled7];[scaled7]eq=saturation=0.7,curves=preset=cross_process,drawtext=text='Creator burnout is REAL.':fontcolor=white:fontsize=100:x=(w-text_w)/2:y=(h-text_h)/2:shadowcolor=black:shadowx=3:shadowy=3,format=yuv420p[v7];[8:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[scaled8];[scaled8]eq=saturation=0.7,curves=preset=cross_process,drawtext=text='Creator burnout is REAL.':fontcolor=white:fontsize=100:x=(w-text_w)/2:y=(h-text_h)/2:shadowcolor=black:shadowx=3:shadowy=3,format=yuv420p[v8];[9:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[scaled9];[scaled9]eq=saturation=0.7,curves=preset=cross_process,drawtext=text='Creator burnout is REAL.':fontcolor=white:fontsize=100:x=(w-text_w)/2:y=(h-text_h)/2:shadowcolor=black:shadowx=3:shadowy=3,format=yuv420p[v9];[v0][v1][v2][v3][v4][v5][v6][v7][v8][v9]concat=n=10:v=1:a=0[v] -map [v] -map 10:a -c:v libx264 -c:a aac -pix_fmt yuv420p -r 30 -shortest C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\videos\The_Blank_Page_Nearly_Broke_Me___Until_Jasper_AI___1761470008545.mp4 
 FFmpeg stderr: ffmpeg version 8.0-full_build-www.gyan.dev Copyright (c) 2000-2025 the FFmpeg developers
   built with gcc 15.2.0 (Rev8, Built by MSYS2 project)
 
@@ -17,72 +18,12 @@ FFmpeg stderr: Fontconfig error: Cannot load default config file: No such file: 
 
 FFmpeg stderr: Fontconfig error: Cannot load default config file: No such file: (null)
 
-FFmpeg stderr: Fontconfig error: Cannot load default config file: No such file: (null
-FFmpeg stderr: )
-
-FFmpeg stderr: Input #0, image2, from 'C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\beyond_the_reps_1761041323940_4 - Copy.jpg':
-  Duration: 00:00:00.04, start: 0.000000, bitrate: 2702 kb/s
-
-FFmpeg stderr:   Stream #0:0: Video: mjpeg (Progressive), yuvj420p(pc, bt470bg/unknown/unknown), 433x650 [SAR 72:72 DAR 433:650], 25 fps, 25 tbr, 25 tbn
-
-FFmpeg stderr: Input #1, image2, from 'C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\beyond_the_reps_1761041323940_4.jpg':
-  Duration: 00:00:00.04, start: 0.000000, bitrate: 2702 kb/
-FFmpeg stderr: s
-  Stream #1:0: Video: mjpeg (Progressive), yuvj420p(pc, bt470bg/unknown/unknown), 433x650 [SAR 72:72 DAR 433:650], 25 fps, 25 tbr, 25 tbn
-FFmpeg stderr: Input #2, image2, from 'C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\blank_screen_battle_1761041961182_0 - Copy.jpg':
-  Duration: 00:00:00.04, start: 0.000000, bitrate:
-FFmpeg stderr:  5455 kb/s
-  Stream #2:0: Video: mjpeg (Progressive), yuvj420p(pc, bt470bg/unknown/unknown), 486x650 [SAR 72:72 DAR 243:325], 25 fps, 25 tbr, 25 tbn
-FFmpeg stderr: Input #3, image2, from 'C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\blank_screen_battle_1761041961182_0.jpg':
-  Duration: 00:00:00.04, start: 0.000000, bitrate: 5455 kb/
-FFmpeg stderr: s
-  Stream #3:0: Video: mjpeg (Progressive), yuvj420p(pc, bt470bg/unknown/unknown), 486x650 [SAR 72:72 DAR 243:325], 25 fps, 25 tbr, 25 tbn
-FFmpeg stderr: Input #4, image2, from 'C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\flow_and_fulfillment_1761041961182_3 - Copy.jpg':
-  Duration: 00:00:00.04, start: 0.000000, bitrate: 8068 kb/s
-FFmpeg stderr: 
-  Stream #4:0: Video: mjpeg (Progressive), yuvj420p(pc, bt470bg/unknown/unknown), 433x650 [SAR 72:72 DAR 433:650], 25 fps, 25 tbr, 25 tbn
-FFmpeg stderr: [mp3 @ 0000014b4f5bcc40] Estimating duration from bitrate, this may be inaccurate
-
-FFmpeg stderr: Input #5, mp3, from 'C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\audio\bodybuilding.com_1761041126316.mp3':
-  Duration: 00:01:22.37, start: 0.000000, bitrate:
-FFmpeg stderr:  64 kb/s
-  Stream #5:0: Audio: mp3 (mp3float), 24000 Hz, mono, fltp, 64 kb/s
-
-FFmpeg stderr: Stream mapping:
-  Stream #0:0 (mjpeg) -> scale:default
-  Stream #1:0 (mjpeg) -> scale:default
-  Stream #2:0 (mjpeg) -> scale:default
-  Stream #3:0 (mjpeg) -> scale:default
-  Stream #4:0 (mjpeg) -> scale:default
+FFmpeg stderr: [Parsed_vignette_30 @ 0000020405b1dc40] [Eval @ 000000c68f5fefa0] Undefined constant or missing '(' in 'pi/5'
+[Parsed_vignette_30 @ 0000020405b1dc40] Unable to parse expression for 'angle'
+[AVFilterGraph @ 0000020405abce80] Error initializing filters
 FFmpeg stderr:
-  concat:out:v0 -> Stream #0:0 (libx264)
-  Stream #5:0 -> #0:1 (mp3 (mp3float) -> aac (native))
 
-FFmpeg stderr: Press [q] to stop, [?] for help
-
-FFmpeg stderr: Fontconfig error: Cannot load default config file: No such file: (null)
-
-FFmpeg stderr: Fontconfig error: 
-FFmpeg stderr: Cannot load default config file: No such file: (null)
-
-FFmpeg stderr: Fontconfig error: Cannot load default config file: No such file: (null)
-
-FFmpeg stderr: [Parsed_zoompan_10 @ 0000014b4f5908c0] [Eval @ 0000004059ffec10] Undefined constant or missing '(' in 't,1.2)'
-[Parsed_zoompan_10 @ 0000014b4f5908c0] Failed to configure output pad on Parsed_zoompan_10
-
-FFmpeg stderr: [fc#0 @ 0000014b4f539a00] Error reinitializing filters!
-[fc#0 @ 0000014b4f539a00] Task finished with error code: -22 (Invalid argument)
-[fc#0 @ 0000014b4f539a00] Terminating thread with return code -22 (Invalid argument)
-[vost#0:0/libx264 @ 0000014b521e3540] [enc:libx264 @ 0000014b524a6dc0] Could not open encoder before EOF
-[vost#0:0/libx264 @ 0000014b521e3540] Task finished with error code: -22 (Invalid argument)
-[vost#0:0/libx264 @ 0000014b521e3540] Terminating thread with return code -22 (Invalid argument)
-
-FFmpeg stderr: [out#0/mp4 @ 0000014b4f58f7c0] Nothing was written into output file, because at least one of its streams received no packets.
-frame=    0 fps=0.0 q=0.0 Lsize=       0KiB time=N/A bitrate=N/A speed=N/A elapsed=0:00:00.17
-
-FFmpeg stderr: [aac @ 0000014b4f54a6c0] Qavg: 5195.469
-
-FFmpeg stderr: Conversion failed!
+FFmpeg stderr: Error : Invalid argument
 
 Error in /render-video route: Error: FFmpeg process exited with code 4294967274:
 ffmpeg version 8.0-full_build-www.gyan.dev Copyright (c) 2000-2025 the FFmpeg developers
@@ -98,48 +39,12 @@ ffmpeg version 8.0-full_build-www.gyan.dev Copyright (c) 2000-2025 the FFmpeg de
 Fontconfig error: Cannot load default config file: No such file: (null)
 Fontconfig error: Cannot load default config file: No such file: (null)
 Fontconfig error: Cannot load default config file: No such file: (null)
-Fontconfig error: Cannot load default config file: No such file: (null)
-Input #0, image2, from 'C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\beyond_the_reps_1761041323940_4 - 
-Copy.jpg':
-  Duration: 00:00:00.04, start: 0.000000, bitrate: 2702 kb/s
-  Stream #0:0: Video: mjpeg (Progressive), yuvj420p(pc, bt470bg/unknown/unknown), 433x650 [SAR 72:72 DAR 433:650], 25 fps, 25 tbr, 25 tbnInput #1, image2, from 'C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\beyond_the_reps_1761041323940_4.jpg':
-  Duration: 00:00:00.04, start: 0.000000, bitrate: 2702 kb/s
-  Stream #1:0: Video: mjpeg (Progressive), yuvj420p(pc, bt470bg/unknown/unknown), 433x650 [SAR 72:72 DAR 433:650], 25 fps, 25 tbr, 25 tbnInput #2, image2, from 'C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\blank_screen_battle_1761041961182_0 - Copy.jpg':
-  Duration: 00:00:00.04, start: 0.000000, bitrate: 5455 kb/s
-  Stream #2:0: Video: mjpeg (Progressive), yuvj420p(pc, bt470bg/unknown/unknown), 486x650 [SAR 72:72 DAR 243:325], 25 fps, 25 tbr, 25 tbnInput #3, image2, from 'C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\blank_screen_battle_1761041961182_0.jpg':
-  Duration: 00:00:00.04, start: 0.000000, bitrate: 5455 kb/s
-  Stream #3:0: Video: mjpeg (Progressive), yuvj420p(pc, bt470bg/unknown/unknown), 486x650 [SAR 72:72 DAR 243:325], 25 fps, 25 tbr, 25 tbnInput #4, image2, from 'C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\flow_and_fulfillment_1761041961182_3 - Copy.jpg':
-  Duration: 00:00:00.04, start: 0.000000, bitrate: 8068 kb/s
-  Stream #4:0: Video: mjpeg (Progressive), yuvj420p(pc, bt470bg/unknown/unknown), 433x650 [SAR 72:72 DAR 433:650], 25 fps, 25 tbr, 25 tbn[mp3 @ 0000014b4f5bcc40] Estimating duration from bitrate, this may be inaccurate
-Input #5, mp3, from 'C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\audio\bodybuilding.com_1761041126316.mp3':  
-  Duration: 00:01:22.37, start: 0.000000, bitrate: 64 kb/s
-  Stream #5:0: Audio: mp3 (mp3float), 24000 Hz, mono, fltp, 64 kb/s
-Stream mapping:
-  Stream #0:0 (mjpeg) -> scale:default
-  Stream #1:0 (mjpeg) -> scale:default
-  Stream #2:0 (mjpeg) -> scale:default
-  Stream #3:0 (mjpeg) -> scale:default
-  Stream #4:0 (mjpeg) -> scale:default
-  concat:out:v0 -> Stream #0:0 (libx264)
-  Stream #5:0 -> #0:1 (mp3 (mp3float) -> aac (native))
-Press [q] to stop, [?] for help
-Fontconfig error: Cannot load default config file: No such file: (null)
-Fontconfig error: Cannot load default config file: No such file: (null)
-Fontconfig error: Cannot load default config file: No such file: (null)
-[Parsed_zoompan_10 @ 0000014b4f5908c0] [Eval @ 0000004059ffec10] Undefined constant or missing '(' in 't,1.2)'
-[Parsed_zoompan_10 @ 0000014b4f5908c0] Failed to configure output pad on Parsed_zoompan_10
-[fc#0 @ 0000014b4f539a00] Error reinitializing filters!
-[fc#0 @ 0000014b4f539a00] Task finished with error code: -22 (Invalid argument)
-[fc#0 @ 0000014b4f539a00] Terminating thread with return code -22 (Invalid argument)
-[vost#0:0/libx264 @ 0000014b521e3540] [enc:libx264 @ 0000014b524a6dc0] Could not open encoder before EOF
-[vost#0:0/libx264 @ 0000014b521e3540] Task finished with error code: -22 (Invalid argument)
-[vost#0:0/libx264 @ 0000014b521e3540] Terminating thread with return code -22 (Invalid argument)
-[out#0/mp4 @ 0000014b4f58f7c0] Nothing was written into output file, because at least one of its streams received no packets.
-frame=    0 fps=0.0 q=0.0 Lsize=       0KiB time=N/A bitrate=N/A speed=N/A elapsed=0:00:00.17
-[aac @ 0000014b4f54a6c0] Qavg: 5195.469
-Conversion failed!
+[Parsed_vignette_30 @ 0000020405b1dc40] [Eval @ 000000c68f5fefa0] Undefined constant or missing '(' in 'pi/5'
+[Parsed_vignette_30 @ 0000020405b1dc40] Unable to parse expression for 'angle'
+[AVFilterGraph @ 0000020405abce80] Error initializing filters
+Error : Invalid argument
 
-    at ChildProcess.<anonymous> (C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\src\services\gemini.service.ts:306:28)        
+    at ChildProcess.<anonymous> (C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\src\services\gemini.service.ts:468:28)        
     at ChildProcess.emit (node:events:519:28)
     at maybeClose (node:internal/child_process:1101:16)
     at Process.ChildProcess._handle.onexit (node:internal/child_process:304:5)
@@ -157,48 +62,12 @@ ffmpeg version 8.0-full_build-www.gyan.dev Copyright (c) 2000-2025 the FFmpeg de
 Fontconfig error: Cannot load default config file: No such file: (null)
 Fontconfig error: Cannot load default config file: No such file: (null)
 Fontconfig error: Cannot load default config file: No such file: (null)
-Fontconfig error: Cannot load default config file: No such file: (null)
-Input #0, image2, from 'C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\beyond_the_reps_1761041323940_4 - 
-Copy.jpg':
-  Duration: 00:00:00.04, start: 0.000000, bitrate: 2702 kb/s
-  Stream #0:0: Video: mjpeg (Progressive), yuvj420p(pc, bt470bg/unknown/unknown), 433x650 [SAR 72:72 DAR 433:650], 25 fps, 25 tbr, 25 tbnInput #1, image2, from 'C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\beyond_the_reps_1761041323940_4.jpg':
-  Duration: 00:00:00.04, start: 0.000000, bitrate: 2702 kb/s
-  Stream #1:0: Video: mjpeg (Progressive), yuvj420p(pc, bt470bg/unknown/unknown), 433x650 [SAR 72:72 DAR 433:650], 25 fps, 25 tbr, 25 tbnInput #2, image2, from 'C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\blank_screen_battle_1761041961182_0 - Copy.jpg':
-  Duration: 00:00:00.04, start: 0.000000, bitrate: 5455 kb/s
-  Stream #2:0: Video: mjpeg (Progressive), yuvj420p(pc, bt470bg/unknown/unknown), 486x650 [SAR 72:72 DAR 243:325], 25 fps, 25 tbr, 25 tbnInput #3, image2, from 'C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\blank_screen_battle_1761041961182_0.jpg':
-  Duration: 00:00:00.04, start: 0.000000, bitrate: 5455 kb/s
-  Stream #3:0: Video: mjpeg (Progressive), yuvj420p(pc, bt470bg/unknown/unknown), 486x650 [SAR 72:72 DAR 243:325], 25 fps, 25 tbr, 25 tbnInput #4, image2, from 'C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\flow_and_fulfillment_1761041961182_3 - Copy.jpg':
-  Duration: 00:00:00.04, start: 0.000000, bitrate: 8068 kb/s
-  Stream #4:0: Video: mjpeg (Progressive), yuvj420p(pc, bt470bg/unknown/unknown), 433x650 [SAR 72:72 DAR 433:650], 25 fps, 25 tbr, 25 tbn[mp3 @ 0000014b4f5bcc40] Estimating duration from bitrate, this may be inaccurate
-Input #5, mp3, from 'C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\audio\bodybuilding.com_1761041126316.mp3':  
-  Duration: 00:01:22.37, start: 0.000000, bitrate: 64 kb/s
-  Stream #5:0: Audio: mp3 (mp3float), 24000 Hz, mono, fltp, 64 kb/s
-Stream mapping:
-  Stream #0:0 (mjpeg) -> scale:default
-  Stream #1:0 (mjpeg) -> scale:default
-  Stream #2:0 (mjpeg) -> scale:default
-  Stream #3:0 (mjpeg) -> scale:default
-  Stream #4:0 (mjpeg) -> scale:default
-  concat:out:v0 -> Stream #0:0 (libx264)
-  Stream #5:0 -> #0:1 (mp3 (mp3float) -> aac (native))
-Press [q] to stop, [?] for help
-Fontconfig error: Cannot load default config file: No such file: (null)
-Fontconfig error: Cannot load default config file: No such file: (null)
-Fontconfig error: Cannot load default config file: No such file: (null)
-[Parsed_zoompan_10 @ 0000014b4f5908c0] [Eval @ 0000004059ffec10] Undefined constant or missing '(' in 't,1.2)'
-[Parsed_zoompan_10 @ 0000014b4f5908c0] Failed to configure output pad on Parsed_zoompan_10
-[fc#0 @ 0000014b4f539a00] Error reinitializing filters!
-[fc#0 @ 0000014b4f539a00] Task finished with error code: -22 (Invalid argument)
-[fc#0 @ 0000014b4f539a00] Terminating thread with return code -22 (Invalid argument)
-[vost#0:0/libx264 @ 0000014b521e3540] [enc:libx264 @ 0000014b524a6dc0] Could not open encoder before EOF
-[vost#0:0/libx264 @ 0000014b521e3540] Task finished with error code: -22 (Invalid argument)
-[vost#0:0/libx264 @ 0000014b521e3540] Terminating thread with return code -22 (Invalid argument)
-[out#0/mp4 @ 0000014b4f58f7c0] Nothing was written into output file, because at least one of its streams received no packets.
-frame=    0 fps=0.0 q=0.0 Lsize=       0KiB time=N/A bitrate=N/A speed=N/A elapsed=0:00:00.17
-[aac @ 0000014b4f54a6c0] Qavg: 5195.469
-Conversion failed!
+[Parsed_vignette_30 @ 0000020405b1dc40] [Eval @ 000000c68f5fefa0] Undefined constant or missing '(' in 'pi/5'
+[Parsed_vignette_30 @ 0000020405b1dc40] Unable to parse expression for 'angle'
+[AVFilterGraph @ 0000020405abce80] Error initializing filters
+Error : Invalid argument
 
-    at ChildProcess.<anonymous> (C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\src\services\gemini.service.ts:306:28)        
+    at ChildProcess.<anonymous> (C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\src\services\gemini.service.ts:468:28)        
     at ChildProcess.emit (node:events:519:28)
     at maybeClose (node:internal/child_process:1101:16)
     at Process.ChildProcess._handle.onexit (node:internal/child_process:304:5)
