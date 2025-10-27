@@ -3,11 +3,11 @@ import fetch from 'node-fetch';
 import config from '../config';
 
 class ElevenLabsService {
-    private apiKey = config.apiKeys.gemini;
+    private apiKey = config.apiKeys.tts;
     private baseUrl = 'https://api.elevenlabs.io/v1';
 
     private async request(endpoint: string, options: any = {}) {
-        if (!this.apiKey) throw new Error("ElevenLabs API key is not configured.");
+        if (!this.apiKey) throw new Error("TTS API key is not configured for ElevenLabs service.");
         const headers = {
             'xi-api-key': this.apiKey,
             'Content-Type': 'application/json',

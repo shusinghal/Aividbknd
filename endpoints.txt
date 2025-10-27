@@ -86,6 +86,11 @@
   },
   {
     "method": "POST",
+    "path": "/api/generate/viral-audio",
+    "description": "Generates a viral-optimized audio narration based on strategic goals, saves it, and returns the base64 content and file URL."
+  },
+  {
+    "method": "POST",
     "path": "/api/generate/single-image",
     "description": "Generates a single image based on a description, visual style, and optional character details."
   },

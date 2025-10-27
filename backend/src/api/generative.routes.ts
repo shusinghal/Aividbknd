@@ -78,12 +78,14 @@ router.post('/character-description', async (req, res, next) => {
 
 router.post('/viral-audio', async (req, res, next) => {
     try {
-        const { script, videoIdea, provider, elevenLabsVoiceId } = req.body;
+        const { videoIdea, provider, elevenLabsVoiceId } = req.body;
+        const script = videoIdea?.script;
 
         // 1. Validate request body
-        if (!script || !videoIdea || !provider) {
-            return res.status(400).json({ message: 'script, videoIdea, and provider are required.' });
+        if (!videoIdea || !script || !provider) {
+            return res.status(400).json({ message: 'A videoIdea object (containing a script) and a provider are required.' });
         }
+
         if (provider === 'elevenlabs' && !elevenLabsVoiceId) {
             return res.status(400).json({ message: 'elevenLabsVoiceId is required for the elevenlabs provider.' });
         }
@@ -170,11 +172,19 @@ router.post('/viral-audio', async (req, res, next) => {
                 return res.status(400).json({ message: `Unsupported provider: ${provider}. Use 'google' or 'elevenlabs'.` });
         }
 
-        // 4. Convert to base64 and send response
+        // 4. Convert to buffer, save the file, and prepare response
         const audioBuffer = await audioBlob.arrayBuffer();
-        const base64Audio = Buffer.from(audioBuffer).toString('base64');
+        const buffer = Buffer.from(audioBuffer);
 
-        res.status(200).json({ base64Audio });
+        // Save the audio file
+        const audioDir = path.join(process.cwd(), 'public', 'assets', 'audio');
+        await fs.mkdir(audioDir, { recursive: true });
+        const audioFileName = `viral_audio_${Date.now()}.mp3`;
+        const audioFilePath = path.join(audioDir, audioFileName);
+        await fs.writeFile(audioFilePath, buffer);
+
+        const base64Audio = buffer.toString('base64');
+        res.status(200).json({ base64Audio, fileUrl: `/assets/audio/${audioFileName}` });
 
     } catch (error) {
         console.error('Error in /viral-audio route:', error);

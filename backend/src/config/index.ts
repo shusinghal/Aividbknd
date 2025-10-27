@@ -8,7 +8,7 @@ const config = {
         gemini: process.env.GEMINI_API_KEY,
         elevenlabs: process.env.ELEVENLABS_API_KEY,
         pexels: process.env.PEXELS_API_KEY,
-        tts: process.env.tts_key,
+        tts: process.env.TTS_KEY,
     },
     googleTts: {
         clientEmail: process.env.GOOGLE_SERVICE_ACCOUNT_CLIENT_EMAIL,
