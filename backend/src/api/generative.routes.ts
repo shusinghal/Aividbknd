@@ -51,6 +51,17 @@ router.post('/video-idea', async (req, res, next) => {
     }
 });
 
+router.post('/refine-video-idea', async (req, res, next) => {
+    try {
+        const { videoIdea } = req.body;
+        if (!videoIdea) return res.status(400).json({ message: 'A videoIdea object is required.' });
+        const refinedIdea = await geminiService.refineVideoIdea(videoIdea);
+        res.json(refinedIdea);
+    } catch (error) {
+        next(error);
+    }
+});
+
 router.post('/assets', async (req, res, next) => {
     try {
         const { companyName, companyDescription, videoIdea } = req.body;

@@ -15,7 +15,6 @@ const roles: string[] = [
     'The Realist (Feasibility, Impact & Monetization): Your focus is on bridging creativity with business goals. Evaluate the concept\'s feasibility within practical constraints (time, cost, tools). Provide data-driven insights on its potential for monetization and suggest small tweaks to improve ROI without harming the story\'s emotional core.',
 ];
 import { githubService } from './github.service';
-import { ffmpegEffectsService, EffectLayer } from './ffmpeg.effects.service';
  
 import fetch from 'node-fetch';
 import { googleTtsService } from './tts.service';
@@ -31,6 +30,7 @@ interface VideoIdea {
   visualStyle: string;
   [key: string]: any;
 }
+import { ffmpegEffectsService, EffectLayer } from './ffmpeg.effects.service';
 
 class GeminiService {
     private ai: GoogleGenAI;
@@ -77,6 +77,7 @@ class GeminiService {
             config: { responseMimeType: "application/json", responseSchema: schema }
         });
         if (!response.text) throw new Error('Empty response from Gemini');
+        console.log('[AI Response - scanForCompanies]:', response.text);
         return JSON.parse(response.text);
     }
 
@@ -96,33 +97,59 @@ class GeminiService {
             config: { responseMimeType: "application/json", responseSchema: schema }
         });
         if (!response.text) throw new Error('Empty response from Gemini');
+        console.log('[AI Response - generateMarketingInsights]:', response.text);
         return JSON.parse(response.text);
     }
     
     public async runAiCollaboration(company: Company): Promise<any> {
-        const initialPrompt = `For "${company.name}", a company described as "${company.description}", create a full viral video content plan. The plan should feel emotionally authentic and human, not like a sales pitch. Use the "Unfiltered Human Moment" framework. Respond ONLY with a valid JSON object. The JSON should have keys: coreProblem, targetEmotion, images (an array of objects with id, description, duration, effects), script, videoLength, ctaGoal, voiceTone, visualStyle, musicPace, heading, hashtags, description, preferredPlatform (an array). Each object in the 'images' array represents a single visual shot.`;
+        const prompt = `For "${company.name}", a company described as "${company.description}", create a full viral video content plan using the "Unfiltered Human Moment" framework. Respond ONLY with a valid JSON object with the following keys: coreProblem, targetEmotion, scenes, script, videoLength, ctaGoal, voiceTone, visualStyle, musicPace, heading, hashtags, description, preferredPlatform.
+        **CRITICAL RULES:**
+        1.  **Scenes**: The 'scenes' array must contain objects, each representing ONE single, continuous visual shot. If a concept requires multiple shots (like 'rapid cuts' or a 'montage'), you MUST break it into multiple, separate scene objects, each with its own description, duration, and effects.
+        2.  **Script**: The 'script' key must be an array of objects, each with a 'type' ('dialogue', 'sfx', or 'pause') and 'content'. For 'pause', content is the duration in seconds (e.g., {"type": "pause", "content": 1.5}).
+        3.  **Timing**: The total duration of all scenes MUST equal the 'videoLength'. The spoken dialogue in the script should be timed appropriately for this video length, using 'pause' objects to fill time where necessary to match the visual pacing.`;
         
-       const initialResponse = await this.ai.models.generateContent({
-           model: 'gemini-2.5-flash', contents: initialPrompt, config: { responseMimeType: "application/json" }
+       const response = await this.ai.models.generateContent({
+           model: 'gemini-2.5-flash', contents: prompt, config: { responseMimeType: "application/json" }
        });
-       if (!initialResponse.text) throw new Error('Empty initial response from Gemini');
-       let currentVideoIdea = JSON.parse(initialResponse.text);
-
-        const feedbackLog: string[] = [];
-        for (const role of roles) {
-            const feedbackPrompt = `You are a "${role}". Critique this video concept: ${JSON.stringify(currentVideoIdea)}. Provide concise, actionable feedback based on your role.`;
-            const feedbackResponse = await this.ai.models.generateContent({ model: 'gemini-2.5-flash', contents: feedbackPrompt });
-            feedbackLog.push(`[${role.split(':')[0]}]: ${feedbackResponse.text ?? ''}`);
-        }
-
-        const finalPrompt = `You are a Creative Director. Refine this initial concept: ${JSON.stringify(currentVideoIdea)} using this feedback from your team: ${feedbackLog.join('\n')}. Output ONLY the final, updated JSON object. Ensure it is a single, valid JSON object and nothing else.`;
-        const finalResponse = await this.ai.models.generateContent({
-            model: 'gemini-2.5-flash', contents: finalPrompt, config: { responseMimeType: "application/json" }
-        });
-        if (!finalResponse.text) throw new Error('Empty final response from Gemini');
-        return JSON.parse(finalResponse.text);
+       if (!response.text) throw new Error('Empty response from Gemini on initial video idea generation.');
+       console.log('[AI Response - runAiCollaboration - Initial Idea]:', response.text);
+       return JSON.parse(response.text);
     }
     
+    public async refineVideoIdea(videoIdea: any): Promise<any> {
+        const feedbackLog: string[] = [];
+        for (const role of roles) {
+            const feedbackPrompt = `You are a "${role}". Critique this video concept: ${JSON.stringify(videoIdea)}. Provide concise, actionable feedback based on your role.`;
+            const feedbackResponse = await this.ai.models.generateContent({ model: 'gemini-2.5-flash', contents: feedbackPrompt });
+            const feedbackText = feedbackResponse.text ?? '';
+            console.log(`[AI Feedback - ${role.split(':')[0]}]:`, feedbackText);
+            feedbackLog.push(`[${role.split(':')[0]}]: ${feedbackText}`);
+        }
+
+        const finalPrompt = `You are a Creative Director. Refine this initial video concept: ${JSON.stringify(videoIdea)} using this feedback from your team: ${feedbackLog.join('\n')}. Your final output MUST be a single, valid JSON object and nothing else.
+        **CRITICAL REFINEMENT RULES:**
+        1.  **Deconstruct Scenes**: Examine the 'scenes' array. If any scene 'description' implies multiple shots (e.g., 'rapid cuts', 'montage'), you MUST break it down into multiple, separate scene objects. Each new scene must represent only ONE single visual and have its own adjusted 'duration' and 'effects'.
+        2.  **Structure Script**: Ensure the 'script' is an array of objects, each with a 'type' ('dialogue', 'sfx', 'pause') and 'content'.
+        3.  **Synchronize Timing**: The total duration of all scenes must equal the 'videoLength'. Adjust the 'script' by adding or modifying 'pause' objects to ensure the spoken dialogue and sound effects are perfectly timed to the total video length.`;
+
+        const finalResponse = await this.ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: finalPrompt,
+            config: { responseMimeType: "application/json" }
+        });
+
+        if (!finalResponse.text) {
+            throw new Error('Empty final response from Gemini during refinement.');
+        }
+
+        console.log('[AI Response - Refined Idea]:', finalResponse.text);
+        const jsonString = this._extractJson(finalResponse.text);
+        if (!jsonString) {
+             throw new Error("Failed to extract JSON from Gemini response for API fix suggestion.");
+        }
+        return JSON.parse(jsonString);
+    }
+
     public async generateCharacterDescription(videoIdea: VideoIdea): Promise<string> {
         const prompt = `Based on the following video idea, create a concise, consistent description of the main character. This description will be used to generate images for every scene. Focus on visual details like age, gender, hair, clothing style, and ethnicity to ensure consistency.
 
@@ -134,6 +161,7 @@ class GeminiService {
         
         const response = await this.ai.models.generateContent({model: 'gemini-2.5-flash', contents: prompt});
         if (!response.text) return '';
+        console.log('[AI Response - generateCharacterDescription]:', response.text);
         return response.text.trim();
     }
     
@@ -286,6 +314,7 @@ class GeminiService {
         });
 
         if (!response.text) throw new Error('AI classification for FFMPEG effects failed.');
+        console.log('[AI Response - generateFfmpegCommands]:', response.text);
 
         const structuredEffectsArray: {id: string, effects: EffectLayer[]}[] = JSON.parse(response.text);
 
@@ -329,71 +358,120 @@ class GeminiService {
         return img.image.imageBytes as string;
     }
 
+    /**
+     * A lightweight, fluent-style builder for creating complex FFMPEG commands.
+     * This avoids manual string concatenation and the limitations of unmaintained libraries.
+     */
+    private ffmpegCommandBuilder() {
+        const inputs: { path: string, options: string[] }[] = [];
+        const complexFilter: string[] = [];
+        const outputOptions: string[] = [];
+        let outputPath = '';
+
+        const builder = {
+            addInput: (path: string, options: string[] = []) => {
+                inputs.push({ path, options });
+                return builder;
+            },
+            addFilter: (filterString: string) => {
+                complexFilter.push(filterString);
+                return builder;
+            },
+            setComplexFilter: (filters: string[]) => {
+                complexFilter.push(...filters);
+                return builder;
+            },
+            addOutputOption: (option: string) => {
+                outputOptions.push(option);
+                return builder;
+            },
+            setOutputPath: (path: string) => {
+                outputPath = path;
+                return builder;
+            },
+            build: (): string[] => {
+                const args: string[] = [];
+
+                // Add inputs and their options
+                inputs.forEach(input => {
+                    args.push(...input.options, '-i', input.path);
+                });
+
+                // Add complex filter graph
+                if (complexFilter.length > 0) {
+                    args.push('-filter_complex', complexFilter.join(';'));
+                }
+
+                // Add output options
+                args.push(...outputOptions);
+
+                // Add output path
+                if (outputPath) {
+                    args.push(outputPath);
+                }
+
+                return args;
+            }
+        };
+
+        return builder;
+    }
+
     public async createVideoFromAssets(imageFiles: { path: string, duration: number, ffmpegCommand?: string, onScreenText?: string }[], audioFile: string, outputPath: string): Promise<string> {
         return new Promise((resolve, reject) => {
-            const args: string[] = [];
+            const commandBuilder = this.ffmpegCommandBuilder();
 
-            // 1. Add all image inputs
+            // 1. Add image and audio inputs
             imageFiles.forEach(file => {
-                // For each image, specify it's a looped single-frame input with a specific duration
-                args.push('-loop', '1', '-t', `${file.duration}`, '-i', file.path);
+                commandBuilder.addInput(file.path, ['-loop', '1', '-t', `${file.duration}`]);
             });
+            commandBuilder.addInput(audioFile);
 
-            // 2. Add audio input
-            args.push('-i', audioFile);
-
-            // 3. Build the complex filter string
-            const filterComplexParts = imageFiles.map((file, index) => {
-                // FIX: Ensure ffmpegCommand is a string before calling .trim() or other string methods.
+            // 2. Build the complex filter graph parts
+            const filterParts: string[] = [];
+            imageFiles.forEach((file, index) => {
                 const isCommandValid = typeof file.ffmpegCommand === 'string' &&
                     file.ffmpegCommand &&
                     file.ffmpegCommand.trim() !== '{}' &&
                     file.ffmpegCommand.trim() !== '';
 
                 let vfCommand = isCommandValid
-                    // If a command exists, treat it as the primary filter.
-                    // The comma ensures it's correctly chained with the subsequent format filter.
                     ? file.ffmpegCommand!
-                    // Otherwise, use a default fade in/out.
                     : `fade=in:st=0:d=0.5,fade=out:st=${(file.duration - 0.5).toFixed(1)}:d=0.5,format=yuv420p`;
 
                 if (file.onScreenText) {
-                    const fontPath = 'C:/Windows/Fonts/Arial.ttf'; // Example for Windows. Use a reliable, cross-platform path or ensure font is available.
+                    const fontPath = 'C:/Windows/Fonts/Arial.ttf'; // NOTE: This path is OS-dependent. For cross-platform, use a bundled font.
                     const escapedText = this.escapeFfmpegText(file.onScreenText);
                     const drawTextFilter = `drawtext=fontfile='${fontPath}':text='${escapedText}':fontsize=60:fontcolor=white:x=(w-text_w)/2:y=(h-text_h)/2:box=1:boxcolor=black@0.5:boxborderw=10`;
-                    // If the command already has a format filter, insert drawtext before it.
-                    if (vfCommand.includes('format=yuv420p')) {
-                        vfCommand = vfCommand.replace('format=yuv420p', `${drawTextFilter},format=yuv420p`);
-                    } else {
-                        // Otherwise, append it.
-                        vfCommand += `,${drawTextFilter}`;
-                    }
+                    vfCommand = vfCommand.includes('format=yuv420p')
+                        ? vfCommand.replace('format=yuv420p', `${drawTextFilter},format=yuv420p`)
+                        : `${vfCommand},${drawTextFilter}`;
                 }
 
-                // The base filter chain for scaling and padding.
                 const baseFilter = `[${index}:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1`;
-
-                return `${baseFilter}[scaled${index}];[scaled${index}]${vfCommand}[v${index}]`;
+                filterParts.push(`${baseFilter}[scaled${index}]`);
+                filterParts.push(`[scaled${index}]${vfCommand}[v${index}]`);
             });
 
+            // Add concatenation filter
             const concatFilter = imageFiles.map((_, index) => `[v${index}]`).join('') + `concat=n=${imageFiles.length}:v=1:a=0[v]`;
-            const fullFilter = `${filterComplexParts.join(';')};${concatFilter}`;
+            filterParts.push(concatFilter);
 
-            args.push('-filter_complex', fullFilter);
+            commandBuilder.setComplexFilter(filterParts);
 
-            // 4. Map streams and set output options
-            args.push(
-                '-map', '[v]',
-                '-map', `${imageFiles.length}:a`,
-                '-c:v', 'libx264',
-                '-c:a', 'aac',
-                '-pix_fmt', 'yuv420p',
-                '-r', '30',
-                '-shortest',
-                outputPath
-            );
+            // 3. Map streams, set output options, and build the final command
+            commandBuilder.addOutputOption('-map').addOutputOption('[v]');
+            commandBuilder.addOutputOption('-map').addOutputOption(`${imageFiles.length}:a`);
+            commandBuilder.addOutputOption('-c:v').addOutputOption('libx264');
+            commandBuilder.addOutputOption('-c:a').addOutputOption('aac');
+            commandBuilder.addOutputOption('-pix_fmt').addOutputOption('yuv420p');
+            commandBuilder.addOutputOption('-r').addOutputOption('30');
+            commandBuilder.addOutputOption('-shortest');
+            commandBuilder.setOutputPath(outputPath);
 
-            // 5. Spawn the process and handle events
+            const args = commandBuilder.build();
+
+            // 4. Spawn the process and handle events
             console.log('Spawning FFmpeg with args:', ['ffmpeg', ...args].join(' '));
             const ffmpegProcess = spawn('ffmpeg', args);
             let stderr = '';
@@ -457,6 +535,7 @@ class GeminiService {
             contents: prompt,
         });
         if (!response.text) throw new Error("Failed to get analysis from Gemini for the render error.");
+        console.log('[AI Response - suggestHttpHeaders]:', response.text);
         return response.text.trim();
     }
 
@@ -492,6 +571,7 @@ class GeminiService {
         if (!responseText) {
             throw new Error("Failed to get a valid text response from Gemini for API fix suggestion.");
         }
+        console.log('[AI Response - suggestApiFix]:', responseText);
         const jsonString = this._extractJson(response.text);
         if (!jsonString) {
              throw new Error("Failed to extract JSON from Gemini response for API fix suggestion.");
@@ -543,6 +623,7 @@ class GeminiService {
         });
 
         if (!response.text) throw new Error("Failed to get analysis from Gemini for the render error.");
+        console.log('[AI Response - analyzeRenderError]:', response.text);
         return response.text;
     }
 
@@ -622,5 +703,6 @@ class GeminiService {
         await fs.rm(tempDir, { recursive: true, force: true });
     }
 }
+
 
 export const geminiService = new GeminiService(config.apiKeys.gemini!);
