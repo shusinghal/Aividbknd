@@ -1,7 +1,16 @@
 [
   {
     "name": "AI Tools & Automation",
-    "socialChannels": []
+    "socialChannels": [
+      {
+        "id": "1761766619059",
+        "socialAccountId": "1761765506834",
+        "platform": "YouTube",
+        "handle": "@aiandiverse",
+        "notes": "",
+        "analytics": {}
+      }
+    ]
   },
   {
     "name": "Health & Fitness",

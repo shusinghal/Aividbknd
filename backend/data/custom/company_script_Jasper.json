@@ -1,0 +1,283 @@
+{
+  "coreProblem": "The overwhelming struggle of content creation, including writer's block, tight deadlines, mental exhaustion from repetitive tasks, and the constant pressure to produce high-quality, engaging text for various platforms.",
+  "targetEmotion": "Relief from stress, recognition of a shared struggle, excitement for a breakthrough, empowerment through efficiency, and the satisfaction of effortless creativity.",
+  "scenes": [
+    {
+      "id": "1761768857946_0",
+      "name": "Problem: Stressed Face",
+      "description": "Close-up on a person's (mid-20s/30s) stressed face, illuminated by laptop glow, staring blankly. Heavy, defeated expression.",
+      "duration": "1.5",
+      "effects": "simple fade",
+      "ffmpegCommands": "fade=t=in:st=0:d=0.5,fade=t=out:st=4.5:d=0.5,format=yuv420p"
+    },
+    {
+      "id": "1761768857946_1",
+      "name": "Problem: Blank Screen & Overwhelm",
+      "description": "POV shot of laptop screen: blinking cursor on a blank document. Quick, frantic cuts of multiple unfinished tabs open (research, competitors, etc.), emphasizing chaos.",
+      "duration": "1.5",
+      "effects": "quick cut",
+      "ffmpegCommands": "format=yuv420p"
+    },
+    {
+      "id": "1761768857946_2",
+      "name": "Problem: Defeated Physicality",
+      "description": "Close-up on person's hands rubbing temples, then slowly slumping forward, an exaggerated, defeated sigh escaping.",
+      "duration": "1.0",
+      "effects": "simple fade",
+      "ffmpegCommands": "fade=t=in:st=0:d=0.5,fade=t=out:st=4.5:d=0.5,format=yuv420p"
+    },
+    {
+      "id": "1761768857946_3",
+      "name": "Discovery: Moment of Despair",
+      "description": "Person slumped, head in hands, almost motionless in despair. Brief, jarring silence before a subtle chime.",
+      "duration": "1.0",
+      "effects": "simple fade",
+      "ffmpegCommands": "fade=t=in:st=0:d=0.5,fade=t=out:st=4.5:d=0.5,format=yuv420p"
+    },
+    {
+      "id": "1761768857946_4",
+      "name": "Discovery: Ad Flash",
+      "description": "Rapid flash of a phone/laptop screen with a targeted ad/notification: 'Struggling with content?' or 'Beat Writer's Block'.",
+      "duration": "0.5",
+      "effects": "flash cut",
+      "ffmpegCommands": "format=yuv420p"
+    },
+    {
+      "id": "1761768857946_5",
+      "name": "Discovery: Hesitant Click",
+      "description": "Person perks up, eyes widening slightly, a flicker of hesitant curiosity. They quickly click on the notification.",
+      "duration": "1.0",
+      "effects": "zoom in",
+      "ffmpegCommands": "zoompan=z='max(if(between(t,0,5),1+(1.2-(1))*(t-0)/5,if(lt(t,0),1,1.2)), 1.0)':x='iw/2-(iw/zoom/2)+0':y='ih/2-(ih/zoom/2)+0':d=30:s=1080x1920,format=yuv420p"
+    },
+    {
+      "id": "1761768857946_6",
+      "name": "Breakthrough: Prompt & Generation Start",
+      "description": "Close-up on screen: Person rapidly navigates to Jasper AI. They type a concise, simple prompt. Cursor blinks, then text starts to generate rapidly.",
+      "duration": "1.5",
+      "effects": "screen record overlay",
+      "ffmpegCommands": "format=yuv420p"
+    },
+    {
+      "id": "1761768857946_7",
+      "name": "Breakthrough: Disbelief to Smile",
+      "description": "Split screen: One side shows high-quality, relevant text generating smoothly on screen. The other side shows the person's face transitioning from disbelief and surprise to a slow, dawning, hopeful smile.",
+      "duration": "2.0",
+      "effects": "split screen",
+      "ffmpegCommands": "format=yuv420p"
+    },
+    {
+      "id": "1761768857946_8",
+      "name": "Transformation: Confident Creation",
+      "description": "Person now types confidently, an energized and focused expression. The desk is noticeably tidier, hinting at improved workflow.",
+      "duration": "1.0",
+      "effects": "quick cut",
+      "ffmpegCommands": "format=yuv420p"
+    },
+    {
+      "id": "1761768857946_9",
+      "name": "Transformation: Blog Post Done",
+      "description": "Close-up on screen: A complete, well-structured blog post appears rapidly, with a subtle 'check' mark animation. (On-screen text: 'Blogs DONE!')",
+      "duration": "1.0",
+      "effects": "pop-up graphic",
+      "ffmpegCommands": "format=yuv420p"
+    },
+    {
+      "id": "1761768857946_10",
+      "name": "Transformation: Relaxed Productivity",
+      "description": "Person sips coffee calmly, leaning back slightly, a relaxed and satisfied expression. No more frantic stress.",
+      "duration": "1.0",
+      "effects": "quick cut",
+      "ffmpegCommands": "format=yuv420p"
+    },
+    {
+      "id": "1761768857946_11",
+      "name": "Transformation: Multi-Content Flow",
+      "description": "Rapid cuts showing different content types appearing completed on screen: ad copy, social media captions, email subject lines. (Quick graphic overlay: 'Content output x3!')",
+      "duration": "1.0",
+      "effects": "hyper-speed montage",
+      "ffmpegCommands": "format=yuv420p"
+    },
+    {
+      "id": "1761768857946_12",
+      "name": "Transformation: Victory Moment",
+      "description": "Person briefly high-fives the air or makes a small celebratory gesture. Desk is completely tidy, bathed in natural light, symbolizing clarity and calm.",
+      "duration": "1.0",
+      "effects": "quick dissolve",
+      "ffmpegCommands": "format=yuv420p"
+    },
+    {
+      "id": "1761768857946_13",
+      "name": "Triumph: Relaxed Confidence",
+      "description": "Person leans back in their chair, truly relaxed, a satisfied chuckle escaping, and a knowing smirk on their face. The background is bright and clear, reflecting their newfound ease.",
+      "duration": "2.5",
+      "effects": "slow zoom out",
+      "ffmpegCommands": "zoompan=z='max(if(between(t,0,5),1.2+(1-(1.2))*(t-0)/5,if(lt(t,0),1.2,1)), 1.0)':x='iw/2-(iw/zoom/2)+0':y='ih/2-(ih/zoom/2)+0':d=75:s=1080x1920,format=yuv420p"
+    },
+    {
+      "id": "1761768857946_14",
+      "name": "Triumph: 'I Did It' Nod",
+      "description": "Person looks directly into the camera, a subtle but confident 'I did it' nod, acknowledging the viewer's shared struggle and their own victory.",
+      "duration": "1.0",
+      "effects": "direct address",
+      "ffmpegCommands": "format=yuv420p"
+    },
+    {
+      "id": "1761768857946_15",
+      "name": "CTA: Logo & Website",
+      "description": "Jasper logo and website (e.g., TryJasper.com) appear prominently on screen. Animated text overlay: 'Link in Bio!' or 'Unlock your content potential!'",
+      "duration": "1.5",
+      "effects": "graphic overlay",
+      "ffmpegCommands": "format=yuv420p"
+    }
+  ],
+  "script": "(SFX: Rapid typing, then an abrupt, frustrated stop)\nAnother deadline. Another blank page.\n(PAUSE: 0.5s)\nMy brain feels... empty. 💀\n(SFX: Exaggerated, defeated sigh)\n(PAUSE: 0.5s)\n(SFX: Subtle, jarring silence, then quick chime of notification)\nWait... what's this? (On-screen text: POV: Drowning in deadlines?)\n(PAUSE: 0.5s)\nAn AI... writing assistant?\n(SFX: UI clicks, quick typing)\n(PAUSE: 0.5s)\n(SFX: Soft AI generation hum)\nNo way. It... actually gets it! (On-screen text: Then I found my secret weapon...)\n(PAUSE: 0.5s)\n(SFX: Upbeat, consistent typing rhythm)\n(SFX: Quick 'ding' for completion)\nBlogs, emails, social posts... drafted in minutes! (On-screen text: Jasper AI: Content in seconds.)\n(PAUSE: 1.0s)\n(SFX: Another quick 'ding')\nThis changes everything. (On-screen text: Effortless content flow. More time, less stress.)\n(PAUSE: 0.5s)\n(SFX: Swish sound effect, 'completed' checkmark)\n(PAUSE: 0.5s)\nNo more blank pages. Just... creation.\n(PAUSE: 0.5s)\n(SFX: Uplifting final flourish music)",
+  "videoLength": "20",
+  "ctaGoal": "Drive immediate sign-ups for a free trial or direct website traffic to explore Jasper's full capabilities and experience the content creation transformation.",
+  "voiceTone": "Initially relatable and exasperated, transitioning to surprised, then genuinely enthusiastic, confident, and slightly triumphant. The pacing is quick and energetic throughout.",
+  "visualStyle": "Begins with a raw, slightly chaotic, and muted color palette with quick, anxiety-inducing cuts to emphasize struggle. It then shifts dramatically to bright, clean, dynamic, and professional visuals with hyper-energetic cuts and a clear, organized aesthetic, symbolizing clarity and ease. On-screen text is crucial for silent viewing.",
+  "musicPace": "Starts with a low-key, slightly anxious background track, abruptly building to a moment of hopeful curiosity and then exploding into an upbeat, inspiring, and dynamic contemporary electronic pop beat, driving the rapid montage.",
+  "heading": "POV: Your Brain is Empty But the Deadline Isn't. Until Now. 🤯 #ContentCreatorHack",
+  "hashtags": "#JasperAI #AIWritingAssistant #ContentCreation #WriterStruggles #DigitalMarketing #ProductivityHacks #MarketingTips #AItools #SaveTime #ContentCreator #ContentMarketingTips #FreelanceLife #SmallBizMarketing #DigitalCreator",
+  "description": "We've all been there: staring at a blank screen, battling deadlines, feeling completely drained. But what if there was a secret weapon? ✨ If you're a content creator or marketer struggling with writer's block, this is your sign. Watch how Jasper transformed my content creation game from frustrating to effortless. Click the link in bio to try Jasper AI and transform your workflow today! #ContentCreationRevolution",
+  "preferredPlatform": "TikTok, Instagram Reels, YouTube Shorts",
+  "structuredScript": [
+    {
+      "id": "part_1_1",
+      "type": "sfx",
+      "content": "Rapid typing, then an abrupt, frustrated stop"
+    },
+    {
+      "id": "part_1_2",
+      "type": "dialogue",
+      "content": "Another deadline. Another blank page."
+    },
+    {
+      "id": "part_1_3",
+      "type": "pause",
+      "content": "0.5"
+    },
+    {
+      "id": "part_1_4",
+      "type": "dialogue",
+      "content": "My brain feels... empty. 💀"
+    },
+    {
+      "id": "part_1_5",
+      "type": "sfx",
+      "content": "Exaggerated, defeated sigh"
+    },
+    {
+      "id": "part_1_6",
+      "type": "pause",
+      "content": "0.5"
+    },
+    {
+      "id": "part_2_1",
+      "type": "sfx",
+      "content": "Subtle, jarring silence, then quick chime of notification"
+    },
+    {
+      "id": "part_2_2",
+      "type": "dialogue",
+      "content": "Wait... what's this? (On-screen text: POV: Drowning in deadlines?)"
+    },
+    {
+      "id": "part_2_3",
+      "type": "pause",
+      "content": "0.5"
+    },
+    {
+      "id": "part_2_4",
+      "type": "dialogue",
+      "content": "An AI... writing assistant?"
+    },
+    {
+      "id": "part_2_5",
+      "type": "sfx",
+      "content": "UI clicks, quick typing"
+    },
+    {
+      "id": "part_2_6",
+      "type": "pause",
+      "content": "0.5"
+    },
+    {
+      "id": "part_2_7",
+      "type": "sfx",
+      "content": "Soft AI generation hum"
+    },
+    {
+      "id": "part_2_8",
+      "type": "dialogue",
+      "content": "No way. It... actually gets it! (On-screen text: Then I found my secret weapon...)"
+    },
+    {
+      "id": "part_2_9",
+      "type": "pause",
+      "content": "0.5"
+    },
+    {
+      "id": "part_3_1",
+      "type": "sfx",
+      "content": "Upbeat, consistent typing rhythm"
+    },
+    {
+      "id": "part_3_2",
+      "type": "sfx",
+      "content": "Quick 'ding' for completion"
+    },
+    {
+      "id": "part_3_3",
+      "type": "dialogue",
+      "content": "Blogs, emails, social posts... drafted in minutes! (On-screen text: Jasper AI: Content in seconds.)"
+    },
+    {
+      "id": "part_3_4",
+      "type": "pause",
+      "content": "1.0"
+    },
+    {
+      "id": "part_3_5",
+      "type": "sfx",
+      "content": "Another quick 'ding'"
+    },
+    {
+      "id": "part_3_6",
+      "type": "dialogue",
+      "content": "This changes everything. (On-screen text: Effortless content flow. More time, less stress.)"
+    },
+    {
+      "id": "part_3_7",
+      "type": "pause",
+      "content": "0.5"
+    },
+    {
+      "id": "part_3_8",
+      "type": "sfx",
+      "content": "Swish sound effect, 'completed' checkmark"
+    },
+    {
+      "id": "part_3_9",
+      "type": "pause",
+      "content": "0.5"
+    },
+    {
+      "id": "part_4_1",
+      "type": "dialogue",
+      "content": "No more blank pages. Just... creation."
+    },
+    {
+      "id": "part_4_2",
+      "type": "pause",
+      "content": "0.5"
+    },
+    {
+      "id": "part_4_3",
+      "type": "sfx",
+      "content": "Uplifting final flourish music"
+    }
+  ],
+  "numberOfImages": "16",
+  "audioProvider": "google"
+}

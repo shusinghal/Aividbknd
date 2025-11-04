@@ -1,123 +1,115 @@
 {
-  "coreProblem": "The profound emotional fatigue and despair content creators feel when they pour their heart and soul into creating high-quality articles, only for them to be completely ignored by search engines and, consequently, their target audience. It's the feeling of being unheard, invisible, and that their passion isn't translating into impact.",
-  "targetEmotion": "Initial frustration, exhaustion, and feeling overlooked, evolving into an empowering sense of clarity, validation, and renewed purpose.",
-  "images": [
-    {
-      "id": 1,
-      "description": "Tight shot on a content creator's tired, slightly frustrated face, illuminated by a laptop screen. Messy desk in soft focus background. Natural, slightly desaturated lighting. (Used briefly as part of the rapid hook).",
-      "duration": 0.5,
-      "effects": "Quick cut, shallow depth of field, natural light."
-    },
-    {
-      "id": 2,
-      "description": "Rapid cuts: close-up on fingers deleting text on a screen (0.5s); a fleeting glimpse of a competitor's highly ranked article (0.5s); a stark red line on an analytics graph showing no traffic (0.5s). Then, a re-cut of these elements (1s) later in the despair phase.",
-      "duration": 2.5,
-      "effects": "Extremely quick cuts initially, slightly desaturated, emphasizing repetition and stagnation. Then, a slightly slower re-cut to deepen frustration."
-    },
-    {
-      "id": 3,
-      "description": "Creator leans back, shoulders slumped, letting out a heavy sigh, rubs temples. Looks out a window with a defeated expression. Soft, contemplative light. (Allow for brief silence in soundscape).",
-      "duration": 3,
-      "effects": "Slower pace to highlight despair, allow audience to sit in the moment. Emphasize body language."
-    },
-    {
-      "id": 4,
-      "description": "Close-up on the creator's eyes, a subtle flicker of curiosity or a dawning realization. Eyes narrow slightly in thought (slight hold), then widen with a hint of understanding. Focus pull to eyes is crucial.",
-      "duration": 2,
-      "effects": "Focus pull to eyes, subtle change in lighting to suggest a shift. Internal, contemplative feel."
-    },
-    {
-      "id": 5,
-      "description": "Montage of focused, confident shots with faster cuts: hands typing with purpose; a screen displaying organized, easy-to-understand data points (e.g., simplified topic clusters, a 'content score' increasing, keyword opportunity highlights – clearly showing actionable insight but no specific brand UI); the creator nodding slowly, a small, genuine smile forming.",
-      "duration": 6,
-      "effects": "Increased pace, sharper focus, warmer lighting. Dynamic cuts that visually convey a 'roadmap' or 'smarter effort'."
-    },
-    {
-      "id": 6,
-      "description": "Creator leans back, a genuine, quiet smile of satisfaction. Looking at their screen with pride or simply contemplating. Quick, momentary, non-intrusive insert: a notification pop-up showing a new positive comment or a subtle upward trend on a simplified graph. (Allow for a moment where only visuals and music convey triumph).",
-      "duration": 2.5,
-      "effects": "Softer, more composed shot. Warm, inviting lighting. Notification is a validation point, not a primary focus."
-    },
-    {
-      "id": 7,
-      "description": "Clean text on screen: 'Find your voice. Be heard.' followed by a subtle, clear fade-in/out of 'Discover your roadmap with [Your Solution Brand Name/Icon]' or 'Powered by [Brand Icon]'. This serves as a direct, yet integrated, call to exploration.",
-      "duration": 5,
-      "effects": "Clean, minimalist text overlay. Gentle fade in/out for any branding, clearly visible but not intrusive. Add a subtle 'Link in Bio' prompt."
-    }
-  ],
-  "script": "Voiceover (starts weary, transitions to quietly confident):\n\"You know that feeling... that hollow ache after you hit 'publish'?\" (Delivered quickly, almost breathless, over rapid cuts)\n\"You poured everything into it. The research, the words, the late nights. But it just… sits there. Buried.\" (Slightly slower, heavier, emphasizing weariness)\n(Deliberate, short pause, allowing melancholic music/ambient sound to swell slightly for ~0.5s)\n\"Like shouting into the void. Your voice, your message... completely invisible.\" (Delivered with a sense of resignation)\n\"But what if... what if it wasn't about *more* effort, but *smarter* effort?\" (Voice tone shifts, a hint of curiosity, thoughtful)\n\"Imagine a map. A clear path.\" (Voice gaining slight purpose)\n\"Where the noise suddenly becomes clarity. The guesswork, a roadmap.\" (Confident, clear)\n(Brief pause, let visuals and music convey satisfaction for ~0.5s)\n\"And for the first time in a long time, my words felt... heard. Truly heard. My passion, finally finding its audience.\" (Warm, quietly triumphant)\n(Text appears on screen: 'Find your voice. Be heard.')\n\"Discover your roadmap.\" (Final, soft verbal CTA, potentially overlapping the end of the text screen)",
-  "videoLength": "25",
-  "ctaGoal": "Inspire content creators to discover how to make their words count by subtly guiding them towards a specific data-driven content optimization solution, naturally leading them to research tools like Surfer SEO and understanding their benefits. The unspoken goal is 'Discover how to make your words count and get seen'.",
-  "voiceTone": "Empathetic, introspective, evolving from weary to quietly confident and inspired. Early lines emphasize weariness with a slightly broken tone or longer pauses.",
-  "visualStyle": "Raw, authentic, slightly desaturated and handheld in the beginning, transitioning to clearer, warmer, and more composed as the story progresses. Emphasizes close-ups on emotions, subtle expressions, and natural lighting. On-screen text overlays for sound-off viewing.",
-  "musicPace": "Starts with subtle, melancholic piano or ambient sound. Builds gradually to an uplifting, but not overly dramatic, hopeful instrumental track, remaining in the background to support the emotion.",
-  "heading": "The Harsh Reality of Content Creation: From Invisible to Impactful.",
-  "hashtags": "#ContentCreatorLife #InvisibleContent #SEOFrustration #DigitalMarketingTips #FindYourVoice #ContentStrategy #OrganicTraffic #EmpoweredCreator #UnfilteredHumanMoment #WriterLife #BloggingTips #CreatorStruggles #MarketingTips #VisibilityHacks #MakeYourWordsCount #ContentOptimization #SEOTips",
-  "description": "Ever poured your heart and soul into content, only for it to disappear into the digital abyss? 😩 You're not alone. This is the raw truth every creator faces. But what if you could finally make your words *heard*? Discover the smarter way to unlock your audience and truly make your passion impact. 👇 #LinkInBio (Also use bold on-screen text overlays throughout for sound-off viewing: e.g., 'IS YOUR CONTENT INVISIBLE? 😤', 'Shouting into the void.', 'What if there's a SMARTER way?', 'Unlock your audience.', 'Make your words count.')",
-  "preferredPlatform": [
-    "TikTok",
-    "Instagram Reels",
-    "YouTube Shorts",
-    "LinkedIn"
-  ],
+  "coreProblem": "The overwhelming pressure and crippling writer's block faced by content creators, marketers, and small business owners who need to consistently produce high-quality content, leading to frustration, exhaustion, and missed opportunities.",
+  "targetEmotion": "Empathy, validation, relief, and empowerment.",
   "scenes": [
     {
-      "id": "1761585281422_0",
+      "id": "1761760825189_0",
       "name": "Scene 1",
-      "description": "Tight shot on a content creator's tired, slightly frustrated face, illuminated by a laptop screen. Messy desk in soft focus background. Natural, slightly desaturated lighting. (Used briefly as part of the rapid hook).",
-      "duration": "0.5",
-      "effects": "Quick cut, shallow depth of field, natural light.",
-      "ffmpegCommands": "format=yuv420p"
+      "description": "Extreme close-up on a person's face (late 20s-30s, relatable, slightly disheveled), eyes wide, a flicker of panic and exhaustion. Laptop screen is blurred in the background, showing a blank document with a blinking cursor. Desk is cluttered with half-empty coffee cups and crumpled notes.",
+      "duration": "8",
+      "effects": "Desaturated colors, slightly shaky handheld camera feel, tight focus on facial expression, low, soft lighting.",
+      "ffmpegCommands": "zoompan=z='max(1.1, 1.1)':x='iw/2-(iw/zoom/2)+0+(2*sin(2*PI*t*10))':y='ih/2-(ih/zoom/2)+0+(2*cos(2*PI*t*13))':d=240:s=1080x1920,format=yuv420p"
     },
     {
-      "id": "1761585281422_1",
+      "id": "1761760825191_1",
       "name": "Scene 2",
-      "description": "Rapid cuts: close-up on fingers deleting text on a screen (0.5s); a fleeting glimpse of a competitor's highly ranked article (0.5s); a stark red line on an analytics graph showing no traffic (0.5s). Then, a re-cut of these elements (1s) later in the despair phase.",
-      "duration": "2.5",
-      "effects": "Extremely quick cuts initially, slightly desaturated, emphasizing repetition and stagnation. Then, a slightly slower re-cut to deepen frustration.",
-      "ffmpegCommands": "format=yuv420p"
+      "description": "Rapid cuts between the person frantically typing, then deleting aggressively. Head falling into hands. Staring blankly at the ceiling. Grabbing their hair in frustration. Each shot is brief, emphasizing mounting stress and despair.",
+      "duration": "7",
+      "effects": "Quick, jarring cuts, slightly sped-up motion, high contrast lighting to emphasize shadows, zoom in on frustrated gestures.",
+      "ffmpegCommands": "zoompan=z='max(if(between(t,0,5),1+(1.2-(1))*(t-0)/5,if(lt(t,0),1,1.2)), 1.0)':x='iw/2-(iw/zoom/2)+0':y='ih/2-(ih/zoom/2)+0':d=210:s=1080x1920,format=yuv420p"
     },
     {
-      "id": "1761585281422_2",
+      "id": "1761760825191_2",
       "name": "Scene 3",
-      "description": "Creator leans back, shoulders slumped, letting out a heavy sigh, rubs temples. Looks out a window with a defeated expression. Soft, contemplative light. (Allow for brief silence in soundscape).",
-      "duration": "3",
-      "effects": "Slower pace to highlight despair, allow audience to sit in the moment. Emphasize body language.",
-      "ffmpegCommands": "format=yuv420p"
+      "description": "The person slumps back into their chair, utterly defeated. They pick up their phone, scrolling absently, eyes glazed over. Suddenly, their thumb pauses, and their eyes widen slightly, as if remembering or seeing a solution.",
+      "duration": "7",
+      "effects": "Slow zoom out from the person's face, natural lighting gradually returns, focus shifts slightly to the action of looking at the phone.",
+      "ffmpegCommands": "zoompan=z='max(if(between(t,0,5),1.1+(1-(1.1))*(t-0)/5,if(lt(t,0),1.1,1)), 1.0)':x='iw/2-(iw/zoom/2)+0':y='ih/2-(ih/zoom/2)+0':d=210:s=1080x1920,format=yuv420p"
     },
     {
-      "id": "1761585281422_3",
+      "id": "1761760825191_3",
       "name": "Scene 4",
-      "description": "Close-up on the creator's eyes, a subtle flicker of curiosity or a dawning realization. Eyes narrow slightly in thought (slight hold), then widen with a hint of understanding. Focus pull to eyes is crucial.",
-      "duration": "2",
-      "effects": "Focus pull to eyes, subtle change in lighting to suggest a shift. Internal, contemplative feel.",
-      "ffmpegCommands": "gblur=sigma='if(between(t,0,1),5+(0-(5))*(t-0)/1,if(lt(t,0),5,0))':enable='between(t,0,1)',format=yuv420p"
+      "description": "The person is back at their laptop, a look of determined hope on their face. Quick cut to a blurred screen where a prompt is being typed into an AI interface (just enough to suggest Jasper). Then, a genuine smile spreads across their face as they quickly read generated, high-quality content appearing on screen.",
+      "duration": "8",
+      "effects": "Warmer, brighter lighting, smooth camera movement. A quick, almost imperceptible screen flash or highlight effect when Jasper 'works'.",
+      "ffmpegCommands": "zoompan=z='max(1.0, 1.1)':x='iw/2-(iw/zoom/2)++(min(t-0, 5)*80)':y='ih/2-(ih/zoom/2)+0':d=240:s=1080x1920,format=yuv420p"
     },
     {
-      "id": "1761585281422_4",
+      "id": "1761760825191_4",
       "name": "Scene 5",
-      "description": "Montage of focused, confident shots with faster cuts: hands typing with purpose; a screen displaying organized, easy-to-understand data points (e.g., simplified topic clusters, a 'content score' increasing, keyword opportunity highlights – clearly showing actionable insight but no specific brand UI); the creator nodding slowly, a small, genuine smile forming.",
-      "duration": "6",
-      "effects": "Increased pace, sharper focus, warmer lighting. Dynamic cuts that visually convey a 'roadmap' or 'smarter effort'.",
-      "ffmpegCommands": "format=yuv420p"
-    },
-    {
-      "id": "1761585281422_5",
-      "name": "Scene 6",
-      "description": "Creator leans back, a genuine, quiet smile of satisfaction. Looking at their screen with pride or simply contemplating. Quick, momentary, non-intrusive insert: a notification pop-up showing a new positive comment or a subtle upward trend on a simplified graph. (Allow for a moment where only visuals and music convey triumph).",
-      "duration": "2.5",
-      "effects": "Softer, more composed shot. Warm, inviting lighting. Notification is a validation point, not a primary focus.",
-      "ffmpegCommands": "format=yuv420p"
-    },
-    {
-      "id": "1761585281422_6",
-      "name": "Scene 7",
-      "description": "Clean text on screen: 'Find your voice. Be heard.' followed by a subtle, clear fade-in/out of 'Discover your roadmap with [Your Solution Brand Name/Icon]' or 'Powered by [Brand Icon]'. This serves as a direct, yet integrated, call to exploration.",
+      "description": "The person confidently gestures towards their screen (now showing a complete, polished piece of content, e.g., a blog post or marketing copy) or directly at the camera with a triumphant, satisfied smile. Text overlay appears: 'Content Done. You're a Genius.' or 'Jasper. Your Secret Weapon.'",
       "duration": "5",
-      "effects": "Clean, minimalist text overlay. Gentle fade in/out for any branding, clearly visible but not intrusive. Add a subtle 'Link in Bio' prompt.",
-      "ffmpegCommands": "fade=t=in:st=0:d=1,fade=t=out:st=4:d=1,format=yuv420p"
+      "effects": "Bright, clear, natural lighting. Stable camera shot. Text overlay appears smoothly with a subtle animation.",
+      "ffmpegCommands": "format=yuv420p"
     }
   ],
-  "numberOfImages": "7",
+  "script": "Another blank page. Another deadline. My brain just... isn't braining today. How am I supposed to create *amazing* content when I can't even start?\n\n(SFX: Furious, frustrated keyboard typing. Aggressive delete key sounds. Deep, exasperated sigh. Muffled groan. Sound of crumpled paper.)\n\nThis is impossible.\n\n(PAUSE: 3s)\n\n(SFX: Light 'ding' or 'spark' sound (the moment of realization).)\n\nWait... Jasper!\n\n(SFX: Quick, energetic mouse click.)\n\nLet's see what you've got.\n\n(SFX: Fast, futuristic typing sounds, followed by a triumphant 'whoosh' as content fills the screen.)\n\nYES! Exactly what I needed! High-quality content, instantly. This is a game changer!\n\n(SFX: Upbeat, final flourish sound effect.)",
+  "videoLength": "35",
+  "ctaGoal": "Drive sign-ups for a free trial or demo of Jasper, encouraging viewers to experience the relief and productivity boost firsthand.",
+  "voiceTone": "Starts with a defeated, internal, almost whispered monologue. Transitions to a hopeful whisper, then an excited, confident, and authentically relieved external voice.",
+  "visualStyle": "Begins with a raw, authentic, handheld, slightly desaturated aesthetic, focusing on the character's genuine struggle. Transitions to a brighter, warmer, more polished look as the solution is introduced and embraced.",
+  "musicPace": "Starts with a low, melancholic, slightly anxious ambient hum or gentle piano track. Gradually builds in subtle optimism during the 'realization' phase, then swells into an uplifting, energetic, and triumphant track once Jasper delivers.",
+  "heading": "Every Creator's Secret Struggle (Until Now!)",
+  "hashtags": "#WriterLife #ContentCreator #WriterStruggles #AIWriting #JasperAI #ContentMarketing #SmallBusinessTips #ProductivityHack #Relatable #UnfilteredMoment #BanishWriterBlock",
+  "description": "Ever felt like your brain just *stops* when you need to create content? 😩 You're not alone. We've all been there – staring at a blank page, feeling the pressure. Watch this raw, unfiltered moment of content creation struggle transform into pure relief with a little help. Find out how to banish writer's block forever and produce amazing content, instantly. 👇 #JasperAI #ContentMagic",
+  "preferredPlatform": "TikTok, Instagram Reels, YouTube Shorts",
+  "structuredScript": [
+    {
+      "id": "part_1761760825191_0",
+      "type": "dialogue",
+      "content": "Another blank page. Another deadline. My brain just... isn't braining today. How am I supposed to create *amazing* content when I can't even start?"
+    },
+    {
+      "id": "part_1761760825191_1",
+      "type": "sfx",
+      "content": "Furious, frustrated keyboard typing. Aggressive delete key sounds. Deep, exasperated sigh. Muffled groan. Sound of crumpled paper."
+    },
+    {
+      "id": "part_1761760825191_2",
+      "type": "dialogue",
+      "content": "This is impossible."
+    },
+    {
+      "id": "part_1761760825191_3",
+      "type": "pause",
+      "content": "3"
+    },
+    {
+      "id": "part_1761760825191_4",
+      "type": "sfx",
+      "content": "Light 'ding' or 'spark' sound (the moment of realization)."
+    },
+    {
+      "id": "part_1761760825191_5",
+      "type": "dialogue",
+      "content": "Wait... Jasper!"
+    },
+    {
+      "id": "part_1761760825191_6",
+      "type": "sfx",
+      "content": "Quick, energetic mouse click."
+    },
+    {
+      "id": "part_1761760825191_7",
+      "type": "dialogue",
+      "content": "Let's see what you've got."
+    },
+    {
+      "id": "part_1761760825191_8",
+      "type": "sfx",
+      "content": "Fast, futuristic typing sounds, followed by a triumphant 'whoosh' as content fills the screen."
+    },
+    {
+      "id": "part_1761760825191_9",
+      "type": "dialogue",
+      "content": "YES! Exactly what I needed! High-quality content, instantly. This is a game changer!"
+    },
+    {
+      "id": "part_1761760825191_10",
+      "type": "sfx",
+      "content": "Upbeat, final flourish sound effect."
+    }
+  ],
+  "numberOfImages": "5",
   "audioProvider": "google"
 }

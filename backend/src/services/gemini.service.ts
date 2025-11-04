@@ -19,18 +19,23 @@ import { githubService } from './github.service';
 import fetch from 'node-fetch';
 import { googleTtsService } from './tts.service';
 
+interface ScriptPart {
+    type: 'dialogue' | 'sfx' | 'pause';
+    content: string | number;
+}
 // Reuse frontend types
 interface Company { name: string; description: string; [key: string]: any; }
 interface Scene { id: string; name: string; description: string; duration: string; effects: string; }
 interface VideoIdea {
   scenes: Scene[];
   onScreenText?: { time: string; duration: string; text: string }[];
-  script: string;
+  script: ScriptPart[];
   voiceTone: string;
   visualStyle: string;
   [key: string]: any;
 }
 import { ffmpegEffectsService, EffectLayer } from './ffmpeg.effects.service';
+import { audioCompositionService } from './audio.composition.service';
 
 class GeminiService {
     private ai: GoogleGenAI;
@@ -103,10 +108,9 @@ class GeminiService {
     
     public async runAiCollaboration(company: Company): Promise<any> {
         const prompt = `For "${company.name}", a company described as "${company.description}", create a full viral video content plan using the "Unfiltered Human Moment" framework. Respond ONLY with a valid JSON object with the following keys: coreProblem, targetEmotion, scenes, script, videoLength, ctaGoal, voiceTone, visualStyle, musicPace, heading, hashtags, description, preferredPlatform.
-        **CRITICAL RULES:**
-        1.  **Scenes**: The 'scenes' array must contain objects, each representing ONE single, continuous visual shot. If a concept requires multiple shots (like 'rapid cuts' or a 'montage'), you MUST break it into multiple, separate scene objects, each with its own description, duration, and effects.
-        2.  **Script**: The 'script' key must be an array of objects, each with a 'type' ('dialogue', 'sfx', or 'pause') and 'content'. For 'pause', content is the duration in seconds (e.g., {"type": "pause", "content": 1.5}).
-        3.  **Timing**: The total duration of all scenes MUST equal the 'videoLength'. The spoken dialogue in the script should be timed appropriately for this video length, using 'pause' objects to fill time where necessary to match the visual pacing.`;
+        **RULES:**
+        1.  **Script**: The 'script' key must be an array of objects, each with a 'type' ('dialogue', 'sfx', or 'pause') and 'content'. For 'pause', content is the duration in seconds (e.g., {"type": "pause", "content": 1.5}).
+        2.  **Timing**: The total duration of all scenes MUST equal the 'videoLength'. The spoken dialogue in the script should be timed appropriately for this video length, using 'pause' objects to fill time where necessary to match the visual pacing.`;
         
        const response = await this.ai.models.generateContent({
            model: 'gemini-2.5-flash', contents: prompt, config: { responseMimeType: "application/json" }
@@ -128,7 +132,7 @@ class GeminiService {
 
         const finalPrompt = `You are a Creative Director. Refine this initial video concept: ${JSON.stringify(videoIdea)} using this feedback from your team: ${feedbackLog.join('\n')}. Your final output MUST be a single, valid JSON object and nothing else.
         **CRITICAL REFINEMENT RULES:**
-        1.  **Deconstruct Scenes**: Examine the 'scenes' array. If any scene 'description' implies multiple shots (e.g., 'rapid cuts', 'montage'), you MUST break it down into multiple, separate scene objects. Each new scene must represent only ONE single visual and have its own adjusted 'duration' and 'effects'.
+        1.  **Deconstruct Scenes**: Examine the 'scenes' array. If any scene 'description' implies multiple shots, actions, or camera movements (e.g., 'a quick montage of...', 'the camera pans from... to...'), you MUST break it down into multiple, separate scene objects. Each new scene object must represent exactly ONE single, static visual shot suitable for a single image generation. Adjust the 'duration' and 'effects' for each new, simplified scene.
         2.  **Structure Script**: Ensure the 'script' is an array of objects, each with a 'type' ('dialogue', 'sfx', 'pause') and 'content'.
         3.  **Synchronize Timing**: The total duration of all scenes must equal the 'videoLength'. Adjust the 'script' by adding or modifying 'pause' objects to ensure the spoken dialogue and sound effects are perfectly timed to the total video length.`;
 
@@ -145,7 +149,7 @@ class GeminiService {
         console.log('[AI Response - Refined Idea]:', finalResponse.text);
         const jsonString = this._extractJson(finalResponse.text);
         if (!jsonString) {
-             throw new Error("Failed to extract JSON from Gemini response for API fix suggestion.");
+             throw new Error("Failed to extract JSON from Gemini response during refinement.");
         }
         return JSON.parse(jsonString);
     }
@@ -633,17 +637,20 @@ class GeminiService {
         
         const characterDescription = await this.generateCharacterDescription(videoIdea);
 
-        // Switch from ElevenLabs to Google TTS
-        const audioBlob = await googleTtsService.synthesize({
-            text: videoIdea.script,
+        // Compose the final audio track from the script (dialogue, sfx, pauses)
+        console.log('[Audio] Starting audio composition...');
+        const audioFilePath = await audioCompositionService.composeAudio(
+            videoIdea.script,
+            tempDir,
             // These are default values; they could be made dynamic in the future
-            voice: { languageCode: 'en-US', name: 'en-US-Studio-O' },
-            speakingRate: 1,
-            pitch: 0,
-        });
-        const audioBuffer = Buffer.from(await audioBlob.arrayBuffer());
-        const audioFilePath = path.join(tempDir, 'narration.mp3');
-        await fs.writeFile(audioFilePath, audioBuffer);
+            {
+                voice: { languageCode: 'en-US', name: 'en-US-Studio-O' },
+                speakingRate: 1,
+                pitch: 0,
+            }
+        );
+        console.log(`[Audio] Composition complete. Final audio at: ${audioFilePath}`);
+        const audioBuffer = await fs.readFile(audioFilePath);
         
         // Generate FFMPEG commands for all scenes first
         const scenesForFfmpeg = videoIdea.scenes.map(s => ({

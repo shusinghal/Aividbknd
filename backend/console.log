@@ -1,73 +1,103 @@
-Spawning FFmpeg with args: ffmpeg -loop 1 -t 2 -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\beyond_the_reps_1761041323940_4 - Copy.jpg -loop 1 -t 3 -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\beyond_the_reps_1761041323940_4.jpg -loop 1 -t 3 -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\blank_screen_battle_1761041961182_0 - Copy.jpg -loop 1 -t 7 -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\blank_screen_battle_1761041961182_0.jpg -loop 1 -t 7 -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\flow_and_fulfillment_1761041961182_3 - Copy.jpg -loop 1 -t 3 -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\flow_and_fulfillment_1761041961182_3.jpg -loop 1 -t 2 -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\just_one_more_1761041323940_2 - Copy.jpg -loop 1 -t 2 -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\just_one_more_1761041323940_2.jpg -loop 1 -t 2 -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\the_alarm's_edge_1761041323940_0 - Copy.jpg -loop 1 -t 2 -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\images\the_alarm's_edge_1761041323940_0.jpg -i C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\assets\audio\bodybuilding.com_1761041126316.mp3 -filter_complex [0:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[scaled0];[scaled0]eq=saturation=0.7,curves=preset=cross_process,drawtext=text='Creator burnout is REAL.':fontcolor=white:fontsize=100:x=(w-text_w)/2:y=(h-text_h)/2:shadowcolor=black:shadowx=3:shadowy=3,format=yuv420p[v0];[1:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[scaled1];[scaled1]zoompan=z='min(zoom+0.001,1.2)':d=90:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920,format=yuv420p[v1];[2:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[scaled2];[scaled2]eq=gamma=1.02,colorbalance=rs=0.05:bs=-0.05,format=yuv420p[v2];[3:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[scaled3];[scaled3]eq=brightness=0.03:gamma=1.05:saturation=1.1,zoompan=z='min(zoom+0.0007, 1.1)':d=210:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920,drawtext=text='Powered by Jasper AI':fontcolor=white@0.8:fontsize=40:x=w-text_w-30:y=h-text_h-30:enable='between(t,4,6.5)',format=yuv420p[v3];[4:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[scaled4];[scaled4]curves=r='0/0.1\:1/0.9':g='0/0\:1/0.95':b='0/0.2\:1/0.8',gblur=sigma=0.6,vignette=a=pi/5,format=yuv420p[v4];[5:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[scaled5];[scaled5]fade=t=in:st=0:d=1,drawtext=text='Jasper AI\: Your creative partner.':fontcolor=white:fontsize=80:x=(w-text_w)/2:y=(h/2):shadowcolor=black:shadowx=2:shadowy=2:alpha='if(lt(t,0.5)\,0\,min(1,(t-0.5)/1.5))',format=yuv420p[v5];[6:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[scaled6];[scaled6]eq=saturation=0.7,curves=preset=cross_process,drawtext=text='Creator burnout 
-is REAL.':fontcolor=white:fontsize=100:x=(w-text_w)/2:y=(h-text_h)/2:shadowcolor=black:shadowx=3:shadowy=3,format=yuv420p[v6];[7:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[scaled7];[scaled7]eq=saturation=0.7,curves=preset=cross_process,drawtext=text='Creator burnout is REAL.':fontcolor=white:fontsize=100:x=(w-text_w)/2:y=(h-text_h)/2:shadowcolor=black:shadowx=3:shadowy=3,format=yuv420p[v7];[8:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[scaled8];[scaled8]eq=saturation=0.7,curves=preset=cross_process,drawtext=text='Creator burnout is REAL.':fontcolor=white:fontsize=100:x=(w-text_w)/2:y=(h-text_h)/2:shadowcolor=black:shadowx=3:shadowy=3,format=yuv420p[v8];[9:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[scaled9];[scaled9]eq=saturation=0.7,curves=preset=cross_process,drawtext=text='Creator burnout is REAL.':fontcolor=white:fontsize=100:x=(w-text_w)/2:y=(h-text_h)/2:shadowcolor=black:shadowx=3:shadowy=3,format=yuv420p[v9];[v0][v1][v2][v3][v4][v5][v6][v7][v8][v9]concat=n=10:v=1:a=0[v] -map [v] -map 10:a -c:v libx264 -c:a aac -pix_fmt yuv420p -r 30 -shortest C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\public\videos\The_Blank_Page_Nearly_Broke_Me___Until_Jasper_AI___1761470008545.mp4 
-FFmpeg stderr: ffmpeg version 8.0-full_build-www.gyan.dev Copyright (c) 2000-2025 the FFmpeg developers
-  built with gcc 15.2.0 (Rev8, Built by MSYS2 project)
-
-FFmpeg stderr:   configuration: --enable-gpl --enable-version3 --enable-static --disable-w32threads --disable-autodetect --enable-fontconfig --enable-iconv --enable-gnutls --enable-lcms2 --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-libsnappy --enable-zlib --enable-librist --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-libbluray --enable-libcaca --enable-libdvdnav --enable-libdvdread --enable-sdl2 --enable-libaribb24 --enable-libaribcaption --enable-libdav1d --enable-libdavs2 --enable-libopenjpeg --enable-libquirc --enable-libuavs3d --enable-libxevd --enable-libzvbi --enable-liboapv --enable-libqrencode --enable-librav1e --enable-libsvtav1 --enable-libvvenc --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs2 --enable-libxeve --enable-libxvid --enable-libaom --enable-libjxl --enable-libvpx --enable-mediafoundation --enable-libass --enable-frei0r --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-liblensfun --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-dxva2 --enable-d3d11va --enable-d3d12va --enable-ffnvcodec --enable-libvpl --enable-nvdec --enable-nvenc --enable-vaapi --enable-libshaderc --enable-vulkan --enable-libplacebo --enable-opencl --enable-libcdio --enable-openal --enable-libgme --enable-libmodplug --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libshine --enable-libtheora --enable-libtwolame --enable-libvo-amrwbenc --enable-libcodec2 --enable-libilbc --enable-libgsm --enable-liblc3 --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-ladspa --enable-libbs2b --enable-libflite --enable-libmysofa --enable-librubberband --enable-libsoxr --enable-chromaprint --enable-whisper
-  libavutil      60.  8.100 / 60.  8.100
-  libavcodec     62. 11.100 / 62. 11.100
-  libavformat    62.  3.100 / 62.  3.100
-  libavdevice    62.  1.100 / 62.  1.100
-  libavfilter    11.  4.100 / 11.  4.100
-  libswscale      9.  1.100 /  9.  1.100
-  libswresample   6.  1.100 /  6.  1.100
-
-FFmpeg stderr: Fontconfig error: Cannot load default config file: No such file: (null)
-
-FFmpeg stderr: Fontconfig error: Cannot load default config file: No such file: (null)
-
-FFmpeg stderr: Fontconfig error: Cannot load default config file: No such file: (null)
-
-FFmpeg stderr: [Parsed_vignette_30 @ 0000020405b1dc40] [Eval @ 000000c68f5fefa0] Undefined constant or missing '(' in 'pi/5'
-[Parsed_vignette_30 @ 0000020405b1dc40] Unable to parse expression for 'angle'
-[AVFilterGraph @ 0000020405abce80] Error initializing filters
-FFmpeg stderr:
-
-FFmpeg stderr: Error : Invalid argument
-
-Error in /render-video route: Error: FFmpeg process exited with code 4294967274:
-ffmpeg version 8.0-full_build-www.gyan.dev Copyright (c) 2000-2025 the FFmpeg developers
-  built with gcc 15.2.0 (Rev8, Built by MSYS2 project)
-  configuration: --enable-gpl --enable-version3 --enable-static --disable-w32threads --disable-autodetect --enable-fontconfig --enable-iconv --enable-gnutls --enable-lcms2 --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-libsnappy --enable-zlib --enable-librist --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-libbluray --enable-libcaca --enable-libdvdnav --enable-libdvdread --enable-sdl2 --enable-libaribb24 --enable-libaribcaption --enable-libdav1d --enable-libdavs2 --enable-libopenjpeg --enable-libquirc --enable-libuavs3d --enable-libxevd --enable-libzvbi --enable-liboapv --enable-libqrencode --enable-librav1e --enable-libsvtav1 --enable-libvvenc --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs2 --enable-libxeve --enable-libxvid --enable-libaom --enable-libjxl --enable-libvpx --enable-mediafoundation --enable-libass --enable-frei0r --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-liblensfun --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-dxva2 --enable-d3d11va --enable-d3d12va --enable-ffnvcodec --enable-libvpl --enable-nvdec --enable-nvenc --enable-vaapi --enable-libshaderc --enable-vulkan --enable-libplacebo --enable-opencl --enable-libcdio --enable-openal --enable-libgme --enable-libmodplug --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libshine --enable-libtheora --enable-libtwolame --enable-libvo-amrwbenc --enable-libcodec2 --enable-libilbc --enable-libgsm --enable-liblc3 --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-ladspa --enable-libbs2b --enable-libflite --enable-libmysofa --enable-librubberband --enable-libsoxr --enable-chromaprint --enable-whisper
-  libavutil      60.  8.100 / 60.  8.100
-  libavcodec     62. 11.100 / 62. 11.100
-  libavformat    62.  3.100 / 62.  3.100
-  libavdevice    62.  1.100 / 62.  1.100
-  libavfilter    11.  4.100 / 11.  4.100
-  libswscale      9.  1.100 /  9.  1.100
-  libswresample   6.  1.100 /  6.  1.100
-Fontconfig error: Cannot load default config file: No such file: (null)
-Fontconfig error: Cannot load default config file: No such file: (null)
-Fontconfig error: Cannot load default config file: No such file: (null)
-[Parsed_vignette_30 @ 0000020405b1dc40] [Eval @ 000000c68f5fefa0] Undefined constant or missing '(' in 'pi/5'
-[Parsed_vignette_30 @ 0000020405b1dc40] Unable to parse expression for 'angle'
-[AVFilterGraph @ 0000020405abce80] Error initializing filters
-Error : Invalid argument
-
-    at ChildProcess.<anonymous> (C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\src\services\gemini.service.ts:468:28)        
-    at ChildProcess.emit (node:events:519:28)
-    at maybeClose (node:internal/child_process:1101:16)
-    at Process.ChildProcess._handle.onexit (node:internal/child_process:304:5)
-Error: FFmpeg process exited with code 4294967274:
-ffmpeg version 8.0-full_build-www.gyan.dev Copyright (c) 2000-2025 the FFmpeg developers
-  built with gcc 15.2.0 (Rev8, Built by MSYS2 project)
-  configuration: --enable-gpl --enable-version3 --enable-static --disable-w32threads --disable-autodetect --enable-fontconfig --enable-iconv --enable-gnutls --enable-lcms2 --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-libsnappy --enable-zlib --enable-librist --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-libbluray --enable-libcaca --enable-libdvdnav --enable-libdvdread --enable-sdl2 --enable-libaribb24 --enable-libaribcaption --enable-libdav1d --enable-libdavs2 --enable-libopenjpeg --enable-libquirc --enable-libuavs3d --enable-libxevd --enable-libzvbi --enable-liboapv --enable-libqrencode --enable-librav1e --enable-libsvtav1 --enable-libvvenc --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs2 --enable-libxeve --enable-libxvid --enable-libaom --enable-libjxl --enable-libvpx --enable-mediafoundation --enable-libass --enable-frei0r --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-liblensfun --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-dxva2 --enable-d3d11va --enable-d3d12va --enable-ffnvcodec --enable-libvpl --enable-nvdec --enable-nvenc --enable-vaapi --enable-libshaderc --enable-vulkan --enable-libplacebo --enable-opencl --enable-libcdio --enable-openal --enable-libgme --enable-libmodplug --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libshine --enable-libtheora --enable-libtwolame --enable-libvo-amrwbenc --enable-libcodec2 --enable-libilbc --enable-libgsm --enable-liblc3 --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-ladspa --enable-libbs2b --enable-libflite --enable-libmysofa --enable-librubberband --enable-libsoxr --enable-chromaprint --enable-whisper
-  libavutil      60.  8.100 / 60.  8.100
-  libavcodec     62. 11.100 / 62. 11.100
-  libavformat    62.  3.100 / 62.  3.100
-  libavdevice    62.  1.100 / 62.  1.100
-  libavfilter    11.  4.100 / 11.  4.100
-  libswscale      9.  1.100 /  9.  1.100
-  libswresample   6.  1.100 /  6.  1.100
-Fontconfig error: Cannot load default config file: No such file: (null)
-Fontconfig error: Cannot load default config file: No such file: (null)
-Fontconfig error: Cannot load default config file: No such file: (null)
-[Parsed_vignette_30 @ 0000020405b1dc40] [Eval @ 000000c68f5fefa0] Undefined constant or missing '(' in 'pi/5'
-[Parsed_vignette_30 @ 0000020405b1dc40] Unable to parse expression for 'angle'
-[AVFilterGraph @ 0000020405abce80] Error initializing filters
-Error : Invalid argument
-
-    at ChildProcess.<anonymous> (C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\src\services\gemini.service.ts:468:28)        
-    at ChildProcess.emit (node:events:519:28)
-    at maybeClose (node:internal/child_process:1101:16)
-    at Process.ChildProcess._handle.onexit (node:internal/child_process:304:5)
+[AI Response - runAiCollaboration - Initial Idea]: {
+  "coreProblem": "The overwhelming pressure and crippling writer's block faced by content creators, marketers, and small business owners who need to consistently produce high-quality content, leading to frustration, exhaustion, and missed opportunities.",
+  "targetEmotion": "Empathy, validation, relief, and empowerment.",
+  "scenes": [
+    {
+      "description": "Extreme close-up on a person's face (late 20s-30s, relatable, slightly disheveled), eyes wide, a flicker of panic and exhaustion. Laptop screen is blurred in the background, showing a blank document with a blinking cursor. Desk is cluttered with half-empty coffee cups and crumpled notes.",
+      "duration": 8,
+      "effects": "Desaturated colors, slightly shaky handheld camera feel, tight focus on facial expression, low, soft lighting."    
+    },
+    {
+      "description": "Rapid cuts between the person frantically typing, then deleting aggressively. Head falling into hands. Staring 
+blankly at the ceiling. Grabbing their hair in frustration. Each shot is brief, emphasizing mounting stress and despair.",
+      "duration": 7,
+      "effects": "Quick, jarring cuts, slightly sped-up motion, high contrast lighting to emphasize shadows, zoom in on frustrated gestures."
+    },
+    {
+      "description": "The person slumps back into their chair, utterly defeated. They pick up their phone, scrolling absently, eyes glazed over. Suddenly, their thumb pauses, and their eyes widen slightly, as if remembering or seeing a solution.",
+      "duration": 7,
+      "effects": "Slow zoom out from the person's face, natural lighting gradually returns, focus shifts slightly to the action of looking at the phone."
+    },
+    {
+      "description": "The person is back at their laptop, a look of determined hope on their face. Quick cut to a blurred screen where a prompt is being typed into an AI interface (just enough to suggest Jasper). Then, a genuine smile spreads across their face as they quickly read generated, high-quality content appearing on screen.",
+      "duration": 8,
+      "effects": "Warmer, brighter lighting, smooth camera movement. A quick, almost imperceptible screen flash or highlight effect when Jasper 'works'."
+    },
+    {
+      "description": "The person confidently gestures towards their screen (now showing a complete, polished piece of content, e.g., 
+a blog post or marketing copy) or directly at the camera with a triumphant, satisfied smile. Text overlay appears: 'Content Done. You're a Genius.' or 'Jasper. Your Secret Weapon.'",
+      "duration": 5,
+      "effects": "Bright, clear, natural lighting. Stable camera shot. Text overlay appears smoothly with a subtle animation."       
+    }
+  ],
+  "script": [
+    {
+      "type": "dialogue",
+      "content": "Another blank page. Another deadline. My brain just... isn't braining today. How am I supposed to create *amazing* 
+content when I can't even start?"
+    },
+    {
+      "type": "sfx",
+      "content": "Furious, frustrated keyboard typing. Aggressive delete key sounds. Deep, exasperated sigh. Muffled groan. Sound of 
+crumpled paper."
+    },
+    {
+      "type": "dialogue",
+      "content": "This is impossible."
+    },
+    {
+      "type": "pause",
+      "content": 3
+    },
+    {
+      "type": "sfx",
+      "content": "Light 'ding' or 'spark' sound (the moment of realization)."
+    },
+    {
+      "type": "dialogue",
+      "content": "Wait... Jasper!"
+    },
+    {
+      "type": "sfx",
+      "content": "Quick, energetic mouse click."
+    },
+    {
+      "type": "dialogue",
+      "content": "Let's see what you've got."
+    },
+    {
+      "type": "sfx",
+      "content": "Fast, futuristic typing sounds, followed by a triumphant 'whoosh' as content fills the screen."
+    },
+    {
+      "type": "dialogue",
+      "content": "YES! Exactly what I needed! High-quality content, instantly. This is a game changer!"
+    },
+    {
+      "type": "sfx",
+      "content": "Upbeat, final flourish sound effect."
+    }
+  ],
+  "videoLength": 35,
+  "ctaGoal": "Drive sign-ups for a free trial or demo of Jasper, encouraging viewers to experience the relief and productivity boost 
+firsthand.",
+  "voiceTone": "Starts with a defeated, internal, almost whispered monologue. Transitions to a hopeful whisper, then an excited, confident, and authentically relieved external voice.",
+  "visualStyle": "Begins with a raw, authentic, handheld, slightly desaturated aesthetic, focusing on the character's genuine struggle. Transitions to a brighter, warmer, more polished look as the solution is introduced and embraced.",
+  "musicPace": "Starts with a low, melancholic, slightly anxious ambient hum or gentle piano track. Gradually builds in subtle optimism during the 'realization' phase, then swells into an uplifting, energetic, and triumphant track once Jasper delivers.",
+  "heading": "Every Creator's Secret Struggle (Until Now!)",
+  "hashtags": [
+    "#WriterLife",
+    "#ContentCreator",
+    "#WriterStruggles",
+    "#AIWriting",
+    "#JasperAI",
+    "#ContentMarketing",
+    "#SmallBusinessTips",
+    "#ProductivityHack",
+    "#Relatable",
+    "#UnfilteredMoment",
+    "#BanishWriterBlock"
+  ],
+  "description": "Ever felt like your brain just *stops* when you need to create content? 😩 You're not alone. We've all been there – staring at a blank page, feeling the pressure. Watch this raw, unfiltered moment of content creation struggle transform into pure relief with a little help. Find out how to banish writer's block forever and produce amazing content, instantly. 👇 #JasperAI #ContentMagic",
+  "preferredPlatform": "TikTok, Instagram Reels, YouTube Shorts"
+}

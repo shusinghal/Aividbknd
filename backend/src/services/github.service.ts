@@ -1,15 +1,24 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { ffmpegEffectsService } from './ffmpeg.effects.service';
+import { secretsService } from './secrets.service';
 
 // Type definitions
 interface Company { name: string; description: string; [key: string]: any; }
 interface Niche { name: string; [key: string]: any; }
+interface SocialAccount {
+    id: string;
+    platform: string;
+    accountName: string;
+    auth: { [key: string]: any };
+    [key: string]: any;
+}
 interface Asset { name: string; url: string; sha: string; } // sha can be empty string for local
 
 const LOCAL_DATA_PATH = path.resolve(__dirname, '..', '..', 'data');
 const COMPANIES_FILE_PATH = path.join(LOCAL_DATA_PATH, 'companies.json');
 const NICHES_FILE_PATH = path.join(LOCAL_DATA_PATH, 'niches.json');
+const SOCIAL_ACCOUNTS_FILE_PATH = path.join(LOCAL_DATA_PATH, 'social-accounts.json');
 const PUBLIC_ASSETS_PATH = path.resolve(__dirname, '..', '..', 'public', 'assets');
 const IMAGE_ASSETS_PATH = path.join(PUBLIC_ASSETS_PATH, 'images');
 const AUDIO_ASSETS_PATH = path.join(PUBLIC_ASSETS_PATH, 'audio');
@@ -29,6 +38,7 @@ class GithubService {
         await fs.mkdir(VIDEO_ASSETS_PATH, { recursive: true });
         await fs.mkdir(CUSTOM_FILES_PATH, { recursive: true });
         await ffmpegEffectsService.initialize();
+        await secretsService.initialize();
 
 
         try {
@@ -43,6 +53,13 @@ class GithubService {
         } catch {
             await fs.writeFile(NICHES_FILE_PATH, '[]', 'utf-8');
             console.log('Created empty niches.json');
+        }
+
+        try {
+            await fs.access(SOCIAL_ACCOUNTS_FILE_PATH);
+        } catch {
+            await fs.writeFile(SOCIAL_ACCOUNTS_FILE_PATH, '[]', 'utf-8');
+            console.log('Created empty social-accounts.json');
         }
         console.log('Local data storage initialized.');
     }
@@ -94,6 +111,39 @@ class GithubService {
         else niches.push(niche);
         await this.writeLocalFile(NICHES_FILE_PATH, niches);
         return niche;
+    }
+
+    // Social Account Methods
+    public async getSocialAccounts(): Promise<SocialAccount[]> {
+        return this.readLocalFile<SocialAccount>(SOCIAL_ACCOUNTS_FILE_PATH);
+    }
+
+    public async createSocialAccount(account: Omit<SocialAccount, 'id'>): Promise<SocialAccount> {
+        const accounts = await this.getSocialAccounts();
+        const newAccount: SocialAccount = {
+            ...account, id: Date.now().toString(),
+            platform: '',
+            accountName: '',
+            auth: {}
+        };
+        accounts.push(newAccount);
+        await this.writeLocalFile(SOCIAL_ACCOUNTS_FILE_PATH, accounts);
+        return newAccount;
+    }
+
+    public async updateSocialAccount(account: SocialAccount): Promise<SocialAccount> {
+        const accounts = await this.getSocialAccounts();
+        const index = accounts.findIndex(a => a.id === account.id);
+        if (index > -1) accounts[index] = account;
+        await this.writeLocalFile(SOCIAL_ACCOUNTS_FILE_PATH, accounts);
+        return account;
+    }
+
+    public async deleteSocialAccount(accountId: string): Promise<void> {
+        const accounts = await this.getSocialAccounts();
+        const updatedAccounts = accounts.filter(a => a.id !== accountId);
+        if (updatedAccounts.length === accounts.length) return; // No change
+        await this.writeLocalFile(SOCIAL_ACCOUNTS_FILE_PATH, updatedAccounts);
     }
 
     // Asset Methods
