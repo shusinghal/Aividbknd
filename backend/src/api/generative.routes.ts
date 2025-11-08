@@ -105,6 +105,9 @@ router.post('/character-description', async (req, res, next) => {
 
 router.post('/viral-audio', async (req, res, next) => {
     try {
+        // Log the raw incoming request body for debugging
+        console.log('[Viral-Audio] Raw incoming request:', JSON.stringify(req.body, null, 2));
+
         const { videoIdea, provider, elevenLabsVoiceId, voiceOptions } = req.body;
         // Revert to the original structure: The script is expected to be inside the videoIdea object.
         // No fallback to a top-level 'script' property will be performed.
@@ -118,6 +121,18 @@ router.post('/viral-audio', async (req, res, next) => {
         if (provider === 'elevenlabs' && !elevenLabsVoiceId) {
             return res.status(400).json({ message: 'elevenLabsVoiceId is required for the elevenlabs provider.' });
         }
+
+        // --- START: Handle string-based script input ---
+        // If the script is a single string with newline-separated JSON, parse it.
+        if (typeof script === 'string') {
+            try {
+                script = script.split('\n').filter(line => line.trim() !== '').map(line => JSON.parse(line));
+            } catch (e) {
+                console.error('Failed to parse string-based script:', e);
+                return res.status(400).json({ message: 'The provided script string is not valid. It must be a series of newline-separated JSON objects.' });
+            }
+        }
+        // --- END: Handle string-based script input ---
 
         // Ensure script is an array for the composition service
         if (!Array.isArray(script)) {
@@ -167,15 +182,16 @@ router.post('/viral-audio', async (req, res, next) => {
             script,
             tempDir,
             finalVoiceOptions
-        );
+        ); 
 
         // 4. Read the final composed audio, save it, and prepare the response
         const buffer = await fs.readFile(audioFilePath);
         const audioDir = path.join(process.cwd(), 'public', 'assets', 'audio');
         await fs.mkdir(audioDir, { recursive: true });
-        const audioFileName = `viral_audio_${Date.now()}.mp3`;
-        const audioFilePath1 = path.join(audioDir, audioFileName);
-        await fs.writeFile(audioFilePath1, buffer);
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-'); // Creates a file-safe timestamp like 2023-10-27T10-30-00-000Z
+        const audioFileName = `viral_audio_${timestamp}.mp3`;
+        const finalAudioPath = path.join(audioDir, audioFileName);
+        await fs.writeFile(finalAudioPath, buffer);
 
         res.status(200).json({ fileUrl: `/assets/audio/${audioFileName}` });
 

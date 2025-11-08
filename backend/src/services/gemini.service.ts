@@ -191,7 +191,7 @@ class GeminiService {
     public async generateCharacterDescription(videoIdea: VideoIdea): Promise<string> {
         const prompt = `Based on the following video idea, create a concise, consistent description of the main character. This description will be used to generate images for every scene. Focus on visual details like age, gender, hair, clothing style, and ethnicity to ensure consistency.
 
-        Video Script: ${videoIdea.script}
+        Video Script: ${JSON.stringify(videoIdea.script, null, 2)}
         Visual Style: ${videoIdea.visualStyle}
         Scenes: ${videoIdea.scenes.map(s => s.description).join(', ')}
 
@@ -704,23 +704,10 @@ class GeminiService {
         const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'narrative-nexus-'));
         
         const characterDescription = await this.generateCharacterDescription(videoIdea);
-
-        // Compose the final audio track from the script (dialogue, sfx, pauses)
-        console.log('[Audio] Starting audio composition...');
-        const audioFilePath = await audioCompositionService.composeAudio(
-            videoIdea.script,
-            tempDir,
-            // These are default values; they could be made dynamic in the future
-            {
-                voice: { languageCode: 'en-US', name: 'en-US-Studio-O' },
-                speakingRate: 1,
-                pitch: 0,
-            }
-        );
-        console.log(`[Audio] Composition complete. Final audio at: ${audioFilePath}`);
-        const audioBuffer = await fs.readFile(audioFilePath);
         
         // Generate FFMPEG commands for all scenes first
+        // NOTE: This assumes the audio has been generated separately and its path will be provided
+        // to the video rendering step. This function no longer creates the audio.
         const scenesForFfmpeg = videoIdea.scenes.map(s => ({
             id: s.id,
             effect: s.effects,
@@ -763,6 +750,11 @@ class GeminiService {
 
         // After successful video creation, save any newly generated effects
         const videoOutputPath = path.join(tempDir, 'output.mp4');
+        
+        // This function now requires the path to a pre-generated audio file.
+        // Since this monolithic 'generateAndSaveAssets' function doesn't have it,
+        // we cannot proceed with video creation. The frontend should use the /render-video endpoint instead.
+        const audioFilePath = ''; // This workflow is now deprecated and cannot create the video.
         await this.createVideoFromAssets(imageFilePaths, audioFilePath, videoOutputPath);
 
         const videoBuffer = await fs.readFile(videoOutputPath);
@@ -777,7 +769,9 @@ class GeminiService {
         }
 
         // Save audio and images as well
+        // The audio buffer is no longer available here.
         const audioFileName = `${company.name.toLowerCase().replace(/\s+/g, '_')}_${generationId}.mp3`;
+        const audioBuffer = Buffer.from(''); // Empty buffer as placeholder
         if (githubService) await githubService.saveAsset('audio', audioFileName, audioBuffer.toString('base64'));
         for (const [index, img] of imageFilePaths.entries()) {
             const scene = videoIdea.scenes[index];

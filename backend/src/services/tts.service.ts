@@ -21,8 +21,6 @@ class GoogleTtsService {
         if (!this.apiKey) {
             throw new Error("TTS API key is not configured for Google TTS service.");
         }
-        // Log the exact text prompt being sent to the TTS service.
-        console.log(`[TTS Service] Sending to Google TTS: "${options.text}"`);
 
         // Handle either plain text or SSML
         const isSsml = options.text.trim().startsWith('<speak>');
@@ -37,6 +35,9 @@ class GoogleTtsService {
                 pitch: options.pitch,
             },
         };
+
+        // Log the raw JSON payload being sent to the Google TTS API
+        console.log(`[TTS Service] Sending to Google TTS (raw payload):`, JSON.stringify(body, null, 2));
 
         const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${this.apiKey}`;
         const response = await fetch(url, {
