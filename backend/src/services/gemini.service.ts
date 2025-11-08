@@ -16,6 +16,7 @@ const roles: string[] = [
 ];
 import { githubService } from './github.service';
  
+import { sfxLibrary } from './sfx-library';
 import fetch from 'node-fetch';
 import { googleTtsService } from './tts.service';
 
@@ -25,7 +26,9 @@ interface ScriptPart {
 }
 // Reuse frontend types
 interface Company { name: string; description: string; [key: string]: any; }
-interface Scene { id: string; name: string; description: string; duration: string; effects: string; }
+interface Scene {
+    visualEffects: never[]; id: string; name: string; description: string; duration: string; effects: string; 
+}
 interface VideoIdea {
   scenes: Scene[];
   onScreenText?: { time: string; duration: string; text: string }[];
@@ -106,11 +109,17 @@ class GeminiService {
         return JSON.parse(response.text);
     }
     
-    public async runAiCollaboration(company: Company): Promise<any> {
-        const prompt = `For "${company.name}", a company described as "${company.description}", create a full viral video content plan using the "Unfiltered Human Moment" framework. Respond ONLY with a valid JSON object with the following keys: coreProblem, targetEmotion, scenes, script, videoLength, ctaGoal, voiceTone, visualStyle, musicPace, heading, hashtags, description, preferredPlatform.
+    public async runAiCollaboration(company: Company, selectedFramework: string): Promise<any> {
+        const prompt = `For "${company.name}", a company described as "${company.description}", create a full viral video content plan using the "${selectedFramework}" framework. Respond ONLY with a valid JSON object.
         **RULES:**
-        1.  **Script**: The 'script' key must be an array of objects, each with a 'type' ('dialogue', 'sfx', or 'pause') and 'content'. For 'pause', content is the duration in seconds (e.g., {"type": "pause", "content": 1.5}).
-        2.  **Timing**: The total duration of all scenes MUST equal the 'videoLength'. The spoken dialogue in the script should be timed appropriately for this video length, using 'pause' objects to fill time where necessary to match the visual pacing.`;
+        1.  **Integrated Scene Structure**: The root of the JSON MUST contain a 'scenes' array. Each object in this array represents a complete scene and MUST contain all visual and audio information for that scene. DO NOT create a separate 'script' array at the root level.
+        2.  **Scene Properties**: Each scene object must have 'name', 'description' (for the visual), 'duration' (in seconds), and an 'audio' key.
+        3.  **Audio Structure**: The 'audio' key within each scene MUST be an array of objects, each with a 'type' ('dialogue', 'sfx', 'music', or 'pause') and 'content'.
+        4.  **SFX Constraint (RAG)**: For 'sfx' objects, you must choose the most appropriate sound effect from the following library based on its description. The 'content' of the 'sfx' object MUST be the 'name' of the chosen library item. Do NOT invent new sound effects.
+            **SFX Library:** ${JSON.stringify(sfxLibrary)}
+        5.  **Pause Constraint**: For 'pause' objects, 'content' MUST be the duration in seconds (e.g., {"type": "pause", "content": 1.5}).
+        6.  **Root Properties**: The root JSON object should also contain the following keys: 'coreProblem', 'targetEmotion', 'videoLength', 'ctaGoal', 'voiceTone', 'visualStyle', 'musicPace', 'heading', 'hashtags', 'description', 'preferredPlatform'.
+        7.  **Timing Synchronization**: The total duration of all scenes MUST equal the 'videoLength'. The total duration of audio elements (dialogue + pauses) within each scene should be close to that scene's duration.`;
         
        const response = await this.ai.models.generateContent({
            model: 'gemini-2.5-flash', contents: prompt, config: { responseMimeType: "application/json" }
@@ -132,9 +141,13 @@ class GeminiService {
 
         const finalPrompt = `You are a Creative Director. Refine this initial video concept: ${JSON.stringify(videoIdea)} using this feedback from your team: ${feedbackLog.join('\n')}. Your final output MUST be a single, valid JSON object and nothing else.
         **CRITICAL REFINEMENT RULES:**
-        1.  **Deconstruct Scenes**: Examine the 'scenes' array. If any scene 'description' implies multiple shots, actions, or camera movements (e.g., 'a quick montage of...', 'the camera pans from... to...'), you MUST break it down into multiple, separate scene objects. Each new scene object must represent exactly ONE single, static visual shot suitable for a single image generation. Adjust the 'duration' and 'effects' for each new, simplified scene.
-        2.  **Structure Script**: Ensure the 'script' is an array of objects, each with a 'type' ('dialogue', 'sfx', 'pause') and 'content'.
-        3.  **Synchronize Timing**: The total duration of all scenes must equal the 'videoLength'. Adjust the 'script' by adding or modifying 'pause' objects to ensure the spoken dialogue and sound effects are perfectly timed to the total video length.`;
+        1.  **Enforce Integrated Structure**: Your primary task is to ensure the final JSON has a single 'scenes' array. Each scene object MUST contain all its visual and audio information. There must NOT be a separate 'script' array at the root level.
+        2.  **Deconstruct for Static Images**: Each scene object in the 'scenes' array MUST represent a single, static photograph. The 'description' must describe a still image, not a video clip. Break down any scene that implies movement into multiple, distinct scene objects.
+        3.  **Add Visual & Text Keys**: For each scene object, add a "visualEffects" key (an array of descriptive strings like "cinematic lighting") and an "onScreenText" key (a string containing any text to be displayed).
+        4.  **Audio Structure**: Ensure the 'audio' key in each scene is a correctly formatted array of objects, each with a 'type' ('dialogue', 'sfx', 'music', 'pause') and 'content'.
+        5.  **SFX Constraint (RAG)**: For 'sfx' objects, the 'content' MUST be a single, exact 'name' string chosen EXCLUSIVELY from the 'name' field of an object in the following library. Do NOT use descriptions or invent new sound effects.
+            **SFX Library:** ${JSON.stringify(sfxLibrary)}
+        6.  **Synchronize Timing**: The total duration of all scenes must equal the 'videoLength'. Adjust 'pause' objects within each scene's 'audio' array to ensure perfect timing.`;
 
         const finalResponse = await this.ai.models.generateContent({
             model: 'gemini-2.5-flash',
@@ -152,6 +165,27 @@ class GeminiService {
              throw new Error("Failed to extract JSON from Gemini response during refinement.");
         }
         return JSON.parse(jsonString);
+    }
+
+    public async findBestSfxMatch(description: string): Promise<string | null> {
+        const prompt = `
+            You are an audio engineer's assistant. Your task is to find the best sound effect from a library based on a description.
+            Analyze the user's description and choose the single best match from the 'name' field of the provided SFX library.
+
+            **User's Description:** "${description}"
+
+            **SFX Library:**
+            ${JSON.stringify(sfxLibrary, null, 2)}
+
+            **Instructions:**
+            1. Read the user's description carefully.
+            2. Compare it to the 'description' of each item in the library.
+            3. Respond with ONLY the 'name' of the single best matching item. For example: "chime-notification".
+            4. If no reasonable match is found, respond with "null".
+        `;
+        const response = await this.ai.models.generateContent({ model: 'gemini-2.5-flash', contents: prompt });
+        const match = response.text?.trim();
+        return match && match !== 'null' ? match.replace(/"/g, '') : null;
     }
 
     public async generateCharacterDescription(videoIdea: VideoIdea): Promise<string> {
@@ -265,7 +299,8 @@ class GeminiService {
             // Add id to the schema for each item in the array
             properties: {
                 id: { type: Type.STRING },
-                effects: { type: Type.ARRAY, items: effectLayerSchema }
+                effects: { type: Type.ARRAY, items: effectLayerSchema, nullable: true },
+                customCommand: { type: Type.STRING, nullable: true }
             },
             required: ['id', 'effects']
         };
@@ -278,7 +313,10 @@ class GeminiService {
 
         const prompt = `
             You are an expert video effect analyst. Your task is to deconstruct a natural language effect description into a structured, machine-readable JSON array of effect layers.
-
+            
+            **Primary Method: Structured Layers (Preferred)**
+            Whenever possible, deconstruct the effect into a JSON array for the "effects" key. This is the most reliable method.
+            
             **Available Effect Names and their Parameters:**
             - **zoom**: params: { level: { start: 1.0, end: 1.2 } } // level > 1 is zoom in, < 1 is zoom out
             - **pan**: params: { direction: 'left' | 'right' | 'up' | 'down' }
@@ -288,16 +326,21 @@ class GeminiService {
             - **vignette**: params: {} // No parameters needed
             - **fisheye_wobble**: params: {} // No parameters needed
 
+            **Fallback Method: Custom Command**
+            If the requested effect is too complex or creative for the structured layers (e.g., "a glitchy, datamosh transition", "a dreamy, watercolor painting effect"), generate a raw FFMPEG filter graph string for the "customCommand" field instead. In this case, the "effects" field should be null.
+
             **Rules:**
             1. Your response MUST be a JSON array.
-            2. Each object in the array represents a scene and MUST contain an "id" and an "effects" key.
-            3. The "effects" key must be an array of effect layer objects.
-            4. Each effect layer object must have a 'name', 'startTime', and 'endTime'.
+            2. Each object in the array represents a scene and MUST contain an "id".
+            3. Each object MUST contain EITHER an "effects" key (an array of structured effect layers) OR a "customCommand" key (a single string), but not both.
+            4. For "effects", each layer object must have a 'name', 'startTime', and 'endTime'.
             5. 'startTime' and 'endTime' are in seconds, relative to the clip's own duration.
             6. For animated effects (like a blur that fades), use a parameter object with 'start', 'end', and an optional 'easing' ('linear', 'easeIn', 'easeOut', 'easeInOut').
             7. For static effects or simple directional effects, use a direct value (e.g., "direction": "right").
-            8. Always try your best to represent the effect using the available primitives. Do not invent new effect names.
-            9. Respond ONLY with a valid JSON array matching the schema.
+            8. When using "customCommand", provide only the filter graph content, not the full "ffmpeg -i ... -vf ..." command. For example: "edgedetect=low=0.1:high=0.4,format=yuv420p".
+            9. Always ensure custom commands end with ',format=yuv420p' for compatibility.
+            10. Prioritize the structured "effects" method. Only use "customCommand" as a fallback for highly creative requests.
+            11. Respond ONLY with a valid JSON array matching the schema.
 
             **Example Request:**
             [{"id": "scene_1", "effect": "Start with a dreamy, soft focus that slowly sharpens over the first 3 seconds. Simultaneously, do a slow zoom-in across the entire 5-second clip."}]
@@ -320,18 +363,28 @@ class GeminiService {
         if (!response.text) throw new Error('AI classification for FFMPEG effects failed.');
         console.log('[AI Response - generateFfmpegCommands]:', response.text);
 
-        const structuredEffectsArray: {id: string, effects: EffectLayer[]}[] = JSON.parse(response.text);
+        const structuredEffectsArray: {id: string, effects?: EffectLayer[], customCommand?: string}[] = JSON.parse(response.text);
 
         const finalCommands: Record<string, string> = {};
 
         // Create a map for easy lookup
-        const effectsMap = new Map(structuredEffectsArray.map(item => [item.id, item.effects]));
+        const effectsMap = new Map(structuredEffectsArray.map(item => [item.id, { effects: item.effects, customCommand: item.customCommand }]));
 
         for (const scene of scenes) {
-            const effectLayers = effectsMap.get(scene.id);
-            if (Array.isArray(effectLayers) && effectLayers.length > 0) {
-                console.log(`[${scene.id}] Composing effect from structured layers:`, effectLayers);
-                finalCommands[scene.id] = ffmpegEffectsService.composer.compose(effectLayers as EffectLayer[], { duration: parseFloat(scene.duration), width: 1080, height: 1920 });
+            const effectData = effectsMap.get(scene.id);
+            if (effectData?.customCommand) {
+                console.log(`[${scene.id}] Validating custom command:`, effectData.customCommand);
+                const validation = await this.validateFfmpegCommand(effectData.customCommand);
+                if (validation.isValid) {
+                    console.log(`[${scene.id}] Custom command is valid.`);
+                    finalCommands[scene.id] = effectData.customCommand;
+                } else {
+                    console.warn(`[${scene.id}] Custom command validation failed: ${validation.error}. Falling back to default.`);
+                    finalCommands[scene.id] = 'format=yuv420p';
+                }
+            } else if (Array.isArray(effectData?.effects) && effectData.effects.length > 0) {
+                console.log(`[${scene.id}] Composing effect from structured layers:`, effectData.effects);
+                finalCommands[scene.id] = ffmpegEffectsService.composer.compose(effectData.effects as EffectLayer[], { duration: parseFloat(scene.duration), width: 1080, height: 1920 });
             } else {
                 console.log(`[${scene.id}] No valid effect layers found for '${scene.effect}'. Applying default format.`);
                 // This handles cases where the AI might fail to return an entry for a specific scene ID.
@@ -345,21 +398,35 @@ class GeminiService {
         return finalCommands;
     }
 
-    public async generateSingleImage(payload: { sceneDescription: string, visualStyle: string, characterDescription: string | null }): Promise<string> {
-        const { sceneDescription, visualStyle, characterDescription } = payload;
-        const prompt = characterDescription
-            ? `${sceneDescription}. The main character is: ${characterDescription}. Style: ${visualStyle}. IMPORTANT: Ensure the character in this image matches this description precisely.`
-            : `${sceneDescription}, ${visualStyle}`;
+    public async generateSingleImage(payload: { sceneDescription: string, visualStyle: string, characterDescription: string | null, visualEffects: string[] }): Promise<{ publicUrl: string, localPath: string }> {
+        const { sceneDescription, visualStyle, characterDescription, visualEffects } = payload;
+        const effectsString = visualEffects.join(', ');
 
+        const prompt = characterDescription
+            ? `${sceneDescription}. The main character is: ${characterDescription}. Style: ${visualStyle}, ${effectsString}. IMPORTANT: Ensure the character in this image matches this description precisely.`
+            : `${sceneDescription}. Style: ${visualStyle}, ${effectsString}.`;
+
+        // Generate Image
         const response = await this.ai.models.generateImages({
             model: 'imagen-4.0-generate-001',
             prompt: prompt,
             config: { numberOfImages: 1, outputMimeType: 'image/jpeg', aspectRatio: '9:16' },
         });
+
         if (!response.generatedImages || response.generatedImages.length === 0) throw new Error('No images generated');
         const img = response.generatedImages[0];
         if (!img || !img.image || !img.image.imageBytes) throw new Error('Malformed image response');
-        return img.image.imageBytes as string;
+        
+        // Save image and create URL
+        const imageBuffer = Buffer.from(img.image.imageBytes, 'base64');
+        const imageName = `generated_image_${Date.now()}.jpg`;
+        const publicDir = path.join(__dirname, '..', '..', 'public', 'assets', 'image');
+        await fs.mkdir(publicDir, { recursive: true });
+        const localPath = path.join(publicDir, imageName);
+        await fs.writeFile(localPath, imageBuffer);
+
+        const publicUrl = `${config.server.publicUrl}/assets/image/${imageName}`;
+        return { publicUrl, localPath };
     }
 
     /**
@@ -582,6 +649,7 @@ class GeminiService {
         }
         return JSON.parse(jsonString);
     }
+
     private _extractJson(text: string): string {
         const match = text.match(/```json\n([\s\S]*?)\n```/);
         return match ? match[1].trim() : text.trim();
@@ -662,12 +730,25 @@ class GeminiService {
 
         const imageFilePaths: {path: string, duration: number, ffmpegCommand: string, onScreenText?: string}[] = [];
         for (const [index, scene] of videoIdea.scenes.entries()) {
-            const base64Image = await this.generateSingleImage({ sceneDescription: scene.description, visualStyle: videoIdea.visualStyle, characterDescription });
-            const imageBuffer = Buffer.from(base64Image, 'base64');
-            const imagePath = path.join(tempDir, `scene_${index}.jpg`);
-            await fs.writeFile(imagePath, imageBuffer);
+            // For the first scene, combine the name (hook) and description for a richer prompt.
+            // For subsequent scenes, the description alone is more direct and sufficient.
+            const scenePrompt = index === 0
+                ? `${scene.name}: ${scene.description}`
+                : scene.description;
+            
+            // generateSingleImage now saves the file and returns its path
+            const { localPath } = await this.generateSingleImage({ 
+                sceneDescription: scenePrompt, 
+                visualStyle: videoIdea.visualStyle, 
+                characterDescription, 
+                visualEffects: scene.visualEffects || [] });
+
+            // The image is already saved, so we just need to copy it to the temp directory for ffmpeg processing.
+            const tempImagePath = path.join(tempDir, `scene_${index}.jpg`);
+            await fs.copyFile(localPath, tempImagePath);
+
             imageFilePaths.push({ 
-                path: imagePath, 
+                path: tempImagePath, 
                 duration: parseFloat(scene.duration) || 3,
                 ffmpegCommand: ffmpegCommandsMap[scene.id] || '', // Add the generated command
                 onScreenText: videoIdea.onScreenText?.find(txt => {

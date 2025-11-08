@@ -11,6 +11,7 @@ import { geminiService } from '../services/gemini.service';
 import { googleTtsService } from '../services/tts.service';
 import { imageGenerationService } from '../services/imageGeneration.service';
 import { elevenlabsService } from '../services/elevenlabs.service';
+import { audioCompositionService } from '../services/audio.composition.service';
 
 const router = express.Router();
 
@@ -44,8 +45,23 @@ router.post('/video-idea', async (req, res, next) => {
         const { name, description } = req.body;
         if (!name || !description) return res.status(400).json({ message: 'Company name and description are required.' });
         const company = { name, description };
-        const videoIdea = await geminiService.runAiCollaboration(company);
+
+        // Define storytelling frameworks at the API level to separate concerns.
+        const storytellingFrameworks = [
+            'The "Unfiltered Human Moment": Start with a raw, relatable struggle and show how the product provides a solution and emotional relief.',
+            'The "Aspirational Transformation": Create a "before and after" narrative, showing a character evolving from a state of difficulty to one of success and empowerment with the help of the product.',
+            'The "Unexpected Discovery": Frame the story around a character who stumbles upon the product by chance and is amazed by its immediate, game-changing impact on their task.',
+            'The "Secret Weapon" Reveal: Build intrigue by showing a character effortlessly succeeding at a difficult task, then reveal at the end that the product is their hidden advantage.',
+            'The "Day in the Life" Integration: Show how the product seamlessly fits into a character\'s daily routine, making it more efficient, creative, or enjoyable without being the sole focus.'
+        ];
+
+        // Randomly select a framework for this generation.
+        const selectedFramework = storytellingFrameworks[Math.floor(Math.random() * storytellingFrameworks.length)];
+
+        // Call the service with the selected framework.
+        const videoIdea = await geminiService.runAiCollaboration(company, selectedFramework);
         res.json(videoIdea);
+
     } catch (error) {
         next(error);
     }
@@ -89,8 +105,10 @@ router.post('/character-description', async (req, res, next) => {
 
 router.post('/viral-audio', async (req, res, next) => {
     try {
-        const { videoIdea, provider, elevenLabsVoiceId } = req.body;
-        const script = videoIdea?.script;
+        const { videoIdea, provider, elevenLabsVoiceId, voiceOptions } = req.body;
+        // Revert to the original structure: The script is expected to be inside the videoIdea object.
+        // No fallback to a top-level 'script' property will be performed.
+        let script = videoIdea?.structuredScript || videoIdea?.script;
 
         // 1. Validate request body
         if (!videoIdea || !script || !provider) {
@@ -101,101 +119,68 @@ router.post('/viral-audio', async (req, res, next) => {
             return res.status(400).json({ message: 'elevenLabsVoiceId is required for the elevenlabs provider.' });
         }
 
-        // 2. Strategy Engine: Determine audio parameters
-        const getAudioParams = (idea: any) => {
-            let speakingRate = 1.0;
-            let pitch = 0.0;
-
-            const platform = idea.preferredPlatform?.[0]?.toLowerCase() || '';
-            const emotion = idea.targetEmotion?.toLowerCase() || '';
-            const musicPace = idea.musicPace?.toLowerCase() || '';
-
-            // Platform analysis
-            if (['tiktok', 'instagram shorts', 'facebook reels'].some(p => platform.includes(p))) {
-                speakingRate *= 1.20; // 20% faster for short-form video
-            }
-
-            // Emotion analysis
-            if (['urgent', 'exciting', 'energetic'].includes(emotion)) {
-                speakingRate *= 1.15;
-                pitch += 1.5;
-            } else if (['inspiring', 'uplifting'].includes(emotion)) {
-                speakingRate *= 1.05;
-                pitch += 1.0;
-            } else if (['calming', 'sad', 'empathetic'].includes(emotion)) {
-                speakingRate *= 0.85;
-                pitch -= 1.5;
-            } else if (['mysterious', 'dramatic'].includes(emotion)) {
-                speakingRate *= 0.75;
-            }
-
-            // Music pace adjustment
-            if (musicPace === 'uptempo') {
-                speakingRate = Math.max(speakingRate, 1.1);
-            } else if (musicPace === 'downtempo') {
-                speakingRate = Math.min(speakingRate, 1.0);
-            }
-
-            // Voice selection for Google
-            const voiceTone = idea.voiceTone?.toLowerCase() || '';
-            let voiceName = 'en-US-Studio-O'; // High-quality default
-            if (voiceTone.includes('empathetic') || voiceTone.includes('warm')) {
-                voiceName = 'en-US-Wavenet-F';
-            } else if (voiceTone.includes('professional') || voiceTone.includes('clear')) {
-                voiceName = 'en-US-Wavenet-D';
-            } else if (voiceTone.includes('energetic') || voiceTone.includes('youthful')) {
-                voiceName = 'en-US-Wavenet-J';
-            }
-
-            return {
-                speakingRate: parseFloat(speakingRate.toFixed(2)),
-                pitch: parseFloat(pitch.toFixed(2)),
-                voiceName: voiceName,
-                languageCode: 'en-US'
-            };
-        };
-
-        const params = getAudioParams(videoIdea);
-        let audioBlob: Blob;
-
-        // 3. Generate audio based on provider
-        switch (provider) {
-            case 'google':
-                audioBlob = await googleTtsService.synthesize({
-                    text: script,
-                    voice: { languageCode: params.languageCode, name: params.voiceName },
-                    speakingRate: params.speakingRate,
-                    pitch: params.pitch,
-                });
-                break;
-
-            case 'elevenlabs':
-                // Note: ElevenLabs API v1 doesn't directly support pitch/rate adjustments.
-                // We pass the voice ID and use default stability settings.
-                audioBlob = await elevenlabsService.generateAudio(
-                    script,
-                    elevenLabsVoiceId,
-                    { stability: 0.7, similarity_boost: 0.8 }
-                );
-                break;
-
-            default:
-                return res.status(400).json({ message: `Unsupported provider: ${provider}. Use 'google' or 'elevenlabs'.` });
+        // Ensure script is an array for the composition service
+        if (!Array.isArray(script)) {
+            return res.status(400).json({ message: 'The script must be a structured array of dialogue, sfx, and pause parts. Please use a refined video idea.' });
         }
 
-        // 4. Convert to buffer, save the file, and prepare response
-        const audioBuffer = await audioBlob.arrayBuffer();
-        const buffer = Buffer.from(audioBuffer);
+        // Stricter validation: ensure dialogue content is a string, not an object
+        for (const part of script) {
+            if (part.type === 'dialogue' && typeof part.content !== 'string') {
+                return res.status(400).json({
+                    message: `Invalid script format. Dialogue content must be a string, but received an object for a dialogue part.`,
+                    errorPart: part
+                });
+            }
+        }
 
-        // Save the audio file
+        // 2. Set audio parameters from request or use defaults. The dependency on videoIdea is removed.
+        const defaultVoiceOptions = {
+            languageCode: 'en-US',
+            name: 'en-US-Studio-O', // High-quality default voice
+            speakingRate: 1.0,
+            pitch: 0.0
+        };
+
+        const finalVoiceOptions = {
+            voice: {
+                languageCode: voiceOptions?.languageCode || defaultVoiceOptions.languageCode,
+                name: voiceOptions?.name || defaultVoiceOptions.name
+            },
+            speakingRate: voiceOptions?.speakingRate || defaultVoiceOptions.speakingRate,
+            pitch: voiceOptions?.pitch || defaultVoiceOptions.pitch
+        };
+
+        const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'viral-audio-'));
+
+        // 3. Generate audio using the audio composition service
+        // This service correctly handles dialogue, sfx, and pauses.
+        // For this endpoint, we'll focus on Google TTS for dialogue.
+        // ElevenLabs integration within composeAudio would be a future enhancement.
+        if (provider !== 'google') {
+            // For now, we only support Google TTS through the composition service in this endpoint.
+            // A future refactor could pass the provider down to the composition service.
+            return res.status(400).json({ message: `Provider '${provider}' is not yet supported for structured script composition. Please use 'google'.` });
+        }
+
+        const audioFilePath = await audioCompositionService.composeAudio(
+            script,
+            tempDir,
+            finalVoiceOptions
+        );
+
+        // 4. Read the final composed audio, save it, and prepare the response
+        const buffer = await fs.readFile(audioFilePath);
         const audioDir = path.join(process.cwd(), 'public', 'assets', 'audio');
         await fs.mkdir(audioDir, { recursive: true });
         const audioFileName = `viral_audio_${Date.now()}.mp3`;
-        const audioFilePath = path.join(audioDir, audioFileName);
-        await fs.writeFile(audioFilePath, buffer);
+        const audioFilePath1 = path.join(audioDir, audioFileName);
+        await fs.writeFile(audioFilePath1, buffer);
 
-        const base64Audio = buffer.toString('base64');
-        res.status(200).json({ base64Audio, fileUrl: `/assets/audio/${audioFileName}` });
+        res.status(200).json({ fileUrl: `/assets/audio/${audioFileName}` });
+
+        // Clean up temporary directory
+        await fs.rm(tempDir, { recursive: true, force: true });
 
     } catch (error) {
         console.error('Error in /viral-audio route:', error);

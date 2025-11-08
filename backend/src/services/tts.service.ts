@@ -2,9 +2,14 @@
 import fetch from 'node-fetch';
 import config from '../config';
 
+export interface GoogleTtsVoice {
+    languageCode: string;
+    name: string;
+}
+
 interface SynthesizeSpeechOptions {
     text: string;
-    voice: { languageCode: string; name: string; };
+    voice: GoogleTtsVoice;
     speakingRate: number;
     pitch: number;
 }
@@ -16,6 +21,9 @@ class GoogleTtsService {
         if (!this.apiKey) {
             throw new Error("TTS API key is not configured for Google TTS service.");
         }
+        // Log the exact text prompt being sent to the TTS service.
+        console.log(`[TTS Service] Sending to Google TTS: "${options.text}"`);
+
         // Handle either plain text or SSML
         const isSsml = options.text.trim().startsWith('<speak>');
         const input = isSsml ? { ssml: options.text } : { text: options.text };

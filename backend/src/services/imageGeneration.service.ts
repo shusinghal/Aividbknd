@@ -47,7 +47,7 @@ class ImageGenerationService {
             });
             
             // FIX: Correctly map the response from `generateImages`.
-            const images = response.generatedImages?.map(img => img.image.imageBytes as string) ?? [];
+            const images = response.generatedImages?.map(img => img.image?.imageBytes as string) ?? [];
 
             if (images.length > 0) {
                 return images;
