@@ -41,6 +41,11 @@
   },
   {
     "method": "POST",
+    "path": "/api/assets/save-from-url",
+    "description": "Downloads an image from a URL and saves it as an asset."
+  },
+  {
+    "method": "POST",
     "path": "/api/assets/audio",
     "description": "Saves a new audio asset."
   },

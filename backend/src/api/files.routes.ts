@@ -2,6 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { githubService } from '../services/github.service';
+import fetch from 'node-fetch';
 
 const CUSTOM_DATA_PATH = path.resolve(__dirname, '..', '..', 'data', 'custom');
 
@@ -126,6 +127,36 @@ router.post('/image', async (req, res, next) => {
         }
         await githubService.saveAsset('image', fileName, content);
         res.status(201).send({ message: `Image asset '${fileName}' saved successfully.` });
+    } catch (error) {
+        next(error);
+    }
+});
+
+// POST /api/assets/save-from-url - Downloads an image from a URL and saves it
+router.post('/save-from-url', async (req, res, next) => {
+    try {
+        const { imageUrl, fileName } = req.body;
+
+        if (!imageUrl || typeof imageUrl !== 'string') {
+            return res.status(400).json({ success: false, message: 'A valid imageUrl is required.' });
+        }
+        if (!fileName || typeof fileName !== 'string') {
+            return res.status(400).json({ success: false, message: 'A valid fileName is required.' });
+        }
+
+        console.log(`[Asset] Downloading image from URL: ${imageUrl}`);
+        const response = await fetch(imageUrl);
+        if (!response.ok) {
+            throw new Error(`Failed to download image. Status: ${response.status} ${response.statusText}`);
+        }
+
+        const imageBuffer = await response.buffer();
+        const base64Content = imageBuffer.toString('base64');
+
+        await githubService.saveAsset('image', fileName, base64Content);
+
+        res.status(200).json({ success: true, message: 'Image saved successfully.', fileName });
+
     } catch (error) {
         next(error);
     }
