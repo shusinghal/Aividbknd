@@ -7,6 +7,7 @@ const router = Router();
 
 router.post('/fetch', async (req, res, next) => {
     try {
+        console.log('[Analytics Fetch] Received request with body:', JSON.stringify(req.body, null, 2));
         const { socialAccountId } = req.body;
         if (!socialAccountId) {
             return res.status(400).json({ message: 'socialAccountId is required.' });
@@ -32,25 +33,44 @@ router.post('/fetch', async (req, res, next) => {
         let analyticsData;
 
         if (account.platform.toLowerCase() === 'youtube') {
-            const channelId = account.auth?.channelId;
-            if (!channelId) {
-                return res.status(400).json({ message: `YouTube account '${socialAccountId}' is missing a channelId.` });
+            let channelIdentifier = account.auth?.channelId;
+            if (!channelIdentifier) {
+                return res.status(400).json({ message: `YouTube account '${socialAccountId}' is missing a channelId or handle.` });
             }
 
             try {
+                const auth = google.auth.fromAPIKey(secret);
+
                 const youtube = google.youtube({
                     version: 'v3',
-                    auth: secret // Your API key
+                    auth: auth
                 });
+
+                let finalChannelId = channelIdentifier;
+
+                // If the identifier starts with '@', it's a handle. We need to search for the ID.
+                if (channelIdentifier.startsWith('@')) {
+                    const searchResponse = await youtube.search.list({
+                        part: ['snippet'],
+                        q: channelIdentifier,
+                        type: ['channel'],
+                        maxResults: 1
+                    });
+                    const foundChannelId = searchResponse.data.items?.[0]?.snippet?.channelId;
+                    if (!foundChannelId) {
+                        return res.status(404).json({ message: `Could not find a YouTube channel for handle '${channelIdentifier}'.` });
+                    }
+                    finalChannelId = foundChannelId;
+                }
 
                 const response = await youtube.channels.list({
                     part: ['statistics', 'snippet'],
-                    id: [channelId],
+                    id: [finalChannelId],
                 });
 
                 const channel = response.data.items?.[0];
                 if (!channel || !channel.statistics) {
-                    return res.status(404).json({ message: `Could not find channel statistics for ID '${channelId}'.` });
+                    return res.status(404).json({ message: `Could not find channel statistics for ID '${finalChannelId}'.` });
                 }
 
                 const stats = channel.statistics;
@@ -69,6 +89,7 @@ router.post('/fetch', async (req, res, next) => {
             return res.status(400).json({ message: `Analytics for platform '${account.platform}' is not yet supported.` });
         }
 
+        console.log('[Analytics Fetch] Sending response data:', JSON.stringify(analyticsData, null, 2));
         res.status(200).json(analyticsData);
     } catch (error) {
         next(error);

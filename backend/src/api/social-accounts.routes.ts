@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { githubService } from '../services/github.service';
+import { secretsService } from '../services/secrets.service';
 
 const router = Router();
 
@@ -19,6 +20,12 @@ router.post('/', async (req, res, next) => {
         const { platform, accountName, auth } = req.body;
         if (!platform || !accountName || !auth || !auth.keyId) {
             return res.status(400).json({ message: 'platform, accountName, and auth object with keyId are required.' });
+        }
+
+        // Verify that the keyId corresponds to an actual secret before creating the account.
+        const secretExists = await secretsService.getSecret(auth.keyId);
+        if (!secretExists) {
+            return res.status(400).json({ message: `The provided keyId '${auth.keyId}' is invalid or does not correspond to a saved secret.` });
         }
 
         const newAccount = await githubService.createSocialAccount({ platform, accountName, auth });

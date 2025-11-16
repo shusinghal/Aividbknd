@@ -1,187 +1,178 @@
 {
-  "coreProblem": "The overwhelming struggle of content creation, writer's block, and the constant pressure of deadlines for businesses and individuals, leading to burnout and suboptimal output.",
-  "targetEmotion": "Frustration and exhaustion, transitioning to curiosity, relief, and ultimately empowerment and satisfaction.",
-  "scenes": [
-    {
-      "id": "1762303829550_0",
-      "name": "Hook: Blank Page Despair",
-      "description": "Extreme close-up on a laptop screen displaying a blank document titled 'Blog Post Draft.' The cursor blinks relentlessly. A subtle, urgent on-screen text overlay reads 'WRITER'S BLOCK?'.",
-      "duration": "1.5",
-      "effects": "simple fade",
-      "ffmpegCommands": "fade=t=in:st=0:d=1,format=yuv420p",
-      "visualEffects": [
-        "extreme close-up",
-        "harsh screen glow",
-        "despairing mood",
-        "minimalist focus",
-        "on-screen text"
-      ]
-    },
-    {
-      "id": "1762303829550_1",
-      "name": "Frustration: Tired Face",
-      "description": "Close-up on the young professional's face (20s-30s). Their eyes are bloodshot and tired, reflecting deep frustration and exhaustion. A slight furrow in their brow. Dim, late-night/early-morning lighting from the laptop screen.",
-      "duration": "1.5",
-      "effects": "simple fade",
-      "ffmpegCommands": "fade=t=in:st=0:d=1,format=yuv420p",
-      "visualEffects": [
-        "natural lighting",
-        "tired expression",
-        "cinematic shadows",
-        "authentic portrait"
-      ]
-    },
-    {
-      "id": "1762303829550_2",
-      "name": "Aggressive Deletion",
-      "description": "Tight shot on the character's hands furiously typing a few words, then aggressively hitting the backspace key, deleting everything. The desk is messy with coffee cups and crumpled papers.",
-      "duration": "1.0",
-      "effects": "simple fade",
-      "ffmpegCommands": "fade=t=in:st=0:d=1,format=yuv420p",
-      "visualEffects": [
-        "dynamic close-up",
-        "fast action",
-        "messy realism",
-        "focused despair"
-      ]
-    },
-    {
-      "id": "1762303829550_3",
-      "name": "Deadline Looms / Defeat",
-      "description": "Wider shot of the character at their desk. A calendar notification briefly flashes 'DEADLINE TOMORROW!' on the laptop screen. The character buries their face in their hands, utterly defeated. A subtle on-screen text overlay: 'BRAIN. FRIED.'",
-      "duration": "2.0",
-      "effects": "simple fade",
-      "ffmpegCommands": "fade=t=in:st=0:d=1,format=yuv420p",
-      "visualEffects": [
-        "wide angle frustration",
-        "overwhelmed posture",
-        "notification overlay",
-        "moody desk setup",
-        "on-screen text"
-      ]
-    },
-    {
-      "id": "1762303829550_4",
-      "name": "A Glimmer of Hope",
-      "description": "The character slowly lifts their head, looking defeated. Their eyes scan the screen, then subtly widen as a pop-up ad for 'Jasper AI writing assistant' appears. The pop-up is clean and intriguing, not overly intrusive.",
-      "duration": "2.0",
-      "effects": "simple fade",
-      "ffmpegCommands": "fade=t=in:st=0:d=1,format=yuv420p",
-      "visualEffects": [
-        "subtle curiosity",
-        "screen reflection",
-        "hopeful gaze",
-        "clean UI pop-up"
-      ]
-    },
-    {
-      "id": "1762303829550_5",
-      "name": "Tentative Click",
-      "description": "Close-up of the character's hand hovering over the mouse/trackpad, then tentatively clicking on the 'Jasper AI' pop-up. Their expression shows a mix of skepticism and desperate curiosity.",
-      "duration": "1.0",
-      "effects": "simple fade",
-      "ffmpegCommands": "fade=t=in:st=0:d=1,format=yuv420p",
-      "visualEffects": [
-        "focused hand shot",
-        "tentative interaction",
-        "subtle anticipation",
-        "digital interface"
-      ]
-    },
-    {
-      "id": "1762303829550_6",
-      "name": "Jasper in Action: Prompt",
-      "description": "A dynamic shot of the Jasper AI interface. The character quickly types a prompt like 'Write a compelling blog post on the benefits of AI content creation' into the input field. The UI is clean and modern.",
-      "duration": "1.5",
-      "effects": "simple fade",
-      "ffmpegCommands": "fade=t=in:st=0:d=1,format=yuv420p",
-      "visualEffects": [
-        "bright UI",
-        "fast input",
-        "clean interface",
-        "action-oriented"
-      ]
-    },
-    {
-      "id": "1762303829550_7",
-      "name": "AI Magic: Instant Generation",
-      "description": "The screen fills *instantly* with high-quality, relevant text. Rapid flashes of various content types (e.g., 'Ad Copy,' 'Email Subject,' 'Social Media Caption' templates) briefly appear, emphasizing versatility. On-screen text: 'AI MAGIC 🤯' and 'CONTENT IN SECONDS!'",
-      "duration": "3.0",
-      "effects": "simple fade",
-      "ffmpegCommands": "fade=t=in:st=0:d=1,format=yuv420p",
-      "visualEffects": [
-        "dynamic text generation",
-        "fast cuts",
-        "bright UI animation",
-        "impressive speed",
-        "on-screen text"
-      ]
-    },
-    {
-      "id": "1762303829550_8",
-      "name": "Awe and Relief",
-      "description": "Close-up of the character's face. Their initial skepticism vanishes, replaced by wide-eyed awe, then a deep, relieved smile spreads across their face as they read the generated content on screen.",
-      "duration": "2.0",
-      "effects": "simple fade",
-      "ffmpegCommands": "fade=t=in:st=0:d=1,format=yuv420p",
-      "visualEffects": [
-        "facial expression focus",
-        "awe-struck gaze",
-        "relieved smile",
-        "transformative moment"
-      ]
-    },
-    {
-      "id": "1762303829550_9",
-      "name": "Content Completed",
-      "description": "The screen displays a fully drafted, polished blog post, visually impressive with formatting and clear headings. The character confidently clicks 'publish' or 'send' on the screen, a sense of finality and accomplishment.",
-      "duration": "2.0",
-      "effects": "simple fade",
-      "ffmpegCommands": "fade=t=in:st=0:d=1,format=yuv420p",
-      "visualEffects": [
-        "professional output",
-        "clean UI",
-        "confident action",
-        "satisfying completion"
-      ]
-    },
-    {
-      "id": "1762303829550_10",
-      "name": "Empowerment and CTA",
-      "description": "The character leans back in their chair, taking a slow, contented sip of coffee, a genuine, relaxed smile on their face. The screen is subtly visible in the background. Prominent, persistent on-screen text CTA: 'TRY JASPER AI (LINK IN BIO)' with 'Start your 7-day FREE Trial!' below it.",
-      "duration": "2.5",
-      "effects": "simple fade",
-      "ffmpegCommands": "fade=t=in:st=0:d=1,format=yuv420p",
-      "visualEffects": [
-        "relaxed posture",
-        "contented expression",
-        "clear CTA overlay",
-        "warm, satisfied lighting",
-        "on-screen text"
-      ]
-    }
-  ],
-  "script": "{\"type\":\"sfx\",\"content\":\"dramatic-music\"}\n\n{\"type\":\"dialogue\",\"content\":\"Blank page. Brain fried. Deadline!\"}\n\n{\"type\":\"sfx\",\"content\":\"frustrated-sigh\"}\n\n{\"type\":\"sfx\",\"content\":\"fast-typing\"}\n\n{\"type\":\"sfx\",\"content\":\"aggressive-delete\"}\n\n{\"type\":\"pause\",\"content\":\"0.5\"}\n\n{\"type\":\"dialogue\",\"content\":\"There *has* to be a better way...\"}\n\n{\"type\":\"pause\",\"content\":\"1.0\"}\n\n{\"type\":\"sfx\",\"content\":\"pop-up\"}\n\n{\"type\":\"sfx\",\"content\":\"mouse-click\"}\n\n{\"type\":\"pause\",\"content\":\"0.2\"}\n\n{\"type\":\"dialogue\",\"content\":\"Jasper? AI writing? Could it actually work?\"}\n\n{\"type\":\"sfx\",\"content\":\"upbeat-music\"}\n\n{\"type\":\"sfx\",\"content\":\"keyboard-typing\"}\n\n{\"type\":\"sfx\",\"content\":\"swoosh\"}\n\n{\"type\":\"sfx\",\"content\":\"ding\"}\n\n{\"type\":\"pause\",\"content\":\"0.5\"}\n\n{\"type\":\"dialogue\",\"content\":\"Whoa... it just created that? And it's genuinely good!\"}\n\n{\"type\":\"pause\",\"content\":\"0.5\"}\n\n{\"type\":\"dialogue\",\"content\":\"It's like getting hours of my life back, honestly. All my content, done in minutes!\"}\n\n{\"type\":\"sfx\",\"content\":\"triumphant-music\"}\n\n{\"type\":\"pause\",\"content\":\"0.5\"}\n\n{\"type\":\"dialogue\",\"content\":\"This has honestly been a game-changer for my stress levels, I had to share.\"}\n\n{\"type\":\"pause\",\"content\":\"0.5\"}",
-  "videoLength": "20.5",
-  "ctaGoal": "Drive traffic to Jasper's website for a free trial or demo, encouraging direct sign-ups.",
-  "voiceTone": "Authentic, relatable, slightly exasperated at first, then transitioning to amazed, excited, and finally confident and empowering.",
-  "visualStyle": "Raw, documentary-like at first with natural lighting and close-ups on the struggle, then transitioning to bright, clean, and dynamic UI shots for Jasper, ending with a professional, polished look for the final content. Explicit, strategically placed on-screen text for key messages and CTA.",
-  "musicPace": "Starts with 'dramatic-music' building tension and frustration, transitions to 'upbeat-music' as Jasper is discovered and used, and finishes with 'triumphant-music' for the moment of success and relief.",
-  "heading": "The Blank Page Battle: My Honest Breakthrough with AI!",
-  "hashtags": "#WriterStruggles #ContentCreation #AIWriter #JasperAI #MarketingTips #ProductivityHacks #FreelanceLife #GameChanger #ContentCreator #AIWriting #ViralVideo",
-  "description": "Tired of writer's block? 😩 Watch how I went from burnout to DONE in minutes with **Jasper AI!** 👇 This is my unfiltered, raw journey from total content burnout to finding a tool that actually changed EVERYTHING. Ready to beat the content grind? Tap the link in bio to try Jasper AI FREE! #AIWriting #Productivity #ContentCreator #WriterStruggles",
+  "coreProblem": "Content creators and marketers struggle with writer's block and the time-consuming nature of producing high-quality content consistently.",
+  "targetEmotion": "Relief and Empowerment",
+  "videoLength": "38",
+  "ctaGoal": "Drive viewers to try Jasper through the affiliate link in the bio.",
+  "voiceTone": "Energetic, Confident, Relatable (with a subtle shift from slightly stressed in the opening line to empowered throughout).",
+  "visualStyle": "Fast-paced, split-screen, screen recordings mixed with user reactions, dynamic text overlays.",
+  "musicPace": "Upbeat, driving electronic track with a build-up and satisfying drop.",
+  "heading": "I automated 90% of my writing. Here's the secret.",
+  "hashtags": "JasperAI AIWriter ContentCreation MarketingHacks Copywriting Productivity AffiliateMarketing AITools ProductivityHacks",
+  "description": "🤯 Writer's block is over. This AI tool automates 90% of my content in seconds. Stop wasting hours, start creating! ✨ Try Jasper FREE - Link in bio! Tag a creator who needs this!",
   "preferredPlatform": [
     "TikTok",
-    "YouTube Shorts",
-    "Instagram Reels"
+    "YouTube Shorts"
+  ],
+  "scenes": [
+    {
+      "id": "1763195903707_0",
+      "name": "The Hook: The Struggle",
+      "description": "Extreme close-up on an aggressively blinking cursor. Quick cuts between a stressed person staring at the blank screen and a calendar with overdue deadlines flashing red. Split screen reinforces internal vs. external pressure.",
+      "duration": "5",
+      "effects": "Fast, jarring cuts. A low, tense hum in the background.",
+      "visualEffects": [
+        "Bold red text overlay 'WRITER'S BLOCK?' flashes on screen for first 2 seconds.",
+        "Dynamic text pop-up: 'Hours Wasted!'"
+      ]
+    },
+    {
+      "id": "1763195903707_1",
+      "name": "The Reveal",
+      "description": "The user quickly types 'AI writing assistant' into a search bar. The Jasper.ai homepage immediately pops up. A quick shot of the user's face shows a subtle 'aha!' moment of realization, their eyes widening just before the logo is prominent.",
+      "duration": "4",
+      "effects": "Quick zoom into the search result. A bright, optimistic sound effect replaces the tense music.",
+      "visualEffects": []
+    },
+    {
+      "id": "1763195903707_2",
+      "name": "The Transformation",
+      "description": "A rapid, crystal-clear montage of the Jasper interface in action. We see a simple prompt generating multiple variations of content (3 ad headlines, 3 tweet ideas) in rapid succession. The hyper-lapse briefly pauses for 1 second on a high-quality, human-sounding snippet of text, zooming in slightly to ensure readability. The user's face, shown in a small corner window, reacts with genuine awe and relief.",
+      "duration": "15",
+      "effects": "Hyper-lapse screen recording. The music builds to a climax.",
+      "visualEffects": [
+        "Dynamic text pop-ups: 'Blog Post in 10s!', '5 Ad Variations!', 'Viral Tweet Ideas!', 'INSTANT CONTENT!'"
+      ]
+    },
+    {
+      "id": "1763195903707_3",
+      "name": "The Result",
+      "description": "Cuts to the same person, now looking relaxed and empowered, smiling as they sip coffee. They swipe through their phone, showing a fully scheduled, color-coded content calendar to signify completion and being ahead of schedule. The background is bright and clean.",
+      "duration": "6",
+      "effects": "Smooth, slow-motion shot. The music becomes confident and rhythmic. A satisfying 'check mark' sound effect is heard as they approve content.",
+      "visualEffects": []
+    },
+    {
+      "id": "1763195903707_4",
+      "name": "The Call to Action",
+      "description": "A full-screen graphic with the Jasper logo. A clear text overlay appears: 'Stop Writing, Start Creating.' followed by 'Get 10,000 words FREE with Jasper ✨ Link in Bio'. A subtle phone UI overlay appears with an animated finger tapping where the bio link would be.",
+      "duration": "8",
+      "effects": "Clean, bold text animation. An arrow points downwards.",
+      "visualEffects": [
+        "Persistent text 'LINK IN BIO' appears at the bottom for the last 5 seconds."
+      ]
+    }
   ],
   "structuredScript": [
     {
-      "id": "part_1762286260989_0",
       "type": "dialogue",
-      "content": "{\"type\":\"sfx\",\"content\":\"dramatic-music\"}\n\n{\"type\":\"dialogue\",\"content\":\"Blank page. Brain fried. Deadline!\"}\n\n{\"type\":\"sfx\",\"content\":\"frustrated-sigh\"}\n\n{\"type\":\"sfx\",\"content\":\"fast-typing\"}\n\n{\"type\":\"sfx\",\"content\":\"aggressive-delete\"}\n\n{\"type\":\"pause\",\"content\":\"0.5\"}\n\n{\"type\":\"dialogue\",\"content\":\"There *has* to be a better way...\"}\n\n{\"type\":\"pause\",\"content\":\"1.0\"}\n\n{\"type\":\"sfx\",\"content\":\"pop-up\"}\n\n{\"type\":\"sfx\",\"content\":\"mouse-click\"}\n\n{\"type\":\"pause\",\"content\":\"0.2\"}\n\n{\"type\":\"dialogue\",\"content\":\"Jasper? AI writing? Could it actually work?\"}\n\n{\"type\":\"sfx\",\"content\":\"upbeat-music\"}\n\n{\"type\":\"sfx\",\"content\":\"keyboard-typing\"}\n\n{\"type\":\"sfx\",\"content\":\"swoosh\"}\n\n{\"type\":\"sfx\",\"content\":\"ding\"}\n\n{\"type\":\"pause\",\"content\":\"0.5\"}\n\n{\"type\":\"dialogue\",\"content\":\"Whoa... it just created that? And it's genuinely good!\"}\n\n{\"type\":\"pause\",\"content\":\"0.5\"}\n\n{\"type\":\"dialogue\",\"content\":\"It's like getting hours of my life back, honestly. All my content, done in minutes!\"}\n\n{\"type\":\"sfx\",\"content\":\"triumphant-music\"}\n\n{\"type\":\"pause\",\"content\":\"0.5\"}\n\n{\"type\":\"dialogue\",\"content\":\"This has honestly been a game-changer for my stress levels, I had to share.\"}\n\n{\"type\":\"pause\",\"content\":\"0.5\"}"
+      "content": "Still staring at this blinking cursor?"
+    },
+    {
+      "type": "sfx",
+      "content": "Frustrated sigh"
+    },
+    {
+      "type": "dialogue",
+      "content": "Your content deadline is screaming at you."
+    },
+    {
+      "type": "sfx",
+      "content": "Tense electronic pulse"
+    },
+    {
+      "type": "dialogue",
+      "content": "But what if the cursor did the work FOR you?"
+    },
+    {
+      "type": "sfx",
+      "content": "Fast keyboard typing, then an uplifting chime"
+    },
+    {
+      "type": "dialogue",
+      "content": "This is Jasper."
+    },
+    {
+      "type": "dialogue",
+      "content": "I gave it one simple prompt..."
+    },
+    {
+      "type": "sfx",
+      "content": "Digital typing sounds"
+    },
+    {
+      "type": "pause",
+      "content": 1
+    },
+    {
+      "type": "dialogue",
+      "content": "...and it generated an entire blog post."
+    },
+    {
+      "type": "sfx",
+      "content": "Dramatic whoosh"
+    },
+    {
+      "type": "pause",
+      "content": 1
+    },
+    {
+      "type": "dialogue",
+      "content": "Then all my social media captions for the week."
+    },
+    {
+      "type": "sfx",
+      "content": "Series of quick digital chimes"
+    },
+    {
+      "type": "pause",
+      "content": 1
+    },
+    {
+      "type": "dialogue",
+      "content": "Even ad copy that actually connects!"
+    },
+    {
+      "type": "sfx",
+      "content": "Cash register 'cha-ching'"
+    },
+    {
+      "type": "dialogue",
+      "content": "Now, my content practically creates itself."
+    },
+    {
+      "type": "sfx",
+      "content": "Satisfying checkmark sound"
+    },
+    {
+      "type": "pause",
+      "content": 0.5
+    },
+    {
+      "type": "dialogue",
+      "content": "I went from writer's block to feeling creatively unstoppable."
+    },
+    {
+      "type": "sfx",
+      "content": "Confident, final musical beat"
+    },
+    {
+      "type": "dialogue",
+      "content": "It's your turn to beat the blank page."
+    },
+    {
+      "type": "pause",
+      "content": 1
+    },
+    {
+      "type": "dialogue",
+      "content": "Click the link in my bio to get 10,000 free words with Jasper."
+    },
+    {
+      "type": "sfx",
+      "content": "Final musical flourish and a subtle click sound"
     }
   ],
-  "numberOfImages": "11",
+  "script": "Still staring at this blinking cursor?\n\n(SFX: Frustrated sigh)\n\nYour content deadline is screaming at you.\n\n(SFX: Tense electronic pulse)\n\nBut what if the cursor did the work FOR you?\n\n(SFX: Fast keyboard typing, then an uplifting chime)\n\nThis is Jasper.\n\nI gave it one simple prompt...\n\n(SFX: Digital typing sounds)\n\n(PAUSE: 1s)\n\n...and it generated an entire blog post.\n\n(SFX: Dramatic whoosh)\n\n(PAUSE: 1s)\n\nThen all my social media captions for the week.\n\n(SFX: Series of quick digital chimes)\n\n(PAUSE: 1s)\n\nEven ad copy that actually connects!\n\n(SFX: Cash register 'cha-ching')\n\nNow, my content practically creates itself.\n\n(SFX: Satisfying checkmark sound)\n\n(PAUSE: 0.5s)\n\nI went from writer's block to feeling creatively unstoppable.\n\n(SFX: Confident, final musical beat)\n\nIt's your turn to beat the blank page.\n\n(PAUSE: 1s)\n\nClick the link in my bio to get 10,000 free words with Jasper.\n\n(SFX: Final musical flourish and a subtle click sound)",
+  "numberOfImages": "5",
   "audioProvider": "google"
 }

@@ -13,3 +13,5 @@ backend/data/assets
 ffmpeg/**
 backend/data/**
 backend/public/**
+backend/data/custom/company_script_Jasper.json
+backend/data/social-accounts.json

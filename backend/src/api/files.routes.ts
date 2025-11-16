@@ -106,13 +106,42 @@ router.get('/images', async (req, res, next) => {
     }
 });
 
-// GET /api/files/audio/:name - Retrieves a single audio asset by name
-router.get('/audio/', async (req, res, next) => {
+// GET /api/files/audios - Retrieves audio assets
+router.get('/audios', async (req, res, next) => {
     try {
         const count = req.query.count ? parseInt(req.query.count as string, 10) : undefined;
         let audios = await githubService.getAssets('audio');
         if (count !== undefined && count > 0) audios = audios.slice(0, count);
         res.json(audios);
+    } catch (error) {
+        next(error);
+    }
+});
+
+// GET /api/files/:assetType/:fileName - Fetches a single asset file
+router.get('/:assetType/:fileName', (req, res, next) => {
+    try {
+        const { assetType, fileName } = req.params;
+
+        // Validate asset type to prevent access to other directories
+        if (assetType !== 'images' && assetType !== 'audio' && assetType !== 'videos') {
+            return res.status(400).json({ message: 'Invalid asset type specified.' });
+        }
+
+        // Sanitize filename to prevent directory traversal attacks
+        if (!fileName || fileName.includes('..') || fileName.includes('/')) {
+            return res.status(400).json({ message: 'Invalid filename.' });
+        }
+
+        const assetsBasePath = path.resolve(__dirname, '..', '..', 'public', 'assets');
+        const filePath = path.join(assetsBasePath, assetType, fileName);
+
+        // sendFile handles setting the correct Content-Type header
+        res.sendFile(filePath, (err) => {
+            if (err) {
+                next(err); // Pass errors to the default error handler
+            }
+        });
     } catch (error) {
         next(error);
     }
@@ -132,30 +161,44 @@ router.post('/image', async (req, res, next) => {
     }
 });
 
-// POST /api/assets/save-from-url - Downloads an image from a URL and saves it
+// POST /api/files/save-from-url - Downloads a file from a URL and saves it as an asset.
 router.post('/save-from-url', async (req, res, next) => {
     try {
-        const { imageUrl, fileName } = req.body;
+        console.log('[save-from-url] Received request body:', req.body);
 
-        if (!imageUrl || typeof imageUrl !== 'string') {
-            return res.status(400).json({ success: false, message: 'A valid imageUrl is required.' });
+        const { assetType, url, fileName } = req.body;
+
+        if (!assetType || (assetType !== 'image' && assetType !== 'audio')) {
+            return res.status(400).json({ success: false, message: 'A valid assetType ("image" or "audio") is required.' });
+        }
+        if (!url || typeof url !== 'string') {
+            return res.status(400).json({ success: false, message: 'A valid url is required.' });
         }
         if (!fileName || typeof fileName !== 'string') {
             return res.status(400).json({ success: false, message: 'A valid fileName is required.' });
         }
 
-        console.log(`[Asset] Downloading image from URL: ${imageUrl}`);
-        const response = await fetch(imageUrl);
+        console.log(`[Asset] Downloading ${assetType} from URL: ${url}`);
+        const response = await fetch(url);
         if (!response.ok) {
-            throw new Error(`Failed to download image. Status: ${response.status} ${response.statusText}`);
+            // Add detailed logging for the failed fetch attempt
+            const errorBody = await response.text().catch(() => 'Could not read error body.');
+            const errorMessage = `Failed to download file from URL: ${url}. Status: ${response.status} ${response.statusText}. Body: ${errorBody}`;
+            console.error(`[save-from-url] ${errorMessage}`);
+            // Pass a more structured error to the error handler
+            const error = new Error(errorMessage) as any;
+            error.status = response.status; // Forward the status code
+            throw error;
         }
 
-        const imageBuffer = await response.buffer();
-        const base64Content = imageBuffer.toString('base64');
+        // The method to get the ArrayBuffer can differ slightly based on the fetch implementation.
+        // node-fetch uses .buffer(), while the browser's native fetch uses .arrayBuffer().
+        const fileBuffer = await (response as any).buffer();
+        const base64Content = fileBuffer.toString('base64');
 
-        await githubService.saveAsset('image', fileName, base64Content);
+        await githubService.saveAsset(assetType, fileName, base64Content);
 
-        res.status(200).json({ success: true, message: 'Image saved successfully.', fileName });
+        res.status(200).json({ success: true, message: `Asset of type '${assetType}' saved successfully.`, fileName });
 
     } catch (error) {
         next(error);

@@ -25,46 +25,6 @@
     "description": "Updates or creates a niche."
   },
   {
-    "method": "GET",
-    "path": "/api/assets/images",
-    "description": "Retrieves a list of image assets. Can be limited by a `count` query parameter to fetch the `n` most recent images (e.g., /api/assets/images?count=5)."
-  },
-  {
-    "method": "GET",
-    "path": "/api/assets/audio",
-    "description": "Retrieves a list of audio assets. Can be limited by a `count` query parameter to fetch the `n` most recent audio files (e.g., /api/assets/audio?count=5)."
-  },
-  {
-    "method": "POST",
-    "path": "/api/assets/image",
-    "description": "Saves a new image asset."
-  },
-  {
-    "method": "POST",
-    "path": "/api/assets/save-from-url",
-    "description": "Downloads an image from a URL and saves it as an asset."
-  },
-  {
-    "method": "POST",
-    "path": "/api/assets/audio",
-    "description": "Saves a new audio asset."
-  },
-  {
-    "method": "DELETE",
-    "path": "/api/assets/image/:name",
-    "description": "Deletes an image asset by name."
-  },
-  {
-    "method": "DELETE",
-    "path": "/api/assets/audio/:name",
-    "description": "Deletes an audio asset by name."
-  },
-  {
-    "method": "DELETE",
-    "path": "/api/assets/video/:name",
-    "description": "Deletes a video asset by name."
-  },
-  {
     "method": "POST",
     "path": "/api/generate/scan-niche",
     "description": "Scans a niche to find related companies."
@@ -133,5 +93,70 @@
     "method": "POST",
     "path": "/api/files/content",
     "description": "Retrieves the content of a JSON file from the custom data folder. The filename should be provided in the request body as a JSON object with a 'filename' key."
+  },
+  {
+    "method": "GET",
+    "path": "/api/files/images",
+    "description": "Retrieves a list of image assets. Can be limited by a `count` query parameter."
+  },
+  {
+    "method": "GET",
+    "path": "/api/files/audio",
+    "description": "Retrieves a list of audio assets. Can be limited by a `count` query parameter."
+  },
+  {
+    "method": "GET",
+    "path": "/api/files/:assetType/:fileName",
+    "description": "Fetches a single asset (images, audio, or videos) by its type and filename."
+  },
+  {
+    "method": "POST",
+    "path": "/api/files/image",
+    "description": "Saves a new image asset from a base64 string."
+  },
+  {
+    "method": "POST",
+    "path": "/api/files/audio",
+    "description": "Saves a new audio asset from a base64 string."
+  },
+  {
+    "method": "POST",
+    "path": "/api/files/save-from-url",
+    "description": "Downloads a file from a URL and saves it as an asset."
+  },
+  {
+    "method": "POST",
+    "path": "/api/secrets",
+    "description": "Saves a new secret value and returns a keyId."
+  },
+  {
+    "method": "POST",
+    "path": "/api/analytics/fetch",
+    "description": "Fetches analytics for a given socialAccountId."
+  },
+  {
+    "method": "GET",
+    "path": "/api/social-accounts",
+    "description": "Retrieves a list of all social media accounts."
+  },
+  {
+    "method": "POST",
+    "path": "/api/social-accounts",
+    "description": "Creates a new social media account."
+  },
+  {
+    "method": "PUT",
+    "path": "/api/social-accounts/:id",
+    "description": "Updates an existing social media account by its ID."
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/social-accounts/:id",
+    "description": "Deletes a social media account by its ID."
+  },
+  {
+    "method": "GET",
+    "path": "/api/assets/video-groups",
+    "description": "Fetches all generated assets (images, audio, video) grouped by project."
   }
 ]

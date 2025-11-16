@@ -124,8 +124,8 @@ class AudioCompositionService {
                 audioFilePaths.push(segmentPath);
 
             } else if (part.type === 'sfx') {
-                // Per the request, SFX are discarded.
-                console.log(`[Audio] Discarding SFX part: "${part.content}"`);
+                // Per your instruction, SFX parts are ignored during TTS narration generation.
+                // They will be handled separately during the final video composition.
                 continue;
 
             } else if (part.type === 'pause') {

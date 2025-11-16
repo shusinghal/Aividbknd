@@ -9,7 +9,6 @@ import os from 'os';
 import multer from 'multer';
 import { geminiService } from '../services/gemini.service';
 import { googleTtsService } from '../services/tts.service';
-import { imageGenerationService } from '../services/imageGeneration.service';
 import { elevenlabsService } from '../services/elevenlabs.service';
 import { audioCompositionService } from '../services/audio.composition.service';
 
@@ -225,7 +224,7 @@ router.post('/single-image', async (req, res, next) => {
 
         // Assuming imageGenerationService exists and abstracts the image generation call
         // Using 9:16 aspect ratio for vertical video format
-        const base64Images = await imageGenerationService.generateImage(prompt, characterDescription, '9:16', 1);
+        const base64Images = await geminiService.generateImage(prompt, characterDescription, '9:16', 1);
         res.json({ base64Image: base64Images[0] });
     } catch(error) {
         next(error);
