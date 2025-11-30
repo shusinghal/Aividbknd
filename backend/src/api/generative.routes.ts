@@ -103,6 +103,8 @@ router.post('/character-description', async (req, res, next) => {
 });
 
 router.post('/viral-audio', async (req, res, next) => {
+    let tempDir: string | null = null; // To hold the temp directory path for cleanup
+
     try {
         // Log the raw incoming request body for debugging
         console.log('[Viral-Audio] Raw incoming request:', JSON.stringify(req.body, null, 2));
@@ -165,7 +167,7 @@ router.post('/viral-audio', async (req, res, next) => {
             pitch: voiceOptions?.pitch || defaultVoiceOptions.pitch
         };
 
-        const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'viral-audio-'));
+        tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'viral-audio-'));
 
         // 3. Generate audio using the audio composition service
         // This service correctly handles dialogue, sfx, and pauses.
@@ -194,12 +196,14 @@ router.post('/viral-audio', async (req, res, next) => {
 
         res.status(200).json({ fileUrl: `/assets/audio/${audioFileName}` });
 
-        // Clean up temporary directory
-        await fs.rm(tempDir, { recursive: true, force: true });
-
     } catch (error) {
         console.error('Error in /viral-audio route:', error);
         next(error);
+    } finally {
+        // Ensure temporary directory is always cleaned up
+        if (tempDir) {
+            await fs.rm(tempDir, { recursive: true, force: true });
+        }
     }
 });
 

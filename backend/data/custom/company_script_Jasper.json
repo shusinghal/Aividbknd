@@ -15,7 +15,7 @@
   ],
   "scenes": [
     {
-      "id": "1763195903707_0",
+      "id": "1763284879628_0",
       "name": "The Hook: The Struggle",
       "description": "Extreme close-up on an aggressively blinking cursor. Quick cuts between a stressed person staring at the blank screen and a calendar with overdue deadlines flashing red. Split screen reinforces internal vs. external pressure.",
       "duration": "5",
@@ -26,7 +26,7 @@
       ]
     },
     {
-      "id": "1763195903707_1",
+      "id": "1763284879628_1",
       "name": "The Reveal",
       "description": "The user quickly types 'AI writing assistant' into a search bar. The Jasper.ai homepage immediately pops up. A quick shot of the user's face shows a subtle 'aha!' moment of realization, their eyes widening just before the logo is prominent.",
       "duration": "4",
@@ -34,7 +34,7 @@
       "visualEffects": []
     },
     {
-      "id": "1763195903707_2",
+      "id": "1763284879628_2",
       "name": "The Transformation",
       "description": "A rapid, crystal-clear montage of the Jasper interface in action. We see a simple prompt generating multiple variations of content (3 ad headlines, 3 tweet ideas) in rapid succession. The hyper-lapse briefly pauses for 1 second on a high-quality, human-sounding snippet of text, zooming in slightly to ensure readability. The user's face, shown in a small corner window, reacts with genuine awe and relief.",
       "duration": "15",
@@ -44,7 +44,7 @@
       ]
     },
     {
-      "id": "1763195903707_3",
+      "id": "1763284879628_3",
       "name": "The Result",
       "description": "Cuts to the same person, now looking relaxed and empowered, smiling as they sip coffee. They swipe through their phone, showing a fully scheduled, color-coded content calendar to signify completion and being ahead of schedule. The background is bright and clean.",
       "duration": "6",
@@ -52,7 +52,7 @@
       "visualEffects": []
     },
     {
-      "id": "1763195903707_4",
+      "id": "1763284879628_4",
       "name": "The Call to Action",
       "description": "A full-screen graphic with the Jasper logo. A clear text overlay appears: 'Stop Writing, Start Creating.' followed by 'Get 10,000 words FREE with Jasper ✨ Link in Bio'. A subtle phone UI overlay appears with an animated finger tapping where the bio link would be.",
       "duration": "8",
@@ -170,9 +170,14 @@
     {
       "type": "sfx",
       "content": "Final musical flourish and a subtle click sound"
+    },
+    {
+      "id": "part_1763284889027",
+      "type": "pause",
+      "content": "3.5"
     }
   ],
-  "script": "Still staring at this blinking cursor?\n\n(SFX: Frustrated sigh)\n\nYour content deadline is screaming at you.\n\n(SFX: Tense electronic pulse)\n\nBut what if the cursor did the work FOR you?\n\n(SFX: Fast keyboard typing, then an uplifting chime)\n\nThis is Jasper.\n\nI gave it one simple prompt...\n\n(SFX: Digital typing sounds)\n\n(PAUSE: 1s)\n\n...and it generated an entire blog post.\n\n(SFX: Dramatic whoosh)\n\n(PAUSE: 1s)\n\nThen all my social media captions for the week.\n\n(SFX: Series of quick digital chimes)\n\n(PAUSE: 1s)\n\nEven ad copy that actually connects!\n\n(SFX: Cash register 'cha-ching')\n\nNow, my content practically creates itself.\n\n(SFX: Satisfying checkmark sound)\n\n(PAUSE: 0.5s)\n\nI went from writer's block to feeling creatively unstoppable.\n\n(SFX: Confident, final musical beat)\n\nIt's your turn to beat the blank page.\n\n(PAUSE: 1s)\n\nClick the link in my bio to get 10,000 free words with Jasper.\n\n(SFX: Final musical flourish and a subtle click sound)",
+  "script": "Still staring at this blinking cursor?\n\n(SFX: Frustrated sigh)\n\nYour content deadline is screaming at you.\n\n(SFX: Tense electronic pulse)\n\nBut what if the cursor did the work FOR you?\n\n(SFX: Fast keyboard typing, then an uplifting chime)\n\nThis is Jasper.\n\nI gave it one simple prompt...\n\n(SFX: Digital typing sounds)\n\n(PAUSE: 1s)\n\n...and it generated an entire blog post.\n\n(SFX: Dramatic whoosh)\n\n(PAUSE: 1s)\n\nThen all my social media captions for the week.\n\n(SFX: Series of quick digital chimes)\n\n(PAUSE: 1s)\n\nEven ad copy that actually connects!\n\n(SFX: Cash register 'cha-ching')\n\nNow, my content practically creates itself.\n\n(SFX: Satisfying checkmark sound)\n\n(PAUSE: 0.5s)\n\nI went from writer's block to feeling creatively unstoppable.\n\n(SFX: Confident, final musical beat)\n\nIt's your turn to beat the blank page.\n\n(PAUSE: 1s)\n\nClick the link in my bio to get 10,000 free words with Jasper.\n\n(SFX: Final musical flourish and a subtle click sound)\n\n(PAUSE: 3.5s)",
   "numberOfImages": "5",
   "audioProvider": "google"
 }

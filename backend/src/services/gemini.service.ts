@@ -530,13 +530,44 @@ class GeminiService {
         return builder;
     }
 
+    /**
+     * Searches for a file in a predefined list of directories and returns the valid path.
+     * @param filename The name of the file to find.
+     * @returns The full, correct path to the file.
+     * @throws An error if the file is not found in any of the specified directories.
+     */
+    private findAssetPath(filename: string): string {
+        const projectRoot = path.join(__dirname, '..', '..');
+        // Define the directories to search in, in order of priority.
+        const searchDirs = [
+            path.join(projectRoot, 'public', 'assets', 'images'),
+            path.join(projectRoot, 'public', 'downloads', 'images')
+        ];
+
+        for (const dir of searchDirs) {
+            const potentialPath = path.join(dir, filename);
+            if (require('fs').existsSync(potentialPath)) {
+                return potentialPath; // Return the first path that exists.
+            }
+        }
+
+        // If the loop finishes, the file was not found.
+        throw new Error(`Asset "${filename}" not found in any of the search directories: ${searchDirs.join(', ')}`);
+    }
+
     public async createVideoFromAssets(imageFiles: { path: string, duration: number, ffmpegCommand?: string, onScreenText?: string }[], audioFile: string, outputPath: string): Promise<string> {
         return new Promise((resolve, reject) => {
             const commandBuilder = this.ffmpegCommandBuilder();
-
-            // 1. Add image and audio inputs
+            // 1. Add image and audio inputs, validating image paths
             imageFiles.forEach(file => {
-                commandBuilder.addInput(file.path, ['-loop', '1', '-t', `${file.duration}`]);
+                try {
+                    const imageName = path.basename(file.path);
+                    const validPath = this.findAssetPath(imageName);
+                    commandBuilder.addInput(validPath, ['-loop', '1', '-t', `${file.duration}`]);
+                } catch (error) {
+                    // If an image is not found, reject the promise immediately.
+                    return reject(error);
+                }
             });
             commandBuilder.addInput(audioFile);
 
