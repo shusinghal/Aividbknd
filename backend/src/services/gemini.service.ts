@@ -5,6 +5,10 @@ import { spawn } from 'child_process';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as os from 'os';
+// --- Feature Flag for Python Video Processor ---
+// Set this to true to use the Python-based video processor, or false to use the original TypeScript one.
+const USE_PYTHON_VIDEO_PROCESSOR = true;
+
 import config from '../config';
 // Local fallback roles to avoid importing frontend files into the backend runtime.
 const roles: string[] = [
@@ -555,7 +559,124 @@ class GeminiService {
         throw new Error(`Asset "${filename}" not found in any of the search directories: ${searchDirs.join(', ')}`);
     }
 
+    /**
+     * This is the Python script content, stored as a string to bypass any build/caching issues.
+     * It will be written to a temporary file and executed.
+     */
+    private getPythonProcessorScript(): string {
+        return `
+import ffmpeg
+import sys
+import json
+import os
+
+def create_video(payload):
+    image_files = payload.get('imageFiles', [])
+    audio_file = payload.get('audioFile')
+    output_path = payload.get('outputPath')
+
+    if not all([image_files, audio_file, output_path]):
+        raise ValueError("Missing imageFiles, audioFile, or outputPath in payload")
+
+    # --- Input Streams ---
+    # This syntax is the most robust for creating a looping video from a static image.
+    image_inputs = [
+    ]
+    audio_input = ffmpeg.input(audio_file)
+
+    # --- Filter Graph ---
+    processed_video_streams = []
+    for i, (file, stream) in enumerate(zip(image_files, image_inputs)):
+        scaled_stream = stream.filter('scale', '1080', '1920', force_original_aspect_ratio='decrease')
+        scaled_stream = scaled_stream.filter('pad', '1080', '1920', '(ow-iw)/2', '(oh-ih)/2')
+        scaled_stream = scaled_stream.filter('setsar', 1)
+
+        duration = file['duration']
+        fade_out_start = max(0, duration - 0.5)
+        processed_stream = scaled_stream.filter('fade', type='in', start_time=0, duration=0.5)
+        processed_stream = processed_stream.filter('fade', type='out', start_time=fade_out_start, duration=0.5)
+        processed_video_streams.append(processed_stream.format('yuv420p'))
+
+    concatenated_video = ffmpeg.concat(*processed_video_streams, v=1, a=0)
+
+    (
+        ffmpeg.output(concatenated_video, audio_input.audio, output_path, vcodec='libx264', acodec='aac', r=30, shortest=None)
+        .overwrite_output()
+        .run(capture_stdout=True, capture_stderr=True)
+    )
+
+if __name__ == "__main__":
+    try:
+        data = json.loads(sys.argv[1])
+        create_video(data)
+        print(json.dumps({"status": "success", "path": data['outputPath']}))
+    except Exception as e:
+        print(json.dumps({"status": "error", "message": str(e)}), file=sys.stderr)
+        sys.exit(1)
+        `.trim();
+    }
+
+    private async createVideoWithPython(imageFiles: { path: string, duration: number, ffmpegCommand?: string, onScreenText?: string }[], audioFile: string, outputPath: string): Promise<string> {
+        return new Promise(async (resolve, reject) => {
+            console.log('Routing video creation to Python processor...');
+
+            // Create a temporary file for the Python script to guarantee we run the correct version.
+            const pythonScriptContent = this.getPythonProcessorScript();
+            const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'py-proc-'));
+            const pythonScriptPath = path.join(tempDir, 'video_processor.py');
+            await fs.writeFile(pythonScriptPath, pythonScriptContent);
+
+            // Resolve asset paths to be absolute before sending to the Python script
+            const resolvedImageFiles = imageFiles.map(file => {
+                try {
+                    const imageName = path.basename(file.path);
+                    const validPath = this.findAssetPath(imageName);
+                    return { ...file, path: validPath };
+                } catch (error) {
+                    // Propagate the error if an asset is not found
+                    throw error;
+                }
+            });
+
+            const payload = {
+                imageFiles: resolvedImageFiles,
+                audioFile,
+                outputPath
+            };
+
+            const args = [pythonScriptPath, JSON.stringify(payload)];
+            console.log('Spawning Python with args:', ['python', ...args].join(' '));
+            const pythonProcess = spawn('python', args);
+
+            let stdout = '';
+            let stderr = '';
+
+            pythonProcess.stdout.on('data', (data) => { stdout += data.toString(); });
+            pythonProcess.stderr.on('data', (data) => { stderr += data.toString(); });
+
+            pythonProcess.on('close', (code) => {
+                // Clean up the temporary directory
+                fs.rm(tempDir, { recursive: true, force: true });
+
+                if (code === 0) {
+                    console.log('Python script finished successfully.');
+                    const result = JSON.parse(stdout);
+                    resolve(result.path);
+                } else {
+                    console.error(`Python script exited with code ${code}.`);
+                    const errorResult = JSON.parse(stderr || '{"message": "Unknown error with empty stderr"}');
+                    reject(new Error(`Python video processing failed: ${errorResult.message}`));
+                }
+            });
+
+            pythonProcess.on('error', (err) => reject(new Error(`Failed to start Python process: ${err.message}`)));
+        });
+    }
+
     public async createVideoFromAssets(imageFiles: { path: string, duration: number, ffmpegCommand?: string, onScreenText?: string }[], audioFile: string, outputPath: string): Promise<string> {
+        if (USE_PYTHON_VIDEO_PROCESSOR) {
+            return this.createVideoWithPython(imageFiles, audioFile, outputPath);
+        }
         return new Promise((resolve, reject) => {
             const commandBuilder = this.ffmpegCommandBuilder();
             // 1. Add image and audio inputs, validating image paths
