@@ -43,6 +43,18 @@ interface VideoIdea {
 }
 import { ffmpegEffectsService, EffectLayer } from './ffmpeg.effects.service';
 import { audioCompositionService } from './audio.composition.service';
+import { ffmpegFilterLibrary } from './ffmpeg.filter.library';
+
+// --- Type Definitions for Microservice Communication ---
+interface RenderSuccessResponse {
+    status: 'success';
+    path: string;
+}
+
+interface RenderErrorResponse {
+    detail: string;
+}
+
 
 class GeminiService {
     private ai: GoogleGenAI;
@@ -295,184 +307,32 @@ class GeminiService {
         });
     }
 
-    public async generateFfmpegCommands(scenes: { id: string, effect: string, duration: string }[]): Promise<Record<string, string>> {
-        // Using @sinclair/typebox would be a great refactor, but for now, let's fix the native schema.
-        // The key is to remove `additionalProperties` from the top-level `params` object
-        // and define it as a flexible record-like structure.
-        const effectLayerSchema = {
-            type: Type.OBJECT,
-            properties: {
-                name: { type: Type.STRING, description: "The name of the effect, e.g., 'zoom', 'gaussianBlur', 'shake'." },
-                startTime: { type: Type.NUMBER, description: "Start time of the effect in seconds from the beginning of the clip." },
-                endTime: { type: Type.NUMBER, description: "End time of the effect in seconds from the beginning of the clip." },
-                params: {
-                    type: Type.OBJECT,
-                    nullable: true, // Allow params to be omitted for effects like 'vignette'
-                    description: "A dictionary of parameters for the effect. Values can be static or an object for animation.",
-                    // FIX: Explicitly define all possible parameter keys to satisfy the API's non-empty `properties` rule.
-                    properties: {
-                        level: {
-                            oneOf: [{ type: Type.NUMBER }, {
-                                type: Type.OBJECT,
-                                properties: { start: { type: Type.NUMBER }, end: { type: Type.NUMBER }, easing: { type: Type.STRING } },
-                                required: ['start', 'end']
-                            }]
-                        },
-                        direction: { type: Type.STRING },
-                        type: { type: Type.STRING },
-                        sigma: {
-                            oneOf: [{ type: Type.NUMBER }, {
-                                type: Type.OBJECT,
-                                properties: { start: { type: Type.NUMBER }, end: { type: Type.NUMBER }, easing: { type: Type.STRING } },
-                                required: ['start', 'end']
-                            }]
-                        },
-                        intensity: {
-                            oneOf: [{ type: Type.NUMBER }, {
-                                type: Type.OBJECT,
-                                properties: { start: { type: Type.NUMBER }, end: { type: Type.NUMBER }, easing: { type: Type.STRING } },
-                                required: ['start', 'end']
-                            }]
-                        }
-                    }
-                },
-            },
-            required: ['name', 'startTime', 'endTime'], // `params` is correctly optional
-        };
-
-        const sceneEffectSchema = {
-            type: Type.OBJECT,
-            // Add id to the schema for each item in the array
-            properties: {
-                id: { type: Type.STRING },
-                effects: { type: Type.ARRAY, items: effectLayerSchema, nullable: true },
-                customCommand: { type: Type.STRING, nullable: true }
-            },
-            required: ['id', 'effects']
-        };
-
-        const responseSchema = {
-            // The root of the response is now an ARRAY of scene effects
-            type: Type.ARRAY,
-            items: sceneEffectSchema
-        };
-
-        const prompt = `
-            You are an expert video effect analyst. Your task is to deconstruct a natural language effect description into a structured, machine-readable JSON array of effect layers.
-            
-            **Primary Method: Structured Layers (Preferred)**
-            Whenever possible, deconstruct the effect into a JSON array for the "effects" key. This is the most reliable method.
-            
-            **Available Effect Names and their Parameters:**
-            - **zoom**: params: { level: { start: 1.0, end: 1.2 } } // level > 1 is zoom in, < 1 is zoom out
-            - **pan**: params: { direction: 'left' | 'right' | 'up' | 'down' }
-            - **fade**: params: { type: 'in' | 'out' }
-            - **gaussianBlur**: params: { sigma: { start: 5, end: 0 } } // sigma is the blur intensity
-            - **shake**: params: { intensity: { start: 4, end: 0 } } // intensity is pixel displacement
-            - **vignette**: params: {} // No parameters needed
-            - **fisheye_wobble**: params: {} // No parameters needed
-
-            **Fallback Method: Custom Command**
-            If the requested effect is too complex or creative for the structured layers (e.g., "a glitchy, datamosh transition", "a dreamy, watercolor painting effect"), generate a raw FFMPEG filter graph string for the "customCommand" field instead. In this case, the "effects" field should be null.
-
-            **Rules:**
-            1. Your response MUST be a JSON array.
-            2. Each object in the array represents a scene and MUST contain an "id".
-            3. Each object MUST contain EITHER an "effects" key (an array of structured effect layers) OR a "customCommand" key (a single string), but not both.
-            4. For "effects", each layer object must have a 'name', 'startTime', and 'endTime'.
-            5. 'startTime' and 'endTime' are in seconds, relative to the clip's own duration.
-            6. For animated effects (like a blur that fades), use a parameter object with 'start', 'end', and an optional 'easing' ('linear', 'easeIn', 'easeOut', 'easeInOut').
-            7. For static effects or simple directional effects, use a direct value (e.g., "direction": "right").
-            8. When using "customCommand", provide only the filter graph content, not the full "ffmpeg -i ... -vf ..." command. For example: "edgedetect=low=0.1:high=0.4,format=yuv420p".
-            9. Always ensure custom commands end with ',format=yuv420p' for compatibility.
-            10. Prioritize the structured "effects" method. Only use "customCommand" as a fallback for highly creative requests.
-            11. Respond ONLY with a valid JSON array matching the schema.
-
-            **Example Request:**
-            [{"id": "scene_1", "effect": "Start with a dreamy, soft focus that slowly sharpens over the first 3 seconds. Simultaneously, do a slow zoom-in across the entire 5-second clip."}]
-
-            **Example Response:**
-            [
-              { "id": "scene_1", "effects": [ { "name": "gaussianBlur", "startTime": 0, "endTime": 3, "params": { "sigma": { "start": 5, "end": 0 } } }, { "name": "zoom", "startTime": 0, "endTime": 5, "params": { "level": { "start": 1.0, "end": 1.15 } } } ] }
-            ]
-
-            **INPUT SCENES:**
-            ${JSON.stringify(scenes.map(s => ({id: s.id, effect: s.effect})), null, 2)}
-        `;
-
-        const response = await this.ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-            config: { responseMimeType: "application/json", responseSchema: responseSchema, temperature: 0.0 }
-        });
-
-        if (!response.text) throw new Error('AI classification for FFMPEG effects failed.');
-        console.log('[AI Response - generateFfmpegCommands]:', response.text);
-
-        const structuredEffectsArray: {id: string, effects?: EffectLayer[], customCommand?: string}[] = JSON.parse(response.text);
-
-        const finalCommands: Record<string, string> = {};
-
-        // Create a map for easy lookup
-        const effectsMap = new Map(structuredEffectsArray.map(item => [item.id, { effects: item.effects, customCommand: item.customCommand }]));
-
-        for (const scene of scenes) {
-            const effectData = effectsMap.get(scene.id);
-            if (effectData?.customCommand) {
-                console.log(`[${scene.id}] Validating custom command:`, effectData.customCommand);
-                const validation = await this.validateFfmpegCommand(effectData.customCommand);
-                if (validation.isValid) {
-                    console.log(`[${scene.id}] Custom command is valid.`);
-                    finalCommands[scene.id] = effectData.customCommand;
-                } else {
-                    console.warn(`[${scene.id}] Custom command validation failed: ${validation.error}. Falling back to default.`);
-                    finalCommands[scene.id] = 'format=yuv420p';
-                }
-            } else if (Array.isArray(effectData?.effects) && effectData.effects.length > 0) {
-                console.log(`[${scene.id}] Composing effect from structured layers:`, effectData.effects);
-                finalCommands[scene.id] = ffmpegEffectsService.composer.compose(effectData.effects as EffectLayer[], { duration: parseFloat(scene.duration), width: 1080, height: 1920 });
-            } else {
-                console.log(`[${scene.id}] No valid effect layers found for '${scene.effect}'. Applying default format.`);
-                // This handles cases where the AI might fail to return an entry for a specific scene ID.
-                // Apply a default, safe filter if AI fails to provide a structure
-                finalCommands[scene.id] = 'format=yuv420p';
-            }
-        }
-
-        console.log('Final FFMPEG commands:', finalCommands);
-
-        return finalCommands;
-    }
-
-    public async generateSingleImage(payload: { sceneDescription: string, visualStyle: string, characterDescription: string | null, visualEffects: string[] }): Promise<{ publicUrl: string, localPath: string }> {
-        const { sceneDescription, visualStyle, characterDescription, visualEffects } = payload;
+    public async generateSingleImage(payload: { sceneDescription: string, visualStyle: string, characterDescription: string | null, visualEffects: string[], outputPath: string }): Promise<{ localPath: string }> {
+        const { sceneDescription, visualStyle, characterDescription, visualEffects, outputPath } = payload;
         const effectsString = visualEffects.join(', ');
 
         const prompt = characterDescription
             ? `${sceneDescription}. The main character is: ${characterDescription}. Style: ${visualStyle}, ${effectsString}. IMPORTANT: Ensure the character in this image matches this description precisely.`
             : `${sceneDescription}. Style: ${visualStyle}, ${effectsString}.`;
 
-        // Generate Image
         const response = await this.ai.models.generateImages({
             model: 'imagen-4.0-generate-001',
             prompt: prompt,
             config: { numberOfImages: 1, outputMimeType: 'image/jpeg', aspectRatio: '9:16' },
         });
 
-        if (!response.generatedImages || response.generatedImages.length === 0) throw new Error('No images generated');
-        const img = response.generatedImages[0];
-        if (!img || !img.image || !img.image.imageBytes) throw new Error('Malformed image response');
-        
-        // Save image and create URL
-        const imageBuffer = Buffer.from(img.image.imageBytes, 'base64');
-        const imageName = `generated_image_${Date.now()}.jpg`;
-        const publicDir = path.join(__dirname, '..', '..', 'public', 'assets', 'image');
-        await fs.mkdir(publicDir, { recursive: true });
-        const localPath = path.join(publicDir, imageName);
-        await fs.writeFile(localPath, imageBuffer);
+        const img = response.generatedImages?.[0];
 
-        const publicUrl = `${config.server.publicUrl}/assets/image/${imageName}`;
-        return { publicUrl, localPath };
+        // FIX: Use a type guard to ensure 'img', 'img.image', and 'img.image.imageBytes' are defined.
+        // This allows TypeScript to correctly narrow the type for subsequent access.
+        if (!img?.image?.imageBytes) {
+            throw new Error('No valid image data was returned from the AI model.');
+        }
+        
+        const imageBuffer = Buffer.from(img.image.imageBytes, 'base64');
+        await fs.writeFile(outputPath, imageBuffer);
+
+        return { localPath: outputPath };
     }
 
     /**
@@ -559,123 +419,69 @@ class GeminiService {
         throw new Error(`Asset "${filename}" not found in any of the search directories: ${searchDirs.join(', ')}`);
     }
 
-    /**
-     * This is the Python script content, stored as a string to bypass any build/caching issues.
-     * It will be written to a temporary file and executed.
-     */
-    private getPythonProcessorScript(): string {
-        return `
-import ffmpeg
-import sys
-import json
-import os
-
-def create_video(payload):
-    image_files = payload.get('imageFiles', [])
-    audio_file = payload.get('audioFile')
-    output_path = payload.get('outputPath')
-
-    if not all([image_files, audio_file, output_path]):
-        raise ValueError("Missing imageFiles, audioFile, or outputPath in payload")
-
-    # --- Input Streams ---
-    # This syntax is the most robust for creating a looping video from a static image.
-    image_inputs = [
-    ]
-    audio_input = ffmpeg.input(audio_file)
-
-    # --- Filter Graph ---
-    processed_video_streams = []
-    for i, (file, stream) in enumerate(zip(image_files, image_inputs)):
-        scaled_stream = stream.filter('scale', '1080', '1920', force_original_aspect_ratio='decrease')
-        scaled_stream = scaled_stream.filter('pad', '1080', '1920', '(ow-iw)/2', '(oh-ih)/2')
-        scaled_stream = scaled_stream.filter('setsar', 1)
-
-        duration = file['duration']
-        fade_out_start = max(0, duration - 0.5)
-        processed_stream = scaled_stream.filter('fade', type='in', start_time=0, duration=0.5)
-        processed_stream = processed_stream.filter('fade', type='out', start_time=fade_out_start, duration=0.5)
-        processed_video_streams.append(processed_stream.format('yuv420p'))
-
-    concatenated_video = ffmpeg.concat(*processed_video_streams, v=1, a=0)
-
-    (
-        ffmpeg.output(concatenated_video, audio_input.audio, output_path, vcodec='libx264', acodec='aac', r=30, shortest=None)
-        .overwrite_output()
-        .run(capture_stdout=True, capture_stderr=True)
-    )
-
-if __name__ == "__main__":
-    try:
-        data = json.loads(sys.argv[1])
-        create_video(data)
-        print(json.dumps({"status": "success", "path": data['outputPath']}))
-    except Exception as e:
-        print(json.dumps({"status": "error", "message": str(e)}), file=sys.stderr)
-        sys.exit(1)
-        `.trim();
-    }
-
-    private async createVideoWithPython(imageFiles: { path: string, duration: number, ffmpegCommand?: string, onScreenText?: string }[], audioFile: string, outputPath: string): Promise<string> {
+    private async createVideoWithMicroservice(imageFiles: { path: string, duration: number, ffmpegCommand?: string, onScreenText?: string }[], audioFile: string, outputPath: string): Promise<string> {
         return new Promise(async (resolve, reject) => {
-            console.log('Routing video creation to Python processor...');
+            console.log('Routing video creation to Python microservice...');
 
-            // Create a temporary file for the Python script to guarantee we run the correct version.
-            const pythonScriptContent = this.getPythonProcessorScript();
-            const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'py-proc-'));
-            const pythonScriptPath = path.join(tempDir, 'video_processor.py');
-            await fs.writeFile(pythonScriptPath, pythonScriptContent);
-
-            // Resolve asset paths to be absolute before sending to the Python script
+            // FIX: The `findAssetPath` function is only for pre-existing assets in /public.
+            // The image files passed here are newly generated in a temp directory.
+            // We just need to ensure their paths are absolute, which `path.resolve` does.
             const resolvedImageFiles = imageFiles.map(file => {
-                try {
-                    const imageName = path.basename(file.path);
-                    const validPath = this.findAssetPath(imageName);
-                    return { ...file, path: validPath };
-                } catch (error) {
-                    // Propagate the error if an asset is not found
-                    throw error;
-                }
+                return {
+                    ...file,
+                    path: path.resolve(file.path) // Ensure the path is absolute.
+                };
             });
 
+            // The audio file path and output path also need to be absolute.
+            const resolvedAudioFile = path.resolve(audioFile);
+            const resolvedOutputPath = path.resolve(outputPath);
+            
             const payload = {
                 imageFiles: resolvedImageFiles,
-                audioFile,
-                outputPath
+                audioFile: resolvedAudioFile,
+                outputPath: resolvedOutputPath
             };
 
-            const args = [pythonScriptPath, JSON.stringify(payload)];
-            console.log('Spawning Python with args:', ['python', ...args].join(' '));
-            const pythonProcess = spawn('python', args);
+            const rendererUrl = 'http://localhost:8001/render'; // URL of the new Python service
+            console.log(`Sending render request to ${rendererUrl}`);
+            
+            // --- DEBUG LOGGING: Inspect the payload before sending ---
+            // This will show the exact data being sent to the Python service.
+            console.log('--- PAYLOAD SENT TO PYTHON ---');
+            console.log(JSON.stringify(payload, null, 2));
+            console.log('------------------------------');
 
-            let stdout = '';
-            let stderr = '';
+            try {
+                const response = await fetch(rendererUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
 
-            pythonProcess.stdout.on('data', (data) => { stdout += data.toString(); });
-            pythonProcess.stderr.on('data', (data) => { stderr += data.toString(); });
+                const result = await response.json() as RenderSuccessResponse | RenderErrorResponse;
 
-            pythonProcess.on('close', (code) => {
-                // Clean up the temporary directory
-                fs.rm(tempDir, { recursive: true, force: true });
-
-                if (code === 0) {
-                    console.log('Python script finished successfully.');
-                    const result = JSON.parse(stdout);
-                    resolve(result.path);
+                if (response.ok) {
+                    console.log('Microservice finished successfully:', result);
+                    resolve((result as RenderSuccessResponse).path);
                 } else {
-                    console.error(`Python script exited with code ${code}.`);
-                    const errorResult = JSON.parse(stderr || '{"message": "Unknown error with empty stderr"}');
-                    reject(new Error(`Python video processing failed: ${errorResult.message}`));
-                }
-            });
+                    console.error('Microservice returned an error:', result);
+                    // FIX: The 'detail' from a FastAPI validation error is an array of objects.
+                    // We need to stringify it to get a readable error message.
+                    const errorDetail = (result as RenderErrorResponse).detail;
+                    const errorMessage = typeof errorDetail === 'string' ? errorDetail : JSON.stringify(errorDetail, null, 2);
 
-            pythonProcess.on('error', (err) => reject(new Error(`Failed to start Python process: ${err.message}`)));
+                    reject(new Error(`Python microservice failed: ${errorMessage || 'Unknown error'}`));
+                }
+            } catch (error: any) {
+                reject(new Error(`Failed to connect to Python microservice: ${error.message}`));
+            }
         });
     }
 
     public async createVideoFromAssets(imageFiles: { path: string, duration: number, ffmpegCommand?: string, onScreenText?: string }[], audioFile: string, outputPath: string): Promise<string> {
         if (USE_PYTHON_VIDEO_PROCESSOR) {
-            return this.createVideoWithPython(imageFiles, audioFile, outputPath);
+            return this.createVideoWithMicroservice(imageFiles, audioFile, outputPath);
         }
         return new Promise((resolve, reject) => {
             const commandBuilder = this.ffmpegCommandBuilder();
@@ -890,83 +696,84 @@ if __name__ == "__main__":
 
         if (!response.text) throw new Error("Failed to get analysis from Gemini for the render error.");
         console.log('[AI Response - analyzeRenderError]:', response.text);
-        return response.text;
+        // The response is expected to be a JSON string, but let's parse it to ensure it's valid
+        // before returning, which also helps in catching malformed AI responses early.
+        // The return type of the outer function is `any`, so we return the parsed object.
+        const jsonString = this._extractJson(response.text);
+        if (!jsonString) throw new Error("Failed to extract JSON from Gemini's error analysis.");
+        return JSON.parse(jsonString);
     }
 
-    public async generateAndSaveAssets(company: Company, videoIdea: VideoIdea): Promise<void> {
+    public async generateAndSaveAssets(company: Company, videoIdea: VideoIdea, audioFilePath: string): Promise<string> {
         const generationId = Date.now().toString();
         const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'narrative-nexus-'));
+        console.log(`Created temporary directory for assets: ${tempDir}`);
         
         const characterDescription = await this.generateCharacterDescription(videoIdea);
         
-        // Generate FFMPEG commands for all scenes first
+        // 1. Generate FFMPEG commands from the local library
         // NOTE: This assumes the audio has been generated separately and its path will be provided
         // to the video rendering step. This function no longer creates the audio.
-        const scenesForFfmpeg = videoIdea.scenes.map(s => ({
-            id: s.id,
-            effect: s.effects,
-            duration: s.duration
-        }));
-        const ffmpegCommandsMap = await this.generateFfmpegCommands(scenesForFfmpeg);
+        // REMOVED AI DEPENDENCY: We now look up the command from our local library.
+        const ffmpegCommandsMap: Record<string, string> = {};
+        for (const scene of videoIdea.scenes) {
+            const effectName = scene.effects || 'default'; // Fallback to a default effect
+            const duration = parseFloat(scene.duration);
+            // Look up the filter in the library. If it exists, generate the command.
+            // If not, or if the frontend provides a full command, we'd use that.
+            // For now, we assume `scene.effects` is a name from our library.
+            const commandGenerator = ffmpegFilterLibrary[effectName] || ffmpegFilterLibrary.default;
+            ffmpegCommandsMap[scene.id] = commandGenerator(duration);
+        }
+        console.log('Generated FFMPEG commands from local library:', ffmpegCommandsMap);
 
+        // 2. Generate and save image for each scene directly into the temp directory
         const imageFilePaths: {path: string, duration: number, ffmpegCommand: string, onScreenText?: string}[] = [];
         for (const [index, scene] of videoIdea.scenes.entries()) {
-            // For the first scene, combine the name (hook) and description for a richer prompt.
-            // For subsequent scenes, the description alone is more direct and sufficient.
             const scenePrompt = index === 0
                 ? `${scene.name}: ${scene.description}`
                 : scene.description;
             
-            // generateSingleImage now saves the file and returns its path
-            const { localPath } = await this.generateSingleImage({ 
+            const tempImagePath = path.join(tempDir, `scene_${index}.jpg`);
+            await this.generateSingleImage({ 
                 sceneDescription: scenePrompt, 
                 visualStyle: videoIdea.visualStyle, 
                 characterDescription, 
-                visualEffects: scene.visualEffects || [] });
-
-            // The image is already saved, so we just need to copy it to the temp directory for ffmpeg processing.
-            const tempImagePath = path.join(tempDir, `scene_${index}.jpg`);
-            await fs.copyFile(localPath, tempImagePath);
-
-            imageFilePaths.push({ 
-                path: tempImagePath, 
-                duration: parseFloat(scene.duration) || 3,
-                ffmpegCommand: ffmpegCommandsMap[scene.id] || '', // Add the generated command
-                onScreenText: videoIdea.onScreenText?.find(txt => {
-                    const sceneStartTime = videoIdea.scenes.slice(0, index).reduce((acc, s) => acc + parseFloat(s.duration), 0);
-                    const sceneEndTime = sceneStartTime + parseFloat(scene.duration);
-                    const textStartTime = parseFloat(txt.time);
-                    // Check if the text's start time falls within the current scene's time range
-                    return textStartTime >= sceneStartTime && textStartTime < sceneEndTime;
-                })?.text
+                visualEffects: scene.visualEffects || [],
+                outputPath: tempImagePath
             });
+
+            // FIX: Construct the payload object explicitly to prevent serialization errors.
+            // The previous implementation had a subtle bug where an undefined `onScreenText`
+            // could cause the `ffmpegCommand` to be serialized incorrectly as an empty object. This ensures a default string is always present.
+            const imagePayload: { path: string; duration: number; ffmpegCommand: string; onScreenText?: string } = {
+                path: tempImagePath,
+                duration: parseFloat(scene.duration) || 3,
+                // CRITICAL FIX: Ensure a default string is provided if the map lookup is undefined.
+                ffmpegCommand: ffmpegCommandsMap[scene.id] || 'format=yuv420p',
+            };
+
+            const onScreenTextObject = videoIdea.onScreenText?.find(txt => {
+                const sceneStartTime = videoIdea.scenes.slice(0, index).reduce((acc, s) => acc + parseFloat(s.duration), 0);
+                const sceneEndTime = sceneStartTime + parseFloat(scene.duration);
+                return parseFloat(txt.time) >= sceneStartTime && parseFloat(txt.time) < sceneEndTime;
+            });
+
+            if (onScreenTextObject?.text) {
+                imagePayload.onScreenText = onScreenTextObject.text;
+            }
+            imageFilePaths.push(imagePayload);
         }
 
-        // After successful video creation, save any newly generated effects
+        // 3. Create the video using the generated assets
         const videoOutputPath = path.join(tempDir, 'output.mp4');
-        
-        // This function now requires the path to a pre-generated audio file.
-        // Since this monolithic 'generateAndSaveAssets' function doesn't have it,
-        // we cannot proceed with video creation. The frontend should use the /render-video endpoint instead.
-        const audioFilePath = ''; // This workflow is now deprecated and cannot create the video.
-        await this.createVideoFromAssets(imageFilePaths, audioFilePath, videoOutputPath);
+        await this.createVideoFromAssets(imageFilePaths, audioFilePath, videoOutputPath); // CRITICAL FIX: Use the provided audioFilePath
 
+        // 4. Save final assets to GitHub
         const videoBuffer = await fs.readFile(videoOutputPath);
         const videoFileName = `${company.name.toLowerCase().replace(/\s+/g, '_')}_${generationId}.mp4`;
         if (githubService) await githubService.saveAsset('video', videoFileName, videoBuffer.toString('base64'));
 
-        // --- SELF-IMPROVEMENT STEP ---
-        // If video generation was successful, add any new AI-generated effects to our library.
-        for (const scene of videoIdea.scenes) {
-            // The self-improvement logic based on direct generation is no longer needed with the structured approach.
-            // We can re-introduce a different kind of learning later if desired.
-        }
-
-        // Save audio and images as well
-        // The audio buffer is no longer available here.
-        const audioFileName = `${company.name.toLowerCase().replace(/\s+/g, '_')}_${generationId}.mp3`;
-        const audioBuffer = Buffer.from(''); // Empty buffer as placeholder
-        if (githubService) await githubService.saveAsset('audio', audioFileName, audioBuffer.toString('base64'));
         for (const [index, img] of imageFilePaths.entries()) {
             const scene = videoIdea.scenes[index];
             const sceneName = scene.name.toLowerCase().replace(/\s+/g, '_');
@@ -975,8 +782,12 @@ if __name__ == "__main__":
             if (githubService) await githubService.saveAsset('image', imageFileName, imageContent.toString('base64'));
         }
 
-        // Clean up temporary directory
+        // 5. Clean up temporary directory
         await fs.rm(tempDir, { recursive: true, force: true });
+        console.log(`Cleaned up temporary directory: ${tempDir}`);
+
+        // Return the path or URL of the final video saved to GitHub
+        return `path/to/github/video/${videoFileName}`; // Placeholder return value
     }
 }
 

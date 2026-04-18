@@ -1,12 +1,108 @@
-Routing video creation to Python processor...
-Spawning Python with args: python C:\Users\HP\AppData\Local\Temp\py-proc-1bbMFz\video_processor.py {"imageFiles":[{"path":"C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\downloads\\images\\1764605073017-347852191.jpeg","duration":1,"ffmpegCommand":{}},{"path":"C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\downloads\\images\\1764605144661-326337820.jpeg","duration":1,"ffmpegCommand":{}},{"path":"C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\downloads\\images\\1764605204801-512777631.jpeg","duration":1,"ffmpegCommand":{}},{"path":"C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\downloads\\images\\1764605247615-381779634.jpeg","duration":2,"ffmpegCommand":{}},{"path":"C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\downloads\\images\\1764605359278-722532433.jpeg","duration":1.5,"ffmpegCommand":{}},{"path":"C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\downloads\\images\\1764605423132-218974218.jpeg","duration":1.5,"ffmpegCommand":{}},{"path":"C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\downloads\\images\\1764605527874-9293379.jpeg","duration":1,"ffmpegCommand":{}},{"path":"C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\downloads\\images\\1764605616770-262837586.jpeg","duration":3,"ffmpegCommand":{}},{"path":"C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\downloads\\images\\1764605630803-140798854.png","duration":3,"ffmpegCommand":{}},{"path":"C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\downloads\\images\\1764605641317-746816974.jpeg","duration":3,"ffmpegCommand":{}},{"path":"C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\downloads\\images\\1764605693139-504812849.jpeg","duration":1,"ffmpegCommand":{}},{"path":"C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\downloads\\images\\1764605791008-466946636.jpeg","duration":5,"ffmpegCommand":{}},{"path":"C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\downloads\\images\\1764605828966-100595824.jpeg","duration":3,"ffmpegCommand":{}},{"path":"C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\downloads\\images\\1764605929249-896849221.jpeg","duration":3,"ffmpegCommand":{}},{"path":"C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\downloads\\images\\1764606036565-838733097.jpeg","duration":3,"ffmpegCommand":{}},{"path":"C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\downloads\\images\\1764606061699-158969296.jpeg","duration":3,"ffmpegCommand":{}},{"path":"C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\downloads\\images\\1764606164396-288815942.jpeg","duration":2,"ffmpegCommand":{}}],"audioFile":"C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\assets\\audio\\viral_audio_2025-12-01T16-03-07-910Z.mp3","outputPath":"C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\assets\\videos\\I_automated_90__of_my_writing__Here_s_the_secret__1764606211120.mp4"}
-Python script exited with code 1.
-Error in /render-video route: Error: Python video processing failed: input() got an unexpected keyword argument 'framerate'    at ChildProcess.<anonymous> (C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\src\services\gemini.service.ts:669:28)
-    at ChildProcess.emit (node:events:519:28)
-    at maybeClose (node:internal/child_process:1101:16)
-    at Process.ChildProcess._handle.onexit (node:internal/child_process:304:5)
-Error: Python video processing failed: input() got an unexpected keyword argument 'framerate'
-    at ChildProcess.<anonymous> (C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\src\services\gemini.service.ts:669:28)
-    at ChildProcess.emit (node:events:519:28)
-    at maybeClose (node:internal/child_process:1101:16)
-    at Process.ChildProcess._handle.onexit (node:internal/child_process:304:5)
+--- PAYLOAD SENT TO PYTHON ---
+{
+  "imageFiles": [
+    {
+      "path": "C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\assets\\images\\1765211341305-892969870.jpeg",
+      "duration": 1,
+      "ffmpegCommand": {}
+    },
+    {
+      "path": "C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\assets\\images\\1765211343395-839745656.jpeg",
+      "duration": 1.5,
+      "ffmpegCommand": {}
+    },
+    {
+      "path": "C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\assets\\images\\1765211345909-276232893.jpeg",
+      "duration": 1.5,
+      "ffmpegCommand": {}
+    },
+    {
+      "path": "C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\assets\\images\\1765211346976-368799186.jpeg",
+      "duration": 1,
+      "ffmpegCommand": {}
+    },
+    {
+      "path": "C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\assets\\images\\1765211349084-647406785.jpeg",
+      "duration": 1,
+      "ffmpegCommand": {}
+    },
+    {
+      "path": "C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\assets\\images\\1765211350430-251082627.jpeg",
+      "duration": 1,
+      "ffmpegCommand": {}
+    },
+    {
+      "path": "C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\assets\\images\\1765211351644-630037578.jpeg",
+      "duration": 1,
+      "ffmpegCommand": {}
+    },
+    {
+      "path": "C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\assets\\images\\1765211354136-80085988.jpeg",
+      "duration": 1,
+      "ffmpegCommand": {}
+    },
+    {
+      "path": "C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\assets\\images\\1765211355820-405555704.jpeg",
+      "duration": 3.5,
+      "ffmpegCommand": {}
+    },
+    {
+      "path": "C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\assets\\images\\1765211358569-810788362.jpeg",
+      "duration": 3.5,
+      "ffmpegCommand": {}
+    },
+    {
+      "path": "C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\assets\\images\\1765211361728-738558183.jpeg",
+      "duration": 3.5,
+      "ffmpegCommand": {}
+    },
+    {
+      "path": "C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\assets\\images\\1765211365246-435799374.jpeg",
+      "duration": 1,
+      "ffmpegCommand": {}
+    },
+    {
+      "path": "C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\assets\\images\\1765211367589-521470945.jpeg",
+      "duration": 3.5,
+      "ffmpegCommand": {}
+    },
+    {
+      "path": "C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\assets\\images\\1765211369451-494722912.jpeg",
+      "duration": 3,
+      "ffmpegCommand": {}
+    },
+    {
+      "path": "C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\assets\\images\\1765211370743-347198562.jpeg",
+      "duration": 3,
+      "ffmpegCommand": {}
+    },
+    {
+      "path": "C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\assets\\images\\1765211372715-170439250.jpeg",
+      "duration": 2,
+      "ffmpegCommand": {}
+    },
+    {
+      "path": "C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\assets\\images\\1765211374441-404465208.jpeg",
+      "duration": 3,
+      "ffmpegCommand": {}
+    },
+    {
+      "path": "C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\assets\\images\\1765211376784-772291367.jpeg",
+      "duration": 3,
+      "ffmpegCommand": {}
+    }
+  ],
+  "audioFile": "C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\assets\\audio\\viral_audio_2025-12-08T16-28-23-998Z.mp3",
+  "outputPath": "C:\\Users\\HP\\OneDrive\\Documents\\narrative-nexus-ai\\backend\\public\\assets\\videos\\I_automated_90__of_my_writing__Here_s_the_secret__1765214448377.mp4"
+}
+------------------------------
+Microservice returned an error: {
+  detail: "Video processing failed: module 'ffmpeg' has no attribute 'complex_filter'"
+}
+Error in /render-video route: Error: Python microservice failed: Video processing failed: module 'ffmpeg' has no attribute 
+'complex_filter'
+    at C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\src\services\gemini.service.ts:474:28
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+Error: Python microservice failed: Video processing failed: module 'ffmpeg' has no attribute 'complex_filter'
+    at C:\Users\HP\OneDrive\Documents\narrative-nexus-ai\backend\src\services\gemini.service.ts:474:28
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
